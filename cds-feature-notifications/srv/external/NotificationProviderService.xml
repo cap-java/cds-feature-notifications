@@ -1,0 +1,354 @@
+<?xml version="1.0" ?>
+<edmx:Edmx xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" Version="1.0">
+<edmx:DataServices m:DataServiceVersion="1.0" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata">
+<Schema Namespace="com.SAP.OData.V2.NotificationProviderService" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+<EntityType Name="Notification">
+<Key>
+<PropertyRef Name="Id">
+</PropertyRef>
+</Key>
+<Property Name="Id" Type="Edm.Guid" Nullable="false">
+</Property>
+<Property Name="OriginId" Type="Edm.String" Nullable="true" MaxLength="200">
+</Property>
+<Property Name="NotificationTypeId" Type="Edm.Guid" Nullable="false">
+</Property>
+<Property Name="NotificationTypeKey" Type="Edm.String" Nullable="false" MaxLength="128">
+</Property>
+<Property Name="NotificationTypeVersion" Type="Edm.String" Nullable="true" MaxLength="20">
+</Property>
+<Property Name="NotificationTemplateKey" Type="Edm.String" Nullable="true">
+</Property>
+<Property Name="NavigationTargetAction" Type="Edm.String" Nullable="true" MaxLength="500">
+</Property>
+<Property Name="NavigationTargetObject" Type="Edm.String" Nullable="true" MaxLength="500">
+</Property>
+<Property Name="Priority" Type="Edm.String" Nullable="true" MaxLength="20">
+</Property>
+<Property Name="Severity" Type="Edm.String" Nullable="true" MaxLength="16">
+</Property>
+<Property Name="ProviderId" Type="Edm.String" Nullable="true" MaxLength="32">
+</Property>
+<Property Name="ActorId" Type="Edm.String" Nullable="true" MaxLength="20">
+</Property>
+<Property Name="ActorType" Type="Edm.String" Nullable="true" MaxLength="20">
+</Property>
+<Property Name="ActorDisplayText" Type="Edm.String" Nullable="true" MaxLength="120">
+</Property>
+<Property Name="ActorImageURL" Type="Edm.String" Nullable="true" MaxLength="100">
+</Property>
+<Property Name="NotificationTypeTimestamp" Type="Edm.DateTimeOffset" Nullable="true" MaxLength="36">
+</Property>
+<Property Name="RequiresRecipientBasedTranslation" Type="Edm.Boolean" Nullable="true">
+</Property>
+<NavigationProperty Name="Recipients" Relationship="com.SAP.OData.V2.NotificationProviderService.Notification_Recipient" FromRole="FromRole_Notification_Recipient" ToRole="ToRole_Notification_Recipient">
+</NavigationProperty>
+<NavigationProperty Name="Properties" Relationship="com.SAP.OData.V2.NotificationProviderService.Notification_NProperty" FromRole="FromRole_Notification_NProperty" ToRole="ToRole_Notification_NProperty">
+</NavigationProperty>
+<NavigationProperty Name="TargetParameters" Relationship="com.SAP.OData.V2.NotificationProviderService.Notification_NParams" FromRole="FromRole_Notification_NParams" ToRole="ToRole_Notification_NParams">
+</NavigationProperty>
+<NavigationProperty Name="Attachments" Relationship="com.SAP.OData.V2.NotificationProviderService.Notification_Attachment" FromRole="FromRole_Notification_Attachment" ToRole="ToRole_Notification_Attachment">
+</NavigationProperty>
+</EntityType>
+<EntityType Name="Recipient" m:HasStream="true">
+<Key>
+<PropertyRef Name="RecipientId">
+</PropertyRef>
+<PropertyRef Name="ProviderRecipientId">
+</PropertyRef>
+<PropertyRef Name="GlobalUserId">
+</PropertyRef>
+<PropertyRef Name="NotificationId">
+</PropertyRef>
+<PropertyRef Name="IasHost">
+</PropertyRef>
+<PropertyRef Name="TenantId">
+</PropertyRef>
+<PropertyRef Name="XsuaaLevel">
+</PropertyRef>
+<PropertyRef Name="RoleName">
+</PropertyRef>
+</Key>
+<Property Name="NotificationId" Type="Edm.Guid" Nullable="false">
+</Property>
+<Property Name="RecipientId" Type="Edm.String" Nullable="false" MaxLength="254">
+</Property>
+<Property Name="ProviderRecipientId" Type="Edm.String" Nullable="false" MaxLength="254">
+</Property>
+<Property Name="GlobalUserId" Type="Edm.String" Nullable="false" MaxLength="36">
+</Property>
+<Property Name="IasHost" Type="Edm.String" Nullable="false" MaxLength="254">
+</Property>
+<Property Name="IasGroupId" Type="Edm.String" Nullable="true" MaxLength="36">
+</Property>
+<Property Name="Language" Type="Edm.String" Nullable="false" MaxLength="5">
+</Property>
+<Property Name="NotificationId" Type="Edm.Guid" Nullable="false">
+</Property>
+<Property Name="XsuaaLevel" Type="Edm.String" Nullable="false" MaxLength="254">
+</Property>
+<Property Name="TenantId" Type="Edm.String" Nullable="false" MaxLength="36">
+</Property>
+<Property Name="RoleName" Type="Edm.String" Nullable="false" MaxLength="254">
+</Property>
+<Property Name="IasHostIdentification" Type="Edm.Boolean" Nullable="true">
+</Property>
+</EntityType>
+<EntityType Name="NotificationProperty" m:HasStream="true">
+<Key>
+<PropertyRef Name="Key">
+</PropertyRef>
+<PropertyRef Name="NotificationId">
+</PropertyRef>
+<PropertyRef Name="Language">
+</PropertyRef>
+</Key>
+<Property Name="NotificationId" Type="Edm.Guid" Nullable="false">
+</Property>
+<Property Name="Language" Type="Edm.String" Nullable="false" MaxLength="5">
+</Property>
+<Property Name="Key" Type="Edm.String" Nullable="false" MaxLength="128">
+</Property>
+<Property Name="Value" Type="Edm.String" Nullable="false">
+</Property>
+<Property Name="Type" Type="Edm.String" Nullable="false" MaxLength="20">
+</Property>
+<Property Name="IsSensitive" Type="Edm.Boolean" Nullable="true">
+</Property>
+</EntityType>
+<EntityType Name="NavigationTargetParam" m:HasStream="true">
+<Key>
+<PropertyRef Name="Key">
+</PropertyRef>
+<PropertyRef Name="NotificationId">
+</PropertyRef>
+</Key>
+<Property Name="NotificationId" Type="Edm.Guid" Nullable="false">
+</Property>
+<Property Name="Key" Type="Edm.String" Nullable="false" MaxLength="250">
+</Property>
+<Property Name="Value" Type="Edm.String" Nullable="false">
+</Property>
+</EntityType>
+<EntityType Name="Attachment">
+<Key>
+<PropertyRef Name="NotificationId">
+</PropertyRef>
+</Key>
+<Property Name="NotificationId" Type="Edm.Guid" Nullable="false">
+</Property>
+<NavigationProperty Name="Headers" Relationship="com.SAP.OData.V2.NotificationProviderService.Attachment_AttachmentHeaders" FromRole="FromRole_Attachment" ToRole="ToRole_Attachment_AttachmentHeaders">
+</NavigationProperty>
+<NavigationProperty Name="Content" Relationship="com.SAP.OData.V2.NotificationProviderService.Attachment_AttachmentContent" FromRole="FromRole_Attachment" ToRole="ToRole_Attachment_AttachmentContent">
+</NavigationProperty>
+</EntityType>
+<EntityType Name="AttachmentHeaders">
+<Key>
+<PropertyRef Name="NotificationId">
+</PropertyRef>
+</Key>
+<Property Name="NotificationId" Type="Edm.Guid" Nullable="false">
+</Property>
+<Property Name="ContentType" Type="Edm.String">
+</Property>
+<Property Name="ContentDisposition" Type="Edm.String">
+</Property>
+<Property Name="ContentId" Type="Edm.String">
+</Property>
+</EntityType>
+<EntityType Name="AttachmentContent">
+<Key>
+<PropertyRef Name="NotificationId">
+</PropertyRef>
+</Key>
+<Property Name="NotificationId" Type="Edm.Guid" Nullable="false">
+</Property>
+<NavigationProperty Name="External" Relationship="com.SAP.OData.V2.NotificationProviderService.AttachmentContent_AttachmentContentExternal" FromRole="FromRole_AttachmentContent" ToRole="ToRole_AttachmentContent_AttachmentContentExternal">
+</NavigationProperty>
+</EntityType>
+<EntityType Name="AttachmentContentExternal">
+<Key>
+<PropertyRef Name="NotificationId">
+</PropertyRef>
+</Key>
+<Property Name="NotificationId" Type="Edm.Guid" Nullable="false">
+</Property>
+
+<Property Name="Path" Type="Edm.String">
+</Property>
+</EntityType>
+<Association Name="Notification_Recipient">
+<End Type="com.SAP.OData.V2.NotificationProviderService.Notification" Multiplicity="1" Role="FromRole_Notification_Recipient">
+</End>
+<End Type="com.SAP.OData.V2.NotificationProviderService.Recipient" Multiplicity="*" Role="ToRole_Notification_Recipient">
+</End>
+<ReferentialConstraint>
+<Principal Role="FromRole_Notification_Recipient">
+<PropertyRef Name="Id">
+</PropertyRef>
+</Principal>
+<Dependent Role="ToRole_Notification_Recipient">
+<PropertyRef Name="NotificationId">
+</PropertyRef>
+</Dependent>
+</ReferentialConstraint>
+</Association>
+<Association Name="Notification_NProperty">
+<End Type="com.SAP.OData.V2.NotificationProviderService.Notification" Multiplicity="1" Role="FromRole_Notification_NProperty">
+</End>
+<End Type="com.SAP.OData.V2.NotificationProviderService.NotificationProperty" Multiplicity="*" Role="ToRole_Notification_NProperty">
+</End>
+<ReferentialConstraint>
+<Principal Role="FromRole_Notification_NProperty">
+<PropertyRef Name="Id">
+</PropertyRef>
+</Principal>
+<Dependent Role="ToRole_Notification_NProperty">
+<PropertyRef Name="NotificationId">
+</PropertyRef>
+</Dependent>
+</ReferentialConstraint>
+</Association>
+<Association Name="Notification_NParams">
+<End Type="com.SAP.OData.V2.NotificationProviderService.Notification" Multiplicity="1" Role="FromRole_Notification_NParams">
+</End>
+<End Type="com.SAP.OData.V2.NotificationProviderService.NavigationTargetParam" Multiplicity="*" Role="ToRole_Notification_NParams">
+</End>
+<ReferentialConstraint>
+<Principal Role="FromRole_Notification_NParams">
+<PropertyRef Name="Id">
+</PropertyRef>
+</Principal>
+<Dependent Role="ToRole_Notification_NParams">
+<PropertyRef Name="NotificationId">
+</PropertyRef>
+</Dependent>
+</ReferentialConstraint>
+</Association>
+<Association Name="Notification_Attachment">
+<End Type="com.SAP.OData.V2.NotificationProviderService.Notification" Multiplicity="1" Role="FromRole_Notification">
+</End>
+<End Type="com.SAP.OData.V2.NotificationProviderService.Attachment" Multiplicity="*" Role="ToRole_Notification_Attachment">
+</End>
+<ReferentialConstraint>
+<Principal Role="FromRole_Notification">
+<PropertyRef Name="Id">
+</PropertyRef>
+</Principal>
+<Dependent Role="ToRole_Notification_Attachment">
+<PropertyRef Name="NotificationId">
+</PropertyRef>
+</Dependent>
+</ReferentialConstraint>
+</Association>
+<Association Name="Attachment_AttachmentHeaders">
+<End Type="com.SAP.OData.V2.NotificationProviderService.Attachment" Multiplicity="1" Role="FromRole_Attachment">
+</End>
+<End Type="com.SAP.OData.V2.NotificationProviderService.AttachmentHeaders" Multiplicity="1" Role="ToRole_Attachment_AttachmentHeaders">
+</End>
+<ReferentialConstraint>
+<Principal Role="FromRole_Attachment">
+<PropertyRef Name="Id">
+</PropertyRef>
+</Principal>
+<Dependent Role="ToRole_Attachment_AttachmentHeaders">
+<PropertyRef Name="NotificationId">
+</PropertyRef>
+</Dependent>
+</ReferentialConstraint>
+</Association>
+<Association Name="Attachment_AttachmentContent">
+<End Type="com.SAP.OData.V2.NotificationProviderService.Attachment" Multiplicity="1" Role="FromRole_Attachment">
+</End>
+<End Type="com.SAP.OData.V2.NotificationProviderService.AttachmentContent" Multiplicity="1" Role="ToRole_Attachment_AttachmentContent">
+</End>
+<ReferentialConstraint>
+<Principal Role="FromRole_Attachment">
+<PropertyRef Name="NotificationId">
+</PropertyRef>
+</Principal>
+<Dependent Role="ToRole_Attachment_AttachmentContent">
+<PropertyRef Name="NotificationId">
+</PropertyRef>
+</Dependent>
+</ReferentialConstraint>
+</Association>
+<Association Name="AttachmentContent_AttachmentContentExternal">
+<End Type="com.SAP.OData.V2.NotificationProviderService.AttachmentContent" Multiplicity="1" Role="FromRole_AttachmentContent">
+</End>
+<End Type="com.SAP.OData.V2.NotificationProviderService.AttachmentContentExternal" Multiplicity="1" Role="ToRole_AttachmentContent_AttachmentContentExternal">
+</End>
+<ReferentialConstraint>
+<Principal Role="FromRole_AttachmentContent">
+<PropertyRef Name="NotificationId">
+</PropertyRef>
+</Principal>
+<Dependent Role="ToRole_AttachmentContent_AttachmentContentExternal">
+<PropertyRef Name="NotificationId">
+</PropertyRef>
+</Dependent>
+</ReferentialConstraint>
+</Association>
+<EntityContainer Name="ODataNotificationsEntityContainer" m:IsDefaultEntityContainer="true">
+<EntitySet Name="Notifications" EntityType="com.SAP.OData.V2.NotificationProviderService.Notification">
+</EntitySet>
+<EntitySet Name="Recipients" EntityType="com.SAP.OData.V2.NotificationProviderService.Recipient">
+</EntitySet>
+<EntitySet Name="NotificationProperties" EntityType="com.SAP.OData.V2.NotificationProviderService.NotificationProperty">
+</EntitySet>
+<EntitySet Name="NavigationTargetParams" EntityType="com.SAP.OData.V2.NotificationProviderService.NavigationTargetParam">
+</EntitySet>
+<EntitySet Name="Attachments" EntityType="com.SAP.OData.V2.NotificationProviderService.Attachment">
+</EntitySet>
+<EntitySet Name="AttachmentHeaders" EntityType="com.SAP.OData.V2.NotificationProviderService.AttachmentHeaders">
+</EntitySet>
+<EntitySet Name="AttachmentContent" EntityType="com.SAP.OData.V2.NotificationProviderService.AttachmentContent">
+</EntitySet>
+<EntitySet Name="AttachmentContentExternal" EntityType="com.SAP.OData.V2.NotificationProviderService.AttachmentContentExternal">
+</EntitySet>
+<AssociationSet Name="Notification_Recipient_Set" Association="com.SAP.OData.V2.NotificationProviderService.Notification_Recipient">
+<End EntitySet="Notifications" Role="FromRole_Notification_Recipient">
+</End>
+<End EntitySet="Recipients" Role="ToRole_Notification_Recipient">
+</End>
+</AssociationSet>
+<AssociationSet Name="Notification_NProperty_Set" Association="com.SAP.OData.V2.NotificationProviderService.Notification_NProperty">
+<End EntitySet="Notifications" Role="FromRole_Notification_NProperty">
+</End>
+<End EntitySet="NotificationProperties" Role="ToRole_Notification_NProperty">
+</End>
+</AssociationSet>
+<AssociationSet Name="Notification_NParamsSet" Association="com.SAP.OData.V2.NotificationProviderService.Notification_NParams">
+<End EntitySet="Notifications" Role="FromRole_Notification_NParams">
+</End>
+<End EntitySet="NavigationTargetParams" Role="ToRole_Notification_NParams">
+</End>
+</AssociationSet>
+<AssociationSet Name="Notification_Attachment_Set" Association="com.SAP.OData.V2.NotificationProviderService.Notification_Attachment">
+<End EntitySet="Notifications" Role="FromRole_Notification">
+</End>
+<End EntitySet="Attachments" Role="ToRole_Notification_Attachment">
+</End>
+</AssociationSet>
+<AssociationSet Name="Attachment_Headers_Set" Association="com.SAP.OData.V2.NotificationProviderService.Attachment_AttachmentHeaders">
+<End EntitySet="Attachments" Role="FromRole_Attachment">
+</End>
+<End EntitySet="AttachmentHeaders" Role="ToRole_Attachment_AttachmentHeaders">
+</End>
+</AssociationSet>
+<AssociationSet Name="Attachment_Content_Set" Association="com.SAP.OData.V2.NotificationProviderService.Attachment_AttachmentContent">
+<End EntitySet="Attachments" Role="FromRole_Attachment">
+</End>
+<End EntitySet="AttachmentContent" Role="ToRole_Attachment_AttachmentContent">
+</End>
+</AssociationSet>
+<AssociationSet Name="Attachment_Content_External_Set" Association="com.SAP.OData.V2.NotificationProviderService.AttachmentContent_AttachmentContentExternal">
+<End EntitySet="AttachmentContent" Role="FromRole_AttachmentContent">
+</End>
+<End EntitySet="AttachmentContentExternal" Role="ToRole_AttachmentContent_AttachmentContentExternal">
+</End>
+</AssociationSet>
+</EntityContainer>
+</Schema>
+</edmx:DataServices>
+</edmx:Edmx>

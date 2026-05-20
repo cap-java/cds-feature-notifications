@@ -1,0 +1,17 @@
+
+---
+spring:
+  config:
+    activate:
+      on-profile: default
+#cds:
+#  remote:
+#    services:
+#      '[NotificationProviderService]':
+#        destination:
+#          name: NotificationProviderService
+#        type: odata-v2
+#      '[NotificationTypeProviderService]':
+#        destination:
+#          name: NotificationTypeProviderService
+#        type: odata-v2

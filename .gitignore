@@ -1,31 +1,67 @@
+# Generated files
 **/gen/
 **/edmx/
+
+# Databases
 *.db
 *.sqlite
 *.sqlite-wal
 *.sqlite-shm
 schema*.sql
-default-env.json
 
+# Environment / credentials
+default-*.json
+.cdsrc-private.json
+connection.properties
+
+# Build output
 **/bin/
 **/target/
+dist/
 .flattened-pom.xml
+
+# Eclipse
 .classpath
 .project
 .settings
 
+# Node
 **/node/
 **/node_modules/
 
+# MTA
 **/.mta/
+*_mta_build_tmp
 *.mtar
+mta_archives/
 
+# Logs / JVM
+*.log
 *.log*
 gc_history*
 hs_err*
 *.tgz
-*.iml
 
+# IDEs
 .vscode
 .idea
+*.iml
 .reloadtrigger
+
+# NPM
+.npmrc
+
+# Web IDE, App Studio
+.che/
+.gen/
+
+# OS
+.DS_Store
+**/.DS_Store
+*.orig
+
+# SAPUI5
+app/*/dist
+
+# VitePress
+_docs/.vitepress/cache

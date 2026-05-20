@@ -1,0 +1,13 @@
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  sql.init.platform: h2
+cds:
+  environment:
+    production:
+      enabled: true
+
+
+
