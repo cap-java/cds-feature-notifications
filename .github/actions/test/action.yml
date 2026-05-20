@@ -33,6 +33,6 @@ runs:
 
     - name: Test Bookshop App (Integration Tests)
       shell: bash
-      working-directory: samples/bookshop
+      working-directory: sample-app/srv
       run: |
         mvn test -B -V
