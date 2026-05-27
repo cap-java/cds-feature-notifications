@@ -5,6 +5,8 @@ package com.sap.cds.notifications;
 
 import cds.gen.notificationproviderservice.NotificationProviderService;
 import cds.gen.notificationproviderservice.NotificationProviderService_;
+import cds.gen.notificationtemplateproviderservice.NotificationTemplateProviderService;
+import cds.gen.notificationtemplateproviderservice.NotificationTemplateProviderService_;
 import cds.gen.notificationtypeproviderservice.NotificationTypeProviderService;
 import cds.gen.notificationtypeproviderservice.NotificationTypeProviderService_;
 import com.sap.cds.notifications.handlers.EntityNotificationHandler;
@@ -186,5 +188,27 @@ public class NotificationServiceConfiguration implements CdsRuntimeConfiguration
         .getRemote()
         .getServices()
         .put("NotificationTypeProviderService", notificationTypeConfig);
+
+    // Define the remote service for notification templates in CDS runtime that uses the
+    // SAP_Notifications destination
+    RemoteServiceConfig notificationTemplateConfig = new RemoteServiceConfig();
+
+    notificationTemplateConfig.setType("odata-v2");
+
+    notificationTemplateConfig.getDestination().setName("SAP_Notifications");
+
+    notificationTemplateConfig.getHttp().setSuffix("/odatav2");
+    notificationTemplateConfig.getHttp().setService("NotificationTemplate.svc");
+    notificationTemplateConfig.getHttp().getCsrf().setEnabled(true);
+
+    // Register the remote service in CDS runtime environment under the name
+    // "NotificationTemplateProviderService"
+    configurer
+        .getCdsRuntime()
+        .getEnvironment()
+        .getCdsProperties()
+        .getRemote()
+        .getServices()
+        .put("NotificationTemplateProviderService", notificationTemplateConfig);
   }
 }

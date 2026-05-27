@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -151,7 +150,7 @@
             <phase>generate-sources</phase>
             <configuration>
               <commands>
-                <command>compile ${project.basedir}/srv/external/*.cds ${project.basedir}/src/main/resources/cds/com.sap.cds/cds-feature-notifications/types.cds --to csn --dest ${project.build.directory}/cds-output/all.csn</command>
+                <command>compile ${project.basedir}/srv/external/*.cds --to csn --dest ${project.build.directory}/cds-output/all.csn</command>
               </commands>
             </configuration>
           </execution>
