@@ -155,6 +155,7 @@ public class NotificationBuilder {
     Notifications notification = Struct.create(Notifications.class);
     notification.setNotificationTypeKey(notificationTypeKey);
     notification.setNotificationTypeVersion("1");
+    notification.setNotificationTemplateKey(notificationTypeKey);
     notification.setPriority(priority);
     notification.setRecipients(recipientsList);
 

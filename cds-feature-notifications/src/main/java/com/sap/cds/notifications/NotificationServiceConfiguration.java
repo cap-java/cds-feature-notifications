@@ -11,7 +11,9 @@ import cds.gen.notificationtypeproviderservice.NotificationTypeProviderService;
 import cds.gen.notificationtypeproviderservice.NotificationTypeProviderService_;
 import com.sap.cds.notifications.handlers.EntityNotificationHandler;
 import com.sap.cds.notifications.handlers.LocalHandler;
+import com.sap.cds.notifications.handlers.LocalNotificationTemplateAutoProvisionerHandler;
 import com.sap.cds.notifications.handlers.LocalNotificationTypeAutoProvisionerHandler;
+import com.sap.cds.notifications.handlers.NotificationTemplateAutoProvisionerHandler;
 import com.sap.cds.notifications.handlers.NotificationTypeAutoProvisionerHandler;
 import com.sap.cds.notifications.handlers.ProductionHandler;
 import com.sap.cds.services.environment.CdsProperties;
@@ -74,6 +76,14 @@ public class NotificationServiceConfiguration implements CdsRuntimeConfiguration
             .getService(
                 NotificationTypeProviderService.class, NotificationTypeProviderService_.CDS_NAME);
 
+    NotificationTemplateProviderService templateProviderSvc =
+        configurer
+            .getCdsRuntime()
+            .getServiceCatalog()
+            .getService(
+                NotificationTemplateProviderService.class,
+                NotificationTemplateProviderService_.CDS_NAME);
+
     NotificationProviderService outboxedSvc;
     if (outbox != null) {
       outboxedSvc = outbox.outboxed(providerSvc);
@@ -89,13 +99,20 @@ public class NotificationServiceConfiguration implements CdsRuntimeConfiguration
     if (environment.getProduction().isEnabled()) {
       logger.info("Production mode enabled - using ProductionHandler");
       configurer.eventHandler(new ProductionHandler(outboxedSvc, configurer.getCdsRuntime()));
-      // Register handler for auto-provisioning on application prepared event
+      // Register handler for auto-provisioning standalone templates on application prepared event
+      configurer.eventHandler(
+          new NotificationTemplateAutoProvisionerHandler(
+              configurer.getCdsRuntime(), templateProviderSvc));
+      // Register handler for auto-provisioning notification types on application prepared event
       configurer.eventHandler(
           new NotificationTypeAutoProvisionerHandler(configurer.getCdsRuntime(), typeProviderSvc));
     } else {
       logger.info("Local mode enabled - using LocalHandler (notifications will be logged only)");
       configurer.eventHandler(new LocalHandler(configurer.getCdsRuntime()));
-      // Register local handler for auto-provisioning (logging only, not sending to ANS)
+      // Register local handler for auto-provisioning standalone templates (logging only)
+      configurer.eventHandler(
+          new LocalNotificationTemplateAutoProvisionerHandler(configurer.getCdsRuntime()));
+      // Register local handler for auto-provisioning notification types (logging only)
       configurer.eventHandler(
           new LocalNotificationTypeAutoProvisionerHandler(configurer.getCdsRuntime()));
     }

@@ -42,6 +42,7 @@ In **local mode**, notifications are logged to the console with no ANS binding r
   - [Identity Authentication Destination (Language Resolution)](#identity-authentication-destination-language-resolution)
     - [Step 1: Create a Technical User in Identity Authentication](#step-1-create-a-technical-user-in-identity-authentication)
     - [Step 2: Create the BTP Destination](#step-2-create-the-btp-destination)
+  - [Template Customization](#template-customization)
   - [Outbox](#outbox)
 - [Minimum Versions](#minimum-versions)
 - [Monitoring & Logging](#monitoring--logging)
@@ -144,12 +145,15 @@ The `template` section defines the visible content of the notification: titles, 
 | `@notification.template.groupedTitle` | **Yes** | Title shown when multiple notifications of the same type are collapsed into a single group (e.g. "Low stock alerts"). |
 | `@notification.template.email.subject` | No | Email subject line. |
 | `@notification.template.email.html` | No | Inline HTML or classpath path to HTML template file. See [Step 3](#step-3-add-email-html-template-optional) for details. |
+| `@notification.template.visibility` | No | Controls whether customer administrators can see and customize this template. `'PUBLIC'` or `'PRIVATE'` (default). See [Template Customization](#template-customization). |
 | `@notification.deliveryChannels` | No | How the notification is delivered: Web and/or Email. If omitted, notifications are delivered via Web only (no email). Each entry has: `channel` (`#Mail` or `#Web`), `enabled` (Boolean), and `defaultPreference` (Boolean, whether the channel is enabled by default for users). Note: setting `#Mail` here is not enough on its own. The ANS instance must be configured with an email infrastructure (see [ANS Service Binding](#option-1-ans-service-binding)). |
 | `@notification.priority` | No | You can set a static notification priority: Priority enum (`#LOW`, `#NEUTRAL`, `#MEDIUM`, `#HIGH`). Can also be a CDS expression (see [Dynamic Priority](#dynamic-priority)). |
 | `@Common.SemanticObject` | No | Maps to `NavigationTargetObject` in ANS. Used for SAP Fiori launchpad navigation. Allows users to navigate directly to the relevant Fiori application when clicking the notification in SAP Build Work Zone. |
 | `@Common.SemanticObjectAction` | No | Maps to `NavigationTargetAction` in ANS. Specifies which action to trigger on the semantic object (e.g. `'display'`). |
 | `recipients` | **Yes** | Who receives the notification. Supports 4 formats (see [Recipient Formats](#recipient-formats)). |
 | Event fields | No | Define `{{variableName}}` (Mustache syntax) placeholders in your templates and matching fields in the CDS event. When you emit a notification, set these fields with the actual values. The plugin passes them to ANS, which replaces the placeholders at delivery time. |
+
+> **Important:** Event names must be **unique across all services** in your application. The event name is used as the key for both NotificationType and NotificationTemplate in ANS. If two services define an event with the same name (e.g. `LowStockAlert`), the last one provisioned will silently overwrite the other.
 
 #### Step 2: Add i18n Translations (Optional)
 
@@ -714,6 +718,22 @@ Replace `<tenant-ID>` with your Identity Authentication tenant ID.
 Once configured, ANS can resolve each recipient's language preference from IAS and select the matching translation when delivering email notifications. For SAP Build Work Zone notifications, the user's Work Zone language setting is used instead of IAS.
 
 For the full setup guide, see [Identity Directory Connectivity](https://help.sap.com/docs/task-center/sap-task-center/identity-directory-connectivity?q=destination) in the SAP Task Center documentation.
+
+### Template Customization
+
+The plugin automatically provisions notification templates to ANS during application startup. These templates enable customer administrators to create customized copies of your notification content for their organization. For details on how template customization works from the admin perspective, see the [Template Customization documentation](https://github.wdf.sap.corp/pages/sl-hybrid/ans/notifications-scenario/template-customization/).
+
+By default, templates are `PRIVATE` (not visible to customer admins). To make a template visible and customizable by admins, set it to `PUBLIC`:
+
+```cds
+event BookOrdered : {
+  @notification.template.visibility: 'PUBLIC'
+  @notification.template.title: '{i18n>TEMPLATE_SENSITIVE}'
+  ...
+}
+```
+
+> **Important:** Once a template is made `PUBLIC`, it **cannot be reverted to `PRIVATE`**. This is enforced by ANS.
 
 ### Outbox
 
