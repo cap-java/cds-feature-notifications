@@ -65,3 +65,5 @@ app/*/dist
 
 # VitePress
 _docs/.vitepress/cache
+
+.DS_Store
