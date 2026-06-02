@@ -70,7 +70,7 @@ public class NotificationTypeBuilder {
       nt.setDeliveryChannels(deliveryChannels);
     }
 
-    logger.info("Extracted NotificationType: {}", key);
+    logger.debug("Extracted NotificationType: {}", key);
     return Optional.of(nt);
   }
 
@@ -140,7 +140,7 @@ public class NotificationTypeBuilder {
     if (emailHtmlValue != null && emailHtmlValue.endsWith(".html")) {
       String htmlContent = i18nHelper.loadHtmlFromClasspath(emailHtmlValue, i18nTexts);
       template.setEmailHtml(htmlContent);
-      logger.info("Loaded HTML template from file: {}", emailHtmlValue);
+      logger.debug("Loaded HTML template from file: {}", emailHtmlValue);
     } else {
       template.setEmailHtml(emailHtmlValue);
     }
@@ -192,7 +192,7 @@ public class NotificationTypeBuilder {
 
       deliveryChannels.add(deliveryChannel);
 
-      logger.info(
+      logger.debug(
           "Parsed delivery channel: Type={}, Enabled={}, DefaultPreference={}",
           deliveryChannel.getType(),
           deliveryChannel.getEnabled(),

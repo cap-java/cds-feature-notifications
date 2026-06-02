@@ -60,9 +60,9 @@ public class NotificationTypeProvisioningTest {
 
   @Test
   void testEachNotificationTypeHasUniqueId() {
-    LOG.info("==========================================");
-    LOG.info("Test: Each notification type should have a unique NotificationTypeId");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Each notification type should have a unique NotificationTypeId");
+    LOG.debug("==========================================");
 
     List<NotificationTypes> allTypes =
         NotificationTypeProviderServiceMockHandler.getAllNotificationTypes();
@@ -81,7 +81,7 @@ public class NotificationTypeProvisioningTest {
       assertFalse(id.isEmpty(), "NotificationTypeId should not be empty for: " + key);
 
       keyToId.put(key, id);
-      LOG.info("Type: {} → ID: {}", key, id);
+      LOG.debug("Type: {} → ID: {}", key, id);
     }
 
     // Verify all IDs are unique
@@ -91,7 +91,7 @@ public class NotificationTypeProvisioningTest {
         uniqueIds.size(),
         "Each notification type must have a UNIQUE NotificationTypeId. " + "Found IDs: " + keyToId);
 
-    LOG.info("All {} notification types have unique IDs", uniqueIds.size());
+    LOG.debug("All {} notification types have unique IDs", uniqueIds.size());
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -100,9 +100,9 @@ public class NotificationTypeProvisioningTest {
 
   @Test
   void testReProvisioningUpdatesEachTypeCorrectly() {
-    LOG.info("==========================================");
-    LOG.info("Test: Re-provisioning should update each type with its own correct data");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Re-provisioning should update each type with its own correct data");
+    LOG.debug("==========================================");
 
     // Record state BEFORE re-provisioning
     Map<String, String> idsBefore = new HashMap<>();
@@ -114,7 +114,7 @@ public class NotificationTypeProvisioningTest {
         EXPECTED_KEYS.size(), idsBefore.size(), "All types should exist before re-provisioning");
 
     // Trigger re-provisioning (simulates app restart)
-    LOG.info("Triggering re-provisioning...");
+    LOG.debug("Triggering re-provisioning...");
     createProvisioner().onApplicationPrepared();
 
     // Verify IDs remain the same (UPDATE, not new INSERT)
@@ -137,7 +137,7 @@ public class NotificationTypeProvisioningTest {
         "Maintenance Notice",
         "System maintenance scheduled for {{systemName}}");
 
-    LOG.info("Re-provisioning verified — all types retain correct data");
+    LOG.debug("Re-provisioning verified — all types retain correct data");
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -146,9 +146,9 @@ public class NotificationTypeProvisioningTest {
 
   @Test
   void testReProvisioningUpdatesAllTypes() {
-    LOG.info("==========================================");
-    LOG.info("Test: Re-provisioning should trigger UPDATE for each existing type");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Re-provisioning should trigger UPDATE for each existing type");
+    LOG.debug("==========================================");
 
     // Record update counts before
     Map<String, Integer> countsBefore = new HashMap<>();
@@ -175,10 +175,10 @@ public class NotificationTypeProvisioningTest {
               + ", After: "
               + after);
 
-      LOG.info("Type '{}': update count {} → {}", key, before, after);
+      LOG.debug("Type '{}': update count {} → {}", key, before, after);
     }
 
-    LOG.info("All {} types were updated during re-provisioning", EXPECTED_KEYS.size());
+    LOG.debug("All {} types were updated during re-provisioning", EXPECTED_KEYS.size());
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -187,9 +187,9 @@ public class NotificationTypeProvisioningTest {
 
   @Test
   void testNoDataCrossContaminationBetweenTypes() {
-    LOG.info("==========================================");
-    LOG.info("Test: Each type's English template must contain its own specific content");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Each type's English template must contain its own specific content");
+    LOG.debug("==========================================");
 
     Map<String, String> typeToExpectedSensitive =
         Map.of(
@@ -227,7 +227,7 @@ public class NotificationTypeProvisioningTest {
 
       // Also verify publicTitle is unique per type
       String publicTitle = enTemplate.getTemplatePublic();
-      LOG.info("[{}] publicTitle='{}', sensitive='{}'", typeKey, publicTitle, sensitive);
+      LOG.debug("[{}] publicTitle='{}', sensitive='{}'", typeKey, publicTitle, sensitive);
     }
 
     // Verify all publicTitles are distinct
@@ -251,7 +251,7 @@ public class NotificationTypeProvisioningTest {
         publicTitles.size(),
         "Each notification type must have a unique publicTitle. Found: " + publicTitles);
 
-    LOG.info("No cross-contamination detected — all types have unique, correct data");
+    LOG.debug("No cross-contamination detected — all types have unique, correct data");
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -283,7 +283,7 @@ public class NotificationTypeProvisioningTest {
             + typeKey
             + "' — data may have been overwritten by another type");
 
-    LOG.info(
+    LOG.debug(
         "[{}] ✓ publicTitle='{}', sensitive='{}'", typeKey, expectedPublicTitle, expectedSensitive);
   }
 }

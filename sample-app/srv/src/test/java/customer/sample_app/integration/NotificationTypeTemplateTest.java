@@ -74,9 +74,9 @@ public class NotificationTypeTemplateTest {
 
   @Test
   void testI18nPlaceholdersResolvedForAllLanguages() {
-    LOG.info("==========================================");
-    LOG.info("Test: i18n placeholders should be resolved for EN, DE, TR, ES");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: i18n placeholders should be resolved for EN, DE, TR, ES");
+    LOG.debug("==========================================");
 
     NotificationTypes nt = getNotificationType("CertificateExpiration");
 
@@ -99,7 +99,7 @@ public class NotificationTypeTemplateTest {
           template.getTemplateSensitive(),
           "TemplateSensitive should be resolved for language: " + lang);
 
-      LOG.info("[{}] TemplateSensitive: {}", lang, template.getTemplateSensitive());
+      LOG.debug("[{}] TemplateSensitive: {}", lang, template.getTemplateSensitive());
     }
 
     // Also verify subtitle and other fields for specific languages
@@ -127,7 +127,7 @@ public class NotificationTypeTemplateTest {
     assertEquals("Certificados por expirar", esTemplate.getTemplateGrouped());
     assertEquals("Alerta de Expiración de Certificado", esTemplate.getEmailSubject());
 
-    LOG.info("All 4 languages verified successfully");
+    LOG.debug("All 4 languages verified successfully");
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -136,9 +136,9 @@ public class NotificationTypeTemplateTest {
 
   @Test
   void testNoUnresolvedI18nPlaceholdersInTemplates() {
-    LOG.info("==========================================");
-    LOG.info("Test: No unresolved {i18n>...} placeholders in any template");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: No unresolved {i18n>...} placeholders in any template");
+    LOG.debug("==========================================");
 
     List<NotificationTypes> allTypes =
         NotificationTypeProviderServiceMockHandler.getAllNotificationTypes();
@@ -168,7 +168,7 @@ public class NotificationTypeTemplateTest {
       }
     }
 
-    LOG.info(
+    LOG.debug(
         "Checked {} templates across {} notification types — no unresolved i18n placeholders",
         totalTemplatesChecked,
         allTypes.size());
@@ -180,9 +180,9 @@ public class NotificationTypeTemplateTest {
 
   @Test
   void testEmailHtmlContainsMustacheVariables() {
-    LOG.info("==========================================");
-    LOG.info("Test: Email HTML should contain Mustache variables for ANS runtime");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Email HTML should contain Mustache variables for ANS runtime");
+    LOG.debug("==========================================");
 
     NotificationTypes nt = getNotificationType("CertificateExpiration");
     Templates enTemplate = getTemplateForLanguage(nt, "en");
@@ -203,10 +203,10 @@ public class NotificationTypeTemplateTest {
     for (String variable : expectedVariables) {
       assertTrue(
           emailHtml.contains(variable), "Email HTML should contain Mustache variable: " + variable);
-      LOG.info("Found Mustache variable: {}", variable);
+      LOG.debug("Found Mustache variable: {}", variable);
     }
 
-    LOG.info("All {} Mustache variables present in email HTML", expectedVariables.size());
+    LOG.debug("All {} Mustache variables present in email HTML", expectedVariables.size());
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -215,9 +215,9 @@ public class NotificationTypeTemplateTest {
 
   @Test
   void testEmailHtmlI18nResolvedPerLanguage() {
-    LOG.info("==========================================");
-    LOG.info("Test: Email HTML i18n values should differ per language");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Email HTML i18n values should differ per language");
+    LOG.debug("==========================================");
 
     NotificationTypes nt = getNotificationType("CertificateExpiration");
 
@@ -254,9 +254,9 @@ public class NotificationTypeTemplateTest {
           emailHtml.contains(expectedGreeting),
           "[" + lang + "] Email HTML should contain greeting: '" + expectedGreeting + "'");
 
-      LOG.info("[{}] Button: '{}', Greeting: '{}'", lang, expectedButton, expectedGreeting);
+      LOG.debug("[{}] Button: '{}', Greeting: '{}'", lang, expectedButton, expectedGreeting);
     }
 
-    LOG.info("Email HTML i18n verified for all 4 languages");
+    LOG.debug("Email HTML i18n verified for all 4 languages");
   }
 }

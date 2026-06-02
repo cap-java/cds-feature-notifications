@@ -60,10 +60,10 @@ public class NotificationIntegrationTest {
 
   @BeforeEach
   void setup() {
-    LOG.info("========================================");
-    LOG.info("Active profiles: {}", String.join(", ", environment.getActiveProfiles()));
-    LOG.info("Setting up test - clearing notifications");
-    LOG.info("========================================");
+    LOG.debug("========================================");
+    LOG.debug("Active profiles: {}", String.join(", ", environment.getActiveProfiles()));
+    LOG.debug("Setting up test - clearing notifications");
+    LOG.debug("========================================");
 
     // Clear notifications before each test
     // Note: NotificationTypes are NOT cleared as they are provisioned at startup
@@ -72,9 +72,9 @@ public class NotificationIntegrationTest {
 
   @Test
   void testNotificationIsStoredInMockHandler() {
-    LOG.info("==========================================");
-    LOG.info("Test: Notification should be stored in mock handler");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Notification should be stored in mock handler");
+    LOG.debug("==========================================");
 
     // Given: Create certificate expiration event using test data
     CertificateExpiration certificateExpiration =
@@ -84,7 +84,7 @@ public class NotificationIntegrationTest {
     eventContext.setData(certificateExpiration);
 
     // When: Emit notification
-    LOG.info("Emitting notification event");
+    LOG.debug("Emitting notification event");
     notificationService.emit(eventContext);
 
     // Wait for async event processing (CAP uses ordered-collector thread pool)
@@ -96,7 +96,7 @@ public class NotificationIntegrationTest {
     // Then: Verify notification was stored in mock handler
     List<Notifications> allNotifications =
         NotificationProviderServiceMockHandler.getAllNotifications();
-    LOG.info("Total notifications stored: {}", allNotifications.size());
+    LOG.debug("Total notifications stored: {}", allNotifications.size());
 
     assertFalse(allNotifications.isEmpty(), "At least one notification should be stored");
 
@@ -106,15 +106,15 @@ public class NotificationIntegrationTest {
     assertNotNull(
         storedNotification.getNotificationTypeKey(), "Notification type key should not be null");
 
-    LOG.info("Notification stored successfully with ID: {}", storedNotification.getId());
-    LOG.info("Notification type key: {}", storedNotification.getNotificationTypeKey());
+    LOG.debug("Notification stored successfully with ID: {}", storedNotification.getId());
+    LOG.debug("Notification type key: {}", storedNotification.getNotificationTypeKey());
   }
 
   @Test
   void testNotificationTypeIsAutoProvisioned() {
-    LOG.info("==========================================");
-    LOG.info("Test: All notification types should be auto-provisioned at startup");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: All notification types should be auto-provisioned at startup");
+    LOG.debug("==========================================");
 
     // Note: NotificationTypes are auto-provisioned during application startup
     // by NotificationTypeAutoProvisionerHandler, not when emitting notifications.
@@ -122,7 +122,7 @@ public class NotificationIntegrationTest {
     // Then: Verify all 4 notification types were auto-provisioned during startup
     List<NotificationTypes> allNotificationTypes =
         NotificationTypeProviderServiceMockHandler.getAllNotificationTypes();
-    LOG.info("Total notification types stored: {}", allNotificationTypes.size());
+    LOG.debug("Total notification types stored: {}", allNotificationTypes.size());
 
     Set<String> expectedKeys =
         Set.of(
@@ -148,7 +148,7 @@ public class NotificationIntegrationTest {
           nt.getNotificationTypeVersion(), "Notification type version should not be null");
       actualKeys.add(nt.getNotificationTypeKey());
 
-      LOG.info(
+      LOG.debug(
           "Auto-provisioned: key={}, version={}, id={}",
           nt.getNotificationTypeKey(),
           nt.getNotificationTypeVersion(),
@@ -163,17 +163,17 @@ public class NotificationIntegrationTest {
 
   @Test
   void testMultipleNotificationsAreStored() {
-    LOG.info("==========================================");
-    LOG.info("Test: Multiple notifications should be stored");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Multiple notifications should be stored");
+    LOG.debug("==========================================");
 
     // Check initial count
     int initialCount = NotificationProviderServiceMockHandler.getNotificationCount();
-    LOG.info("BEFORE LOOP - Notification count: {}", initialCount);
+    LOG.debug("BEFORE LOOP - Notification count: {}", initialCount);
 
     // Given: Create multiple certificate expiration events using test data builder
     for (int i = 1; i <= 3; i++) {
-      LOG.info(">>> LOOP ITERATION {} STARTING <<<", i);
+      LOG.debug(">>> LOOP ITERATION {} STARTING <<<", i);
 
       CertificateExpiration certificateExpiration =
           CertificateExpirationTestData.builder()
@@ -186,15 +186,15 @@ public class NotificationIntegrationTest {
       eventContext.setData(certificateExpiration);
 
       // When: Emit notification
-      LOG.info(">>> Emitting notification #{}", i);
+      LOG.debug(">>> Emitting notification #{}", i);
       notificationService.emit(eventContext);
 
       // Check count after each emit
       int currentCount = NotificationProviderServiceMockHandler.getNotificationCount();
-      LOG.info(">>> AFTER EMIT #{} - Notification count: {}", i, currentCount);
+      LOG.debug(">>> AFTER EMIT #{} - Notification count: {}", i, currentCount);
     }
 
-    LOG.info(
+    LOG.debug(
         "AFTER ALL EMITS - Final notification count: {}",
         NotificationProviderServiceMockHandler.getNotificationCount());
 
@@ -206,7 +206,7 @@ public class NotificationIntegrationTest {
 
     // Then: Verify all notifications were stored
     int notificationCount = NotificationProviderServiceMockHandler.getNotificationCount();
-    LOG.info("Total notifications stored: {}", notificationCount);
+    LOG.debug("Total notifications stored: {}", notificationCount);
 
     assertEquals(3, notificationCount, "Exactly 3 notifications should be stored");
 
@@ -214,15 +214,15 @@ public class NotificationIntegrationTest {
         NotificationProviderServiceMockHandler.getAllNotifications();
     for (Notifications notification : allNotifications) {
       assertNotNull(notification.getId(), "Each notification should have an ID");
-      LOG.info("Notification stored with ID: {}", notification.getId());
+      LOG.debug("Notification stored with ID: {}", notification.getId());
     }
   }
 
   @Test
   void testRetrieveNotificationByTypeKey() {
-    LOG.info("==========================================");
-    LOG.info("Test: Retrieve notification by type key");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Retrieve notification by type key");
+    LOG.debug("==========================================");
 
     // Given: Create and emit notification using test data
     CertificateExpiration certificateExpiration =
@@ -244,7 +244,7 @@ public class NotificationIntegrationTest {
     assertFalse(allNotifications.isEmpty(), "Notification should be stored");
 
     String notificationTypeKey = allNotifications.get(0).getNotificationTypeKey();
-    LOG.info("Searching for notifications with type key: {}", notificationTypeKey);
+    LOG.debug("Searching for notifications with type key: {}", notificationTypeKey);
 
     // Then: Retrieve notifications by type key
     List<Notifications> notificationsByTypeKey =
@@ -256,7 +256,7 @@ public class NotificationIntegrationTest {
         notificationsByTypeKey.get(0).getNotificationTypeKey(),
         "Retrieved notification should have the correct type key");
 
-    LOG.info(
+    LOG.debug(
         "Successfully retrieved {} notification(s) with type key: {}",
         notificationsByTypeKey.size(),
         notificationTypeKey);
@@ -264,9 +264,9 @@ public class NotificationIntegrationTest {
 
   @Test
   void testRetrieveNotificationTypeByKeyAndVersion() {
-    LOG.info("==========================================");
-    LOG.info("Test: Retrieve notification type by key and version");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Retrieve notification type by key and version");
+    LOG.debug("==========================================");
 
     // Note: NotificationTypes are auto-provisioned at startup, not when emitting notifications.
     // This test verifies the retrieval functionality using the startup-provisioned types.
@@ -281,7 +281,7 @@ public class NotificationIntegrationTest {
     String key = notificationType.getNotificationTypeKey();
     String version = notificationType.getNotificationTypeVersion();
 
-    LOG.info("Searching for notification type with key: {}, version: {}", key, version);
+    LOG.debug("Searching for notification type with key: {}, version: {}", key, version);
 
     // Then: Retrieve notification type by key and version
     NotificationTypes retrievedType =
@@ -295,14 +295,14 @@ public class NotificationIntegrationTest {
         retrievedType.getNotificationTypeVersion(),
         "Retrieved type should have correct version");
 
-    LOG.info("Successfully retrieved notification type with key: {}, version: {}", key, version);
+    LOG.debug("Successfully retrieved notification type with key: {}, version: {}", key, version);
   }
 
   @Test
   void testValidationRejectsEmptyRecipients() {
-    LOG.info("==========================================");
-    LOG.info("Test: Validation should reject notification without recipients");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Validation should reject notification without recipients");
+    LOG.debug("==========================================");
 
     // Given: Create certificate expiration event WITHOUT recipients using test data
     CertificateExpiration certificateExpiration =
@@ -313,7 +313,7 @@ public class NotificationIntegrationTest {
     eventContext.setData(certificateExpiration);
 
     // When & Then: Emit notification - should throw ServiceException
-    LOG.info("Emitting notification event without recipients: {}", eventContext.getEvent());
+    LOG.debug("Emitting notification event without recipients: {}", eventContext.getEvent());
 
     ServiceException exception =
         assertThrows(
@@ -322,15 +322,15 @@ public class NotificationIntegrationTest {
               notificationService.emit(eventContext);
             });
 
-    LOG.info("Test passed - validation correctly rejected notification without recipients");
-    LOG.info("Exception message: {}", exception.getMessage());
+    LOG.debug("Test passed - validation correctly rejected notification without recipients");
+    LOG.debug("Exception message: {}", exception.getMessage());
   }
 
   @Test
   void testMultipleRecipientsSupport() {
-    LOG.info("==========================================");
-    LOG.info("Test: Notification should support multiple recipients (array of String)");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Notification should support multiple recipients (array of String)");
+    LOG.debug("==========================================");
 
     // Given: SystemMaintenance event with array of String recipients
     SystemMaintenance data = SystemMaintenanceTestData.createValid();
@@ -354,7 +354,7 @@ public class NotificationIntegrationTest {
     assertNotNull(recipients, "Recipients list should not be null");
     assertEquals(3, recipients.size(), "Should have 3 recipients");
 
-    LOG.info("Multiple recipients test passed — {} recipients", recipients.size());
+    LOG.debug("Multiple recipients test passed — {} recipients", recipients.size());
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -363,9 +363,9 @@ public class NotificationIntegrationTest {
 
   @Test
   void testRecipientCase1_String() {
-    LOG.info("==========================================");
-    LOG.info("Test: Case 1 — CertificateExpiration with String recipient");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Case 1 — CertificateExpiration with String recipient");
+    LOG.debug("==========================================");
 
     // Given: CertificateExpiration — recipients: String
     CertificateExpiration data = CertificateExpirationTestData.createValidCertificateExpiration();
@@ -391,14 +391,14 @@ public class NotificationIntegrationTest {
         recipients.get(0).getRecipientId(),
         "RecipientId should match the String value");
 
-    LOG.info("Case 1 passed — RecipientId: {}", recipients.get(0).getRecipientId());
+    LOG.debug("Case 1 passed — RecipientId: {}", recipients.get(0).getRecipientId());
   }
 
   @Test
   void testRecipientCase2_ArrayOfString() {
-    LOG.info("==========================================");
-    LOG.info("Test: Case 2 — SystemMaintenance with array of String recipients");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Case 2 — SystemMaintenance with array of String recipients");
+    LOG.debug("==========================================");
 
     // Given: SystemMaintenance — recipients: array of String
     SystemMaintenance data = SystemMaintenanceTestData.createValid();
@@ -423,14 +423,14 @@ public class NotificationIntegrationTest {
     assertEquals("admin2@example.com", recipients.get(1).getRecipientId());
     assertEquals("admin3@example.com", recipients.get(2).getRecipientId());
 
-    LOG.info("Case 2 passed — {} recipients resolved from array of String", recipients.size());
+    LOG.debug("Case 2 passed — {} recipients resolved from array of String", recipients.size());
   }
 
   @Test
   void testRecipientAutoDetection_UUIDMappedToGlobalUserId() {
-    LOG.info("==========================================");
-    LOG.info("Test: UUID string auto-detected and mapped to GlobalUserId");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: UUID string auto-detected and mapped to GlobalUserId");
+    LOG.debug("==========================================");
 
     // Given: CertificateExpiration with UUID recipient
     CertificateExpiration data = CertificateExpirationTestData.createWithUUIDRecipient();
@@ -457,14 +457,14 @@ public class NotificationIntegrationTest {
         recipients.get(0).getGlobalUserId(),
         "UUID should be mapped to GlobalUserId");
 
-    LOG.info("UUID auto-detection passed — GlobalUserId: {}", recipients.get(0).getGlobalUserId());
+    LOG.debug("UUID auto-detection passed — GlobalUserId: {}", recipients.get(0).getGlobalUserId());
   }
 
   @Test
   void testRecipientAutoDetection_MixedEmailAndUUIDArray() {
-    LOG.info("==========================================");
-    LOG.info("Test: Mixed email/UUID array — each auto-detected correctly");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Mixed email/UUID array — each auto-detected correctly");
+    LOG.debug("==========================================");
 
     // Given: SystemMaintenance with mixed recipients (emails + UUID)
     SystemMaintenance data = SystemMaintenanceTestData.createWithMixedRecipients();
@@ -507,7 +507,7 @@ public class NotificationIntegrationTest {
         "Third recipient email should map to RecipientId");
     assertNull(recipients.get(2).getGlobalUserId(), "Third recipient should not have GlobalUserId");
 
-    LOG.info("Mixed auto-detection passed — {} recipients resolved", recipients.size());
+    LOG.debug("Mixed auto-detection passed — {} recipients resolved", recipients.size());
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -516,9 +516,9 @@ public class NotificationIntegrationTest {
 
   @Test
   void testNavigationTargetFromSemanticObjectAnnotation() {
-    LOG.info("==========================================");
-    LOG.info("Test: @Common.SemanticObject should map to NavigationTargetObject/Action");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: @Common.SemanticObject should map to NavigationTargetObject/Action");
+    LOG.debug("==========================================");
 
     // Given: CertificateExpiration has @Common.SemanticObject:'project1' and
     // @Common.SemanticObjectAction:'display'
@@ -546,7 +546,7 @@ public class NotificationIntegrationTest {
         stored.getNavigationTargetAction(),
         "NavigationTargetAction should be mapped from @Common.SemanticObjectAction");
 
-    LOG.info(
+    LOG.debug(
         "Navigation target: object={}, action={}",
         stored.getNavigationTargetObject(),
         stored.getNavigationTargetAction());
@@ -554,10 +554,10 @@ public class NotificationIntegrationTest {
 
   @Test
   void testNoNavigationTargetWhenAnnotationMissing() {
-    LOG.info("==========================================");
-    LOG.info(
+    LOG.debug("==========================================");
+    LOG.debug(
         "Test: Notification without @Common.SemanticObject should have null navigation target");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
 
     // Given: SystemMaintenance has NO @Common.SemanticObject annotation
     SystemMaintenance data = SystemMaintenanceTestData.createValid();
@@ -582,7 +582,7 @@ public class NotificationIntegrationTest {
         stored.getNavigationTargetAction(),
         "NavigationTargetAction should be null when @Common.SemanticObjectAction is missing");
 
-    LOG.info(
+    LOG.debug(
         "No navigation target — correct behavior for events without semantic object annotation");
   }
 
@@ -592,9 +592,9 @@ public class NotificationIntegrationTest {
 
   @Test
   void testDynamicPriority_HighWhenYearAbove2025() {
-    LOG.info("==========================================");
-    LOG.info("Test: Dynamic priority should be HIGH when year > 2025");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Dynamic priority should be HIGH when year > 2025");
+    LOG.debug("==========================================");
 
     // Given: CertificateExpiration with year = 2026
     // CDS annotation: priority : (year > 2025 ? 'HIGH' : 'LOW')
@@ -613,7 +613,7 @@ public class NotificationIntegrationTest {
     // Then: Priority should be HIGH (year > 2025)
     Notifications stored = NotificationProviderServiceMockHandler.getAllNotifications().get(0);
 
-    LOG.info("Dynamic priority result: {}", stored.getPriority());
+    LOG.debug("Dynamic priority result: {}", stored.getPriority());
 
     assertNotNull(stored.getPriority(), "Priority should not be null");
     assertEquals("HIGH", stored.getPriority(), "Priority should be HIGH when year > 2025");
@@ -621,9 +621,9 @@ public class NotificationIntegrationTest {
 
   @Test
   void testDynamicPriority_LowWhenYearNotAbove2025() {
-    LOG.info("==========================================");
-    LOG.info("Test: Dynamic priority should be LOW when year <= 2025");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Dynamic priority should be LOW when year <= 2025");
+    LOG.debug("==========================================");
 
     // Given: CertificateExpiration with year = 2024
     // CDS annotation: priority : (year > 2025 ? 'HIGH' : 'LOW')
@@ -642,7 +642,7 @@ public class NotificationIntegrationTest {
     // Then: Priority should be LOW (year <= 2025)
     Notifications stored = NotificationProviderServiceMockHandler.getAllNotifications().get(0);
 
-    LOG.info("Dynamic priority result: {}", stored.getPriority());
+    LOG.debug("Dynamic priority result: {}", stored.getPriority());
 
     assertNotNull(stored.getPriority(), "Priority should not be null");
     assertEquals("LOW", stored.getPriority(), "Priority should be LOW when year <= 2025");
@@ -654,9 +654,9 @@ public class NotificationIntegrationTest {
 
   @Test
   void testBatchNotificationEmit() {
-    LOG.info("==========================================");
-    LOG.info("Test: Batch emit — multiple notifications in a single emit call");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Batch emit — multiple notifications in a single emit call");
+    LOG.debug("==========================================");
 
     // Given: Create 3 certificate expiration payloads with different recipients
     List<CertificateExpiration> batch = CertificateExpirationTestData.createBatchOfThree();
@@ -686,16 +686,16 @@ public class NotificationIntegrationTest {
       assertNotNull(notification.getId(), "Each notification should have an ID");
     }
 
-    LOG.info(
+    LOG.debug(
         "Batch emit test passed — {} notifications created in single emit",
         allNotifications.size());
   }
 
   @Test
   void testBatchNotificationEmitPreservesIndividualData() {
-    LOG.info("==========================================");
-    LOG.info("Test: Batch emit preserves individual notification data");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Batch emit preserves individual notification data");
+    LOG.debug("==========================================");
 
     // Given: 2 certificate expirations with different data
     List<CertificateExpiration> batch = CertificateExpirationTestData.createAliceAndBob();
@@ -726,7 +726,7 @@ public class NotificationIntegrationTest {
     assertTrue(recipientIds.contains("alice@example.com"), "Should contain Alice's email");
     assertTrue(recipientIds.contains("bob@example.com"), "Should contain Bob's email");
 
-    LOG.info("Batch data preservation test passed — individual data correctly isolated");
+    LOG.debug("Batch data preservation test passed — individual data correctly isolated");
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -735,9 +735,9 @@ public class NotificationIntegrationTest {
 
   @Test
   void testDynamicPriority_HighWhenDeadlineWithin30Days() {
-    LOG.info("==========================================");
-    LOG.info("Test: days_between — HIGH priority when deadline < 30 days away");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: days_between — HIGH priority when deadline < 30 days away");
+    LOG.debug("==========================================");
 
     // Given: ContractDeadline with deadline 10 days from now
     // CDS annotation: priority : (days_between($now, deadlineDate) < 30 ? 'HIGH' : 'LOW')
@@ -756,7 +756,7 @@ public class NotificationIntegrationTest {
     // Then: Priority should be HIGH (deadline within 30 days)
     Notifications stored = NotificationProviderServiceMockHandler.getAllNotifications().get(0);
 
-    LOG.info("days_between priority result: {}", stored.getPriority());
+    LOG.debug("days_between priority result: {}", stored.getPriority());
 
     assertNotNull(stored.getPriority(), "Priority should not be null");
     assertEquals("HIGH", stored.getPriority(), "Priority should be HIGH when deadline < 30 days");
@@ -764,9 +764,9 @@ public class NotificationIntegrationTest {
 
   @Test
   void testDynamicPriority_LowWhenDeadlineFarAway() {
-    LOG.info("==========================================");
-    LOG.info("Test: days_between — LOW priority when deadline >= 30 days away");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: days_between — LOW priority when deadline >= 30 days away");
+    LOG.debug("==========================================");
 
     // Given: ContractDeadline with deadline 90 days from now
     // CDS annotation: priority : (days_between($now, deadlineDate) < 30 ? 'HIGH' : 'LOW')
@@ -785,7 +785,7 @@ public class NotificationIntegrationTest {
     // Then: Priority should be LOW (deadline far away)
     Notifications stored = NotificationProviderServiceMockHandler.getAllNotifications().get(0);
 
-    LOG.info("days_between priority result: {}", stored.getPriority());
+    LOG.debug("days_between priority result: {}", stored.getPriority());
 
     assertNotNull(stored.getPriority(), "Priority should not be null");
     assertEquals("LOW", stored.getPriority(), "Priority should be LOW when deadline >= 30 days");
@@ -797,9 +797,9 @@ public class NotificationIntegrationTest {
 
   @Test
   void testDynamicPriority_HighWhenImpactContainsCritical() {
-    LOG.info("==========================================");
-    LOG.info("Test: contains — HIGH priority when impact contains 'critical'");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: contains — HIGH priority when impact contains 'critical'");
+    LOG.debug("==========================================");
 
     // Given: SystemMaintenance with impact containing 'critical'
     // CDS annotation: priority : (contains(impact, 'critical') ? 'HIGH' : 'MEDIUM')
@@ -817,7 +817,7 @@ public class NotificationIntegrationTest {
 
     // Then
     Notifications stored = NotificationProviderServiceMockHandler.getAllNotifications().get(0);
-    LOG.info("contains priority result: {}", stored.getPriority());
+    LOG.debug("contains priority result: {}", stored.getPriority());
 
     assertNotNull(stored.getPriority(), "Priority should not be null");
     assertEquals(
@@ -826,9 +826,9 @@ public class NotificationIntegrationTest {
 
   @Test
   void testDynamicPriority_MediumWhenImpactDoesNotContainCritical() {
-    LOG.info("==========================================");
-    LOG.info("Test: contains — MEDIUM priority when impact does not contain 'critical'");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: contains — MEDIUM priority when impact does not contain 'critical'");
+    LOG.debug("==========================================");
 
     // Given: SystemMaintenance with impact NOT containing 'critical'
     SystemMaintenance data = SystemMaintenanceTestData.createValid();
@@ -845,7 +845,7 @@ public class NotificationIntegrationTest {
 
     // Then
     Notifications stored = NotificationProviderServiceMockHandler.getAllNotifications().get(0);
-    LOG.info("contains priority result: {}", stored.getPriority());
+    LOG.debug("contains priority result: {}", stored.getPriority());
 
     assertNotNull(stored.getPriority(), "Priority should not be null");
     assertEquals(
@@ -860,9 +860,9 @@ public class NotificationIntegrationTest {
 
   @Test
   void testDynamicPriority_HighWhenSeverityStartsWithCrit() {
-    LOG.info("==========================================");
-    LOG.info("Test: startsWith — HIGH priority when severity starts with 'CRIT'");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: startsWith — HIGH priority when severity starts with 'CRIT'");
+    LOG.debug("==========================================");
 
     // Given: SecurityAlert with severity starting with 'CRIT'
     // CDS annotation: priority : (startsWith(severity, 'CRIT') ? 'HIGH' : 'LOW')
@@ -880,7 +880,7 @@ public class NotificationIntegrationTest {
 
     // Then
     Notifications stored = NotificationProviderServiceMockHandler.getAllNotifications().get(0);
-    LOG.info("startsWith priority result: {}", stored.getPriority());
+    LOG.debug("startsWith priority result: {}", stored.getPriority());
 
     assertNotNull(stored.getPriority(), "Priority should not be null");
     assertEquals(
@@ -889,9 +889,9 @@ public class NotificationIntegrationTest {
 
   @Test
   void testDynamicPriority_LowWhenSeverityDoesNotStartWithCrit() {
-    LOG.info("==========================================");
-    LOG.info("Test: startsWith — LOW priority when severity does not start with 'CRIT'");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: startsWith — LOW priority when severity does not start with 'CRIT'");
+    LOG.debug("==========================================");
 
     // Given: SecurityAlert with severity NOT starting with 'CRIT'
     SecurityAlert data = SecurityAlertTestData.createWithLowSeverity();
@@ -908,7 +908,7 @@ public class NotificationIntegrationTest {
 
     // Then
     Notifications stored = NotificationProviderServiceMockHandler.getAllNotifications().get(0);
-    LOG.info("startsWith priority result: {}", stored.getPriority());
+    LOG.debug("startsWith priority result: {}", stored.getPriority());
 
     assertNotNull(stored.getPriority(), "Priority should not be null");
     assertEquals(
@@ -923,9 +923,9 @@ public class NotificationIntegrationTest {
 
   @Test
   void testDynamicPriority_HighWhenServerNameEndsWithProd() {
-    LOG.info("==========================================");
-    LOG.info("Test: endsWith — HIGH priority when serverName ends with '-prod'");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: endsWith — HIGH priority when serverName ends with '-prod'");
+    LOG.debug("==========================================");
 
     // Given: ServerIncident with server name ending in '-prod'
     // CDS annotation: priority : (endsWith(serverName, '-prod') ? 'HIGH' : 'LOW')
@@ -943,7 +943,7 @@ public class NotificationIntegrationTest {
 
     // Then
     Notifications stored = NotificationProviderServiceMockHandler.getAllNotifications().get(0);
-    LOG.info("endsWith priority result: {}", stored.getPriority());
+    LOG.debug("endsWith priority result: {}", stored.getPriority());
 
     assertNotNull(stored.getPriority(), "Priority should not be null");
     assertEquals(
@@ -952,9 +952,9 @@ public class NotificationIntegrationTest {
 
   @Test
   void testDynamicPriority_LowWhenServerNameDoesNotEndWithProd() {
-    LOG.info("==========================================");
-    LOG.info("Test: endsWith — LOW priority when serverName does not end with '-prod'");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: endsWith — LOW priority when serverName does not end with '-prod'");
+    LOG.debug("==========================================");
 
     // Given: ServerIncident with server name NOT ending in '-prod'
     ServerIncident data = ServerIncidentTestData.createWithDevServer();
@@ -971,7 +971,7 @@ public class NotificationIntegrationTest {
 
     // Then
     Notifications stored = NotificationProviderServiceMockHandler.getAllNotifications().get(0);
-    LOG.info("endsWith priority result: {}", stored.getPriority());
+    LOG.debug("endsWith priority result: {}", stored.getPriority());
 
     assertNotNull(stored.getPriority(), "Priority should not be null");
     assertEquals(
@@ -986,9 +986,9 @@ public class NotificationIntegrationTest {
 
   @Test
   void testDynamicPriority_NeutralWhenRequiredFieldMissing() {
-    LOG.info("==========================================");
-    LOG.info("Test: NEUTRAL fallback when priority expression field is missing");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: NEUTRAL fallback when priority expression field is missing");
+    LOG.debug("==========================================");
 
     // Given: SystemMaintenance WITHOUT impact field
     // CDS annotation: priority : (contains(impact, 'critical') ? 'HIGH' : 'MEDIUM')
@@ -1007,7 +1007,7 @@ public class NotificationIntegrationTest {
 
     // Then: Priority should fall back to NEUTRAL
     Notifications stored = NotificationProviderServiceMockHandler.getAllNotifications().get(0);
-    LOG.info("Fallback priority result: {}", stored.getPriority());
+    LOG.debug("Fallback priority result: {}", stored.getPriority());
 
     assertNotNull(stored.getPriority(), "Priority should not be null");
     assertEquals(
@@ -1022,9 +1022,9 @@ public class NotificationIntegrationTest {
 
   @Test
   void testDynamicPriority_LowWhenDeadlineExactly30DaysAway() {
-    LOG.info("==========================================");
-    LOG.info("Test: days_between boundary — LOW when deadline is exactly 30 days away");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: days_between boundary — LOW when deadline is exactly 30 days away");
+    LOG.debug("==========================================");
 
     // Given: ContractDeadline with deadline exactly 30 days from now
     // CDS annotation: priority : (days_between($now, deadlineDate) < 30 ? 'HIGH' : 'LOW')
@@ -1043,7 +1043,7 @@ public class NotificationIntegrationTest {
 
     // Then: Priority should be LOW (30 < 30 is false)
     Notifications stored = NotificationProviderServiceMockHandler.getAllNotifications().get(0);
-    LOG.info("Boundary priority result: {}", stored.getPriority());
+    LOG.debug("Boundary priority result: {}", stored.getPriority());
 
     assertNotNull(stored.getPriority(), "Priority should not be null");
     assertEquals(
@@ -1058,9 +1058,9 @@ public class NotificationIntegrationTest {
 
   @Test
   void testDynamicPriority_HighWhenConcatContainsProdCritical() {
-    LOG.info("==========================================");
-    LOG.info("Test: contains(concat()) — HIGH when result contains 'PROD-critical'");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: contains(concat()) — HIGH when result contains 'PROD-critical'");
+    LOG.debug("==========================================");
 
     // Given: environment="PROD", appName="critical-service"
     // concat → "PROD-critical-service" which contains "PROD-critical" → HIGH
@@ -1078,7 +1078,7 @@ public class NotificationIntegrationTest {
 
     // Then
     Notifications stored = NotificationProviderServiceMockHandler.getAllNotifications().get(0);
-    LOG.info("contains(concat()) priority result: {}", stored.getPriority());
+    LOG.debug("contains(concat()) priority result: {}", stored.getPriority());
 
     assertNotNull(stored.getPriority(), "Priority should not be null");
     assertEquals(
@@ -1089,9 +1089,9 @@ public class NotificationIntegrationTest {
 
   @Test
   void testDynamicPriority_LowWhenConcatDoesNotContainProdCritical() {
-    LOG.info("==========================================");
-    LOG.info("Test: contains(concat()) — LOW when result does not contain 'PROD-critical'");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: contains(concat()) — LOW when result does not contain 'PROD-critical'");
+    LOG.debug("==========================================");
 
     // Given: environment="DEV", appName="my-app"
     // concat → "DEV-my-app" which does NOT contain "PROD-critical" → LOW
@@ -1109,7 +1109,7 @@ public class NotificationIntegrationTest {
 
     // Then
     Notifications stored = NotificationProviderServiceMockHandler.getAllNotifications().get(0);
-    LOG.info("contains(concat()) priority result: {}", stored.getPriority());
+    LOG.debug("contains(concat()) priority result: {}", stored.getPriority());
 
     assertNotNull(stored.getPriority(), "Priority should not be null");
     assertEquals(

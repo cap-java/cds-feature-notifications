@@ -110,7 +110,7 @@ public class NotificationBuilder {
             "Batch notification emit for event '{}' with empty data list, skipping", eventName);
         return List.of();
       }
-      logger.info("Batch notification emit for event '{}': {} entries", eventName, dataList.size());
+      logger.debug("Batch notification emit for event '{}': {} entries", eventName, dataList.size());
       List<NotificationBuildResult> results = new ArrayList<>();
       for (Object item : dataList) {
         if (!(item instanceof CdsData cdsData)) {
@@ -166,7 +166,7 @@ public class NotificationBuilder {
     List<NotificationProperties> properties = extractProperties(event, eventData);
     notification.setProperties(properties);
 
-    logger.info("Built notification with {} properties", properties.size());
+    logger.debug("Built notification with {} properties", properties.size());
 
     return new NotificationBuildResult(eventName, notification, event);
   }
@@ -251,7 +251,7 @@ public class NotificationBuilder {
               .map(row -> row.get("result"))
               .map(v -> v.toString().toUpperCase())
               .orElse("NEUTRAL");
-      logger.info("Dynamic priority evaluated via DB to: {}", priority);
+      logger.debug("Dynamic priority evaluated via DB to: {}", priority);
       return validatePriority(priority);
     } catch (Exception e) {
       logger.error(

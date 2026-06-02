@@ -38,15 +38,15 @@ public class NotificationTemplateProvisioningTest {
 
   @Test
   void testTemplatesProvisionedAtStartup() {
-    LOG.info("==========================================");
-    LOG.info("Test: Templates should be auto-provisioned at startup");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Templates should be auto-provisioned at startup");
+    LOG.debug("==========================================");
 
     List<NotificationTemplates> allTemplates =
         NotificationTemplateProviderServiceMockHandler.getAllTemplates();
     assertFalse(allTemplates.isEmpty(), "At least one NotificationTemplate should be provisioned");
 
-    LOG.info("Total templates provisioned: {}", allTemplates.size());
+    LOG.debug("Total templates provisioned: {}", allTemplates.size());
 
     // The sample-app has 6 events with @notification.template.title → 6 templates
     assertTrue(
@@ -60,9 +60,9 @@ public class NotificationTemplateProvisioningTest {
 
   @Test
   void testCertificateExpirationTemplateStructure() {
-    LOG.info("==========================================");
-    LOG.info("Test: CertificateExpiration template structure");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: CertificateExpiration template structure");
+    LOG.debug("==========================================");
 
     NotificationTemplates template =
         NotificationTemplateProviderServiceMockHandler.getTemplateByKey("CertificateExpiration");
@@ -87,7 +87,7 @@ public class NotificationTemplateProvisioningTest {
     assertNotNull(translations, "Translations should not be null");
     assertFalse(translations.isEmpty(), "Translations should not be empty");
 
-    LOG.info("CertificateExpiration template: Key={}, Visibility={}, Translations={}",
+    LOG.debug("CertificateExpiration template: Key={}, Visibility={}, Translations={}",
         template.getKey(), template.getVisibility(), translations.size());
   }
 
@@ -97,9 +97,9 @@ public class NotificationTemplateProvisioningTest {
 
   @Test
   void testVisibilityDefaultsToPrivate() {
-    LOG.info("==========================================");
-    LOG.info("Test: Templates without @notification.customizable should have null visibility (PRIVATE)");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Templates without @notification.customizable should have null visibility (PRIVATE)");
+    LOG.debug("==========================================");
 
     // SystemMaintenance has no @notification.customizable → visibility should be null (ANS defaults PRIVATE)
     NotificationTemplates template =
@@ -108,7 +108,7 @@ public class NotificationTemplateProvisioningTest {
     assertNull(template.getVisibility(),
         "Template without @notification.customizable should have null visibility (ANS defaults to PRIVATE)");
 
-    LOG.info("SystemMaintenance visibility: {} (null = ANS default PRIVATE)", template.getVisibility());
+    LOG.debug("SystemMaintenance visibility: {} (null = ANS default PRIVATE)", template.getVisibility());
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -117,9 +117,9 @@ public class NotificationTemplateProvisioningTest {
 
   @Test
   void testI18nResolvedInTranslations() {
-    LOG.info("==========================================");
-    LOG.info("Test: i18n placeholders should be resolved in template translations");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: i18n placeholders should be resolved in template translations");
+    LOG.debug("==========================================");
 
     NotificationTemplates template =
         NotificationTemplateProviderServiceMockHandler.getTemplateByKey("CertificateExpiration");
@@ -146,7 +146,7 @@ public class NotificationTemplateProvisioningTest {
         assertNoUnresolvedI18n(t.getEmail().getBodyHtml(), "Email.BodyHtml", lang);
       }
 
-      LOG.info("[{}] Title={}, Body={}, Preview={}", lang, t.getTitle(), t.getBody(), t.getPreview());
+      LOG.debug("[{}] Title={}, Body={}, Preview={}", lang, t.getTitle(), t.getBody(), t.getPreview());
     }
   }
 
@@ -156,9 +156,9 @@ public class NotificationTemplateProvisioningTest {
 
   @Test
   void testMultiLanguageTranslations() {
-    LOG.info("==========================================");
-    LOG.info("Test: CertificateExpiration should have translations for all i18n languages");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: CertificateExpiration should have translations for all i18n languages");
+    LOG.debug("==========================================");
 
     NotificationTemplates template =
         NotificationTemplateProviderServiceMockHandler.getTemplateByKey("CertificateExpiration");
@@ -191,7 +191,7 @@ public class NotificationTemplateProvisioningTest {
     // Titles should differ per language (i18n resolved)
     assertNotEquals(en.getTitle(), de.getTitle(), "EN and DE titles should differ");
 
-    LOG.info("Translations verified for {} languages", translations.size());
+    LOG.debug("Translations verified for {} languages", translations.size());
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -200,9 +200,9 @@ public class NotificationTemplateProvisioningTest {
 
   @Test
   void testStaticTemplateTranslation() {
-    LOG.info("==========================================");
-    LOG.info("Test: Templates with static strings should have same value across all locale translations");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Templates with static strings should have same value across all locale translations");
+    LOG.debug("==========================================");
 
     // SystemMaintenance uses static strings (no {i18n>...} placeholders).
     // Since i18n files exist in the project for other events, translations are created
@@ -229,7 +229,7 @@ public class NotificationTemplateProvisioningTest {
               + t.getLanguage() + "' differs");
     }
 
-    LOG.info("Static template: {} translations, all with title: {}", translations.size(), expectedTitle);
+    LOG.debug("Static template: {} translations, all with title: {}", translations.size(), expectedTitle);
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -238,9 +238,9 @@ public class NotificationTemplateProvisioningTest {
 
   @Test
   void testEmailHtmlLoadedFromFile() {
-    LOG.info("==========================================");
-    LOG.info("Test: CertificateExpiration email HTML should be loaded from file");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: CertificateExpiration email HTML should be loaded from file");
+    LOG.debug("==========================================");
 
     NotificationTemplates template =
         NotificationTemplateProviderServiceMockHandler.getTemplateByKey("CertificateExpiration");
@@ -257,7 +257,7 @@ public class NotificationTemplateProvisioningTest {
     assertFalse(html.endsWith(".html"), "Email body should be HTML content, not a file path");
     assertTrue(html.contains("<"), "Email body should contain HTML tags");
 
-    LOG.info("Email HTML loaded successfully ({} chars)", html.length());
+    LOG.debug("Email HTML loaded successfully ({} chars)", html.length());
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -266,9 +266,9 @@ public class NotificationTemplateProvisioningTest {
 
   @Test
   void testTagsContainSourceAndEvent() {
-    LOG.info("==========================================");
-    LOG.info("Test: Template tags should contain source and event information");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Template tags should contain source and event information");
+    LOG.debug("==========================================");
 
     NotificationTemplates template =
         NotificationTemplateProviderServiceMockHandler.getTemplateByKey("CertificateExpiration");
@@ -278,7 +278,7 @@ public class NotificationTemplateProvisioningTest {
     assertNotNull(tags, "Tags should not be null");
     assertFalse(tags.isEmpty(), "Tags should not be empty");
 
-    LOG.info("Tags: {}", tags);
+    LOG.debug("Tags: {}", tags);
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -287,9 +287,9 @@ public class NotificationTemplateProvisioningTest {
 
   @Test
   void testTranslationMetadata() {
-    LOG.info("==========================================");
-    LOG.info("Test: Translations should have source, event, and displayName set");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Translations should have source, event, and displayName set");
+    LOG.debug("==========================================");
 
     NotificationTemplates template =
         NotificationTemplateProviderServiceMockHandler.getTemplateByKey("CertificateExpiration");
@@ -308,7 +308,7 @@ public class NotificationTemplateProvisioningTest {
     // DisplayName = event name
     assertEquals("CertificateExpiration", en.getDisplayName(), "DisplayName should be the event name");
 
-    LOG.info("Source={}, Event={}, DisplayName={}", en.getSource(), en.getEvent(), en.getDisplayName());
+    LOG.debug("Source={}, Event={}, DisplayName={}", en.getSource(), en.getEvent(), en.getDisplayName());
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -317,9 +317,9 @@ public class NotificationTemplateProvisioningTest {
 
   @Test
   void testPropertiesSchemaReflectsEventElements() {
-    LOG.info("==========================================");
-    LOG.info("Test: PropertiesSchema should be a JSON schema of event elements");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: PropertiesSchema should be a JSON schema of event elements");
+    LOG.debug("==========================================");
 
     NotificationTemplates template =
         NotificationTemplateProviderServiceMockHandler.getTemplateByKey("SystemMaintenance");
@@ -332,7 +332,7 @@ public class NotificationTemplateProvisioningTest {
     assertTrue(schema.contains("properties") || schema.contains("type"),
         "Schema should contain JSON Schema keywords: " + schema);
 
-    LOG.info("PropertiesSchema: {}", schema);
+    LOG.debug("PropertiesSchema: {}", schema);
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -341,9 +341,9 @@ public class NotificationTemplateProvisioningTest {
 
   @Test
   void testI18nPlaceholdersResolvedForAllLanguages() {
-    LOG.info("==========================================");
-    LOG.info("Test: i18n placeholders should be resolved for EN, DE, TR, ES");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: i18n placeholders should be resolved for EN, DE, TR, ES");
+    LOG.debug("==========================================");
 
     NotificationTemplates template =
         NotificationTemplateProviderServiceMockHandler.getTemplateByKey("CertificateExpiration");
@@ -381,7 +381,7 @@ public class NotificationTemplateProvisioningTest {
     assertEquals("Sertifika Sona Erme Uyarısı", findTranslation(translations, "tr").getDescription());
     assertEquals("Alerta de Expiración de Certificado", findTranslation(translations, "es").getDescription());
 
-    LOG.info("All 4 languages verified with exact i18n values");
+    LOG.debug("All 4 languages verified with exact i18n values");
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -390,9 +390,9 @@ public class NotificationTemplateProvisioningTest {
 
   @Test
   void testEmailHtmlContainsMustacheVariables() {
-    LOG.info("==========================================");
-    LOG.info("Test: Email HTML should contain Mustache variables for ANS runtime");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Email HTML should contain Mustache variables for ANS runtime");
+    LOG.debug("==========================================");
 
     NotificationTemplates template =
         NotificationTemplateProviderServiceMockHandler.getTemplateByKey("CertificateExpiration");
@@ -420,7 +420,7 @@ public class NotificationTemplateProvisioningTest {
           emailHtml.contains(variable), "Email HTML should contain Mustache variable: " + variable);
     }
 
-    LOG.info("All {} Mustache variables present in email HTML", expectedVariables.size());
+    LOG.debug("All {} Mustache variables present in email HTML", expectedVariables.size());
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -429,9 +429,9 @@ public class NotificationTemplateProvisioningTest {
 
   @Test
   void testEmailHtmlI18nResolvedPerLanguage() {
-    LOG.info("==========================================");
-    LOG.info("Test: Email HTML i18n values should differ per language");
-    LOG.info("==========================================");
+    LOG.debug("==========================================");
+    LOG.debug("Test: Email HTML i18n values should differ per language");
+    LOG.debug("==========================================");
 
     NotificationTemplates template =
         NotificationTemplateProviderServiceMockHandler.getTemplateByKey("CertificateExpiration");
@@ -475,10 +475,10 @@ public class NotificationTemplateProvisioningTest {
           emailHtml.contains(expectedGreeting),
           "[" + lang + "] Email HTML should contain greeting: '" + expectedGreeting + "'");
 
-      LOG.info("[{}] Button: '{}', Greeting: '{}'", lang, expectedButton, expectedGreeting);
+      LOG.debug("[{}] Button: '{}', Greeting: '{}'", lang, expectedButton, expectedGreeting);
     }
 
-    LOG.info("Email HTML i18n verified for all 4 languages");
+    LOG.debug("Email HTML i18n verified for all 4 languages");
   }
 
   // ──────────────────────────────────────────────────────────────

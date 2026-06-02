@@ -35,7 +35,7 @@ public class NotificationProviderServiceMockHandler implements EventHandler {
 
   @On(event = CqnService.EVENT_CREATE, entity = Notifications_.CDS_NAME)
   public void interceptCreate(CdsCreateEventContext context) {
-    logger.info("MockHandler intercepting CREATE - {} entries", context.getCqn().entries().size());
+    logger.debug("MockHandler intercepting CREATE - {} entries", context.getCqn().entries().size());
 
     List<Map<String, Object>> resultEntries = new ArrayList<>();
 
@@ -45,7 +45,7 @@ public class NotificationProviderServiceMockHandler implements EventHandler {
         .entries()
         .forEach(
             entry -> {
-              logger.info("Entry data: {}", entry);
+              logger.debug("Entry data: {}", entry);
 
               Notifications notification = Notifications.create();
               entry.forEach(notification::put);
@@ -82,7 +82,7 @@ public class NotificationProviderServiceMockHandler implements EventHandler {
 
               // Store notification
               notificationStore.put(notification.getId(), notification);
-              logger.info(
+              logger.debug(
                   "Mock NotificationProviderService: Stored notification with ID: {}, TypeKey: {}",
                   notification.getId(),
                   notification.getNotificationTypeKey());
@@ -130,7 +130,7 @@ public class NotificationProviderServiceMockHandler implements EventHandler {
   /** Clears all stored notifications. Useful for test cleanup. */
   public static void clearAllNotifications() {
     notificationStore.clear();
-    logger.info("Mock NotificationProviderService: Cleared all notifications");
+    logger.debug("Mock NotificationProviderService: Cleared all notifications");
   }
 
   /**

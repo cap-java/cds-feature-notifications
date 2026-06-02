@@ -66,7 +66,7 @@ public class NotificationTemplateAutoProvisionerHandler implements EventHandler 
 
     // Fetch all existing templates from ANS to determine create vs update
     Set<String> existingTemplateKeys = fetchExistingTemplateKeys();
-    logger.info("Found {} existing standalone templates in ANS", existingTemplateKeys.size());
+    logger.debug("Found {} existing standalone templates in ANS", existingTemplateKeys.size());
 
     for (NotificationTemplates template : templates) {
       String key = template.getKey();
@@ -100,14 +100,14 @@ public class NotificationTemplateAutoProvisionerHandler implements EventHandler 
       notificationTemplateProviderService.run(
           Insert.into(NotificationTemplates_.CDS_NAME).entry(template));
 
-      logger.info(
+      logger.debug(
           "Standalone NotificationTemplate '{}' created in ANS successfully", template.getKey());
     } catch (Exception e) {
       String errorMsg = e.getMessage() != null ? e.getMessage() : "";
 
       if (errorMsg.contains("409")) {
         // Race condition: template was created between our GET and INSERT
-        logger.info(
+        logger.debug(
             "Standalone template '{}' was created concurrently (409). Attempting update...",
             template.getKey());
         updateTemplate(template);
@@ -135,13 +135,13 @@ public class NotificationTemplateAutoProvisionerHandler implements EventHandler 
   }
 
   private void updateTemplate(NotificationTemplates template) {
-    logger.info("Updating standalone template '{}'", template.getKey());
+    logger.debug("Updating standalone template '{}'", template.getKey());
 
     try {
       notificationTemplateProviderService.run(
           Update.entity(NotificationTemplates_.CDS_NAME).data(template));
 
-      logger.info(
+      logger.debug(
           "Standalone NotificationTemplate '{}' updated in ANS successfully", template.getKey());
     } catch (Exception e) {
       String errorMsg = e.getMessage() != null ? e.getMessage() : "";

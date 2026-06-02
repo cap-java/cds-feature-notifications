@@ -172,7 +172,7 @@ public class EntityNotificationHandler implements EventHandler {
     // Optional: explicit parameter mapping (entity field → notification property)
     Map<?, ?> properties = notification.get("parameters") instanceof Map<?, ?> m ? m : null;
 
-    logger.info(
+    logger.debug(
         "Entity notification triggered: type='{}', event='{}', entity='{}'",
         notificationType,
         currentEvent,
@@ -307,7 +307,7 @@ public class EntityNotificationHandler implements EventHandler {
       EventContext notificationCtx = EventContext.create(notificationType, null);
       notificationCtx.put("data", batchData);
       service.emit(notificationCtx);
-      logger.info(
+      logger.debug(
           "Emitted {} notification(s) for event '{}' on service '{}'",
           batchData.size(),
           notificationType,

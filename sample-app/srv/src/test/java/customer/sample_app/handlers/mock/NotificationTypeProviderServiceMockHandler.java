@@ -45,7 +45,7 @@ public class NotificationTypeProviderServiceMockHandler implements EventHandler 
 
   @On(event = CqnService.EVENT_CREATE, entity = NotificationTypes_.CDS_NAME)
   public void interceptCreate(CdsCreateEventContext context) {
-    logger.info(
+    logger.debug(
         "MockHandler intercepting NotificationTypes CREATE - {} entries",
         context.getCqn().entries().size());
 
@@ -57,7 +57,7 @@ public class NotificationTypeProviderServiceMockHandler implements EventHandler 
         .entries()
         .forEach(
             entry -> {
-              logger.info("NotificationType entry data: {}", entry);
+              logger.debug("NotificationType entry data: {}", entry);
 
               NotificationTypes notificationType = NotificationTypes.create();
               entry.forEach(notificationType::put);
@@ -78,7 +78,7 @@ public class NotificationTypeProviderServiceMockHandler implements EventHandler 
                       + notificationType.getNotificationTypeVersion();
               notificationTypeByKeyVersion.put(keyVersion, notificationType);
 
-              logger.info(
+              logger.debug(
                   "Mock NotificationTypeProviderService: Stored notification type with ID: {}, Key: {}, Version: {}",
                   notificationType.getNotificationTypeId(),
                   notificationType.getNotificationTypeKey(),
@@ -95,7 +95,7 @@ public class NotificationTypeProviderServiceMockHandler implements EventHandler 
 
   @On(event = CqnService.EVENT_READ, entity = NotificationTypes_.CDS_NAME)
   public void interceptRead(CdsReadEventContext context) {
-    logger.info("MockHandler intercepting NotificationTypes READ");
+    logger.debug("MockHandler intercepting NotificationTypes READ");
 
     List<Map<String, Object>> results = new ArrayList<>();
     for (NotificationTypes nt : notificationTypeStore.values()) {
@@ -104,14 +104,14 @@ public class NotificationTypeProviderServiceMockHandler implements EventHandler 
       results.add(row);
     }
 
-    logger.info("MockHandler returning {} notification types for READ", results.size());
+    logger.debug("MockHandler returning {} notification types for READ", results.size());
     context.setResult(results);
     context.setCompleted();
   }
 
   @On(event = CqnService.EVENT_UPDATE, entity = NotificationTypes_.CDS_NAME)
   public void interceptUpdate(CdsUpdateEventContext context) {
-    logger.info("MockHandler intercepting NotificationTypes UPDATE");
+    logger.debug("MockHandler intercepting NotificationTypes UPDATE");
 
     context
         .getCqn()
@@ -133,7 +133,7 @@ public class NotificationTypeProviderServiceMockHandler implements EventHandler 
                 String key = updated.getNotificationTypeKey();
                 updateCountByKey.computeIfAbsent(key, k -> new AtomicInteger(0)).incrementAndGet();
 
-                logger.info("MockHandler updated notification type: Key={}, ID={}", key, id);
+                logger.debug("MockHandler updated notification type: Key={}, ID={}", key, id);
               } else {
                 logger.warn("MockHandler UPDATE: no existing type with ID={}", id);
               }
@@ -180,7 +180,7 @@ public class NotificationTypeProviderServiceMockHandler implements EventHandler 
     notificationTypeStore.clear();
     notificationTypeByKeyVersion.clear();
     updateCountByKey.clear();
-    logger.info("Mock NotificationTypeProviderService: Cleared all notification types");
+    logger.debug("Mock NotificationTypeProviderService: Cleared all notification types");
   }
 
   /**

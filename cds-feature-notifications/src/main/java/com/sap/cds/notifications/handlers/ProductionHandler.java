@@ -39,7 +39,7 @@ public class ProductionHandler implements EventHandler {
     }
 
     String eventName = results.get(0).eventName();
-    logger.info("=== Processing {} notification(s) for event: {} ===", results.size(), eventName);
+    logger.debug("=== Processing {} notification(s) for event: {} ===", results.size(), eventName);
 
     int successCount = 0;
     Exception firstError = null;
@@ -66,7 +66,7 @@ public class ProductionHandler implements EventHandler {
       }
     }
 
-    logger.info(
+    logger.debug(
         "Sent {}/{} notification(s) for event: {}", successCount, results.size(), eventName);
 
     if (firstError != null) {

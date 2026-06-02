@@ -41,7 +41,7 @@ public class NotificationTemplateProviderServiceMockHandler implements EventHand
 
   @On(event = CqnService.EVENT_CREATE, entity = NotificationTemplates_.CDS_NAME)
   public void interceptCreate(CdsCreateEventContext context) {
-    logger.info(
+    logger.debug(
         "MockHandler intercepting NotificationTemplates CREATE - {} entries",
         context.getCqn().entries().size());
 
@@ -52,7 +52,7 @@ public class NotificationTemplateProviderServiceMockHandler implements EventHand
         .entries()
         .forEach(
             entry -> {
-              logger.info("NotificationTemplate entry data: {}", entry);
+              logger.debug("NotificationTemplate entry data: {}", entry);
 
               NotificationTemplates template = NotificationTemplates.create();
               entry.forEach(template::put);
@@ -65,7 +65,7 @@ public class NotificationTemplateProviderServiceMockHandler implements EventHand
               // Store template by key
               templateStore.put(key, template);
 
-              logger.info(
+              logger.debug(
                   "Mock NotificationTemplateProviderService: Stored template with Key: {}, Visibility: {}",
                   key,
                   template.getVisibility());
@@ -79,7 +79,7 @@ public class NotificationTemplateProviderServiceMockHandler implements EventHand
 
   @On(event = CqnService.EVENT_READ, entity = NotificationTemplates_.CDS_NAME)
   public void interceptRead(CdsReadEventContext context) {
-    logger.info("MockHandler intercepting NotificationTemplates READ");
+    logger.debug("MockHandler intercepting NotificationTemplates READ");
 
     List<Map<String, Object>> results = new ArrayList<>();
     for (NotificationTemplates template : templateStore.values()) {
@@ -88,14 +88,14 @@ public class NotificationTemplateProviderServiceMockHandler implements EventHand
       results.add(row);
     }
 
-    logger.info("MockHandler returning {} notification templates for READ", results.size());
+    logger.debug("MockHandler returning {} notification templates for READ", results.size());
     context.setResult(results);
     context.setCompleted();
   }
 
   @On(event = CqnService.EVENT_UPDATE, entity = NotificationTemplates_.CDS_NAME)
   public void interceptUpdate(CdsUpdateEventContext context) {
-    logger.info("MockHandler intercepting NotificationTemplates UPDATE");
+    logger.debug("MockHandler intercepting NotificationTemplates UPDATE");
 
     context
         .getCqn()
@@ -111,7 +111,7 @@ public class NotificationTemplateProviderServiceMockHandler implements EventHand
                 updateCountByKey
                     .computeIfAbsent(key, k -> new AtomicInteger(0))
                     .incrementAndGet();
-                logger.info("MockHandler updated notification template: Key={}", key);
+                logger.debug("MockHandler updated notification template: Key={}", key);
               } else {
                 logger.warn("MockHandler UPDATE: no existing template with Key={}", key);
               }
@@ -148,7 +148,7 @@ public class NotificationTemplateProviderServiceMockHandler implements EventHand
   public static void clearAllTemplates() {
     templateStore.clear();
     updateCountByKey.clear();
-    logger.info("Mock NotificationTemplateProviderService: Cleared all templates");
+    logger.debug("Mock NotificationTemplateProviderService: Cleared all templates");
   }
 
   /**

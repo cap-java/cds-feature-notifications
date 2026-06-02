@@ -102,7 +102,7 @@ public class NotificationTemplateBuilder {
 
     template.setTranslations(translations);
 
-    logger.info("Extracted standalone NotificationTemplate: Key={}, Source={}", key, source);
+    logger.debug("Extracted standalone NotificationTemplate: Key={}, Source={}", key, source);
     return Optional.of(template);
   }
 
@@ -181,7 +181,7 @@ public class NotificationTemplateBuilder {
       if (htmlValue.endsWith(".html")) {
         String htmlContent = i18nHelper.loadHtmlFromClasspath(htmlValue, i18nTexts);
         email.setBodyHtml(htmlContent);
-        logger.info("Loaded HTML template from file: {}", htmlValue);
+        logger.debug("Loaded HTML template from file: {}", htmlValue);
       } else {
         email.setBodyHtml(htmlValue);
       }
