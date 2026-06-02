@@ -138,8 +138,8 @@ type DeliveryChannelType : String enum {
 service NotificationService {
   
   @description : '{i18n>DESCRIPTION}'
-  @UI.AdaptationHidden: false
   @notification : {
+     customizable: true,
      template: {
         title : '{i18n>TEMPLATE_SENSITIVE}',
         publicTitle : '{i18n>TEMPLATE_PUBLIC}',

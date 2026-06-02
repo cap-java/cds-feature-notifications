@@ -139,13 +139,13 @@ The `template` section defines the visible content of the notification: titles, 
 | Annotation | Required | Description |
 |---|---|---|
 | `@description` | No | Description label of a notification type. Shown to administrators and end-users in the SAP Build Work Zone notification type management UI. |
+| `@notification.customizable` | No | Controls whether customer administrators can see and customize this template. `true` = PUBLIC (visible for customization), absent or `false` = PRIVATE (default). See [Template Customization](#template-customization). |
 | `@notification.template.title` | **Yes** | Detailed notification title, shown to the recipient and authorized users. May contain sensitive information (e.g. "Low stock: Wuthering Heights by Emily Brontë"). Mapped to `TemplateSensitive` in ANS. |
 | `@notification.template.publicTitle` | **Yes** | Short, non-sensitive title shown when the viewer is not authorized to see the full details (e.g. "Low Stock Alert"). Mapped to `TemplatePublic` in ANS. |
 | `@notification.template.subtitle` | **Yes** | Subtitle for the notification. |
 | `@notification.template.groupedTitle` | **Yes** | Title shown when multiple notifications of the same type are collapsed into a single group (e.g. "Low stock alerts"). |
 | `@notification.template.email.subject` | No | Email subject line. |
 | `@notification.template.email.html` | No | Inline HTML or classpath path to HTML template file. See [Step 3](#step-3-add-email-html-template-optional) for details. |
-| `@UI.AdaptationHidden` | No | Controls whether customer administrators can see and customize this template. `false` = PUBLIC (visible for customization), absent or `true` = PRIVATE (default). See [Template Customization](#template-customization). |
 | `@notification.deliveryChannels` | No | How the notification is delivered: Web and/or Email. If omitted, notifications are delivered via Web only (no email). Each entry has: `channel` (`#Mail` or `#Web`), `enabled` (Boolean), and `defaultPreference` (Boolean, whether the channel is enabled by default for users). Note: setting `#Mail` here is not enough on its own. The ANS instance must be configured with an email infrastructure (see [ANS Service Binding](#option-1-ans-service-binding)). |
 | `@notification.priority` | No | You can set a static notification priority: Priority enum (`#LOW`, `#NEUTRAL`, `#MEDIUM`, `#HIGH`). Can also be a CDS expression (see [Dynamic Priority](#dynamic-priority)). |
 | `@Common.SemanticObject` | No | Maps to `NavigationTargetObject` in ANS. Used for SAP Fiori launchpad navigation. Allows users to navigate directly to the relevant Fiori application when clicking the notification in SAP Build Work Zone. |
@@ -723,11 +723,11 @@ For the full setup guide, see [Identity Directory Connectivity](https://help.sap
 
 The plugin automatically provisions notification templates to ANS during application startup. These templates enable customer administrators to create customized copies of your notification content for their organization. For details on how template customization works from the admin perspective, see the [Template Customization documentation](https://github.wdf.sap.corp/pages/sl-hybrid/ans/notifications-scenario/template-customization/).
 
-By default, templates are `PRIVATE` (not visible to customer admins). To make a template visible and customizable by admins, add `@UI.AdaptationHidden: false`:
+By default, templates are `PRIVATE` (not visible to customer admins). To make a template visible and customizable by admins, add `@notification.customizable: true`:
 
 ```cds
-@UI.AdaptationHidden: false
 @notification : {
+   customizable: true,
    template: {
       title : '{i18n>TEMPLATE_SENSITIVE}',
       ...

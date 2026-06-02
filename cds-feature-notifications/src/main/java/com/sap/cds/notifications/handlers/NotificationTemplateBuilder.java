@@ -69,8 +69,8 @@ public class NotificationTemplateBuilder {
     NotificationTemplates template = Struct.create(NotificationTemplates.class);
     template.setKey(key);
 
-    // Visibility - from @UI.AdaptationHidden annotation (ANS defaults to PRIVATE)
-    // @UI.AdaptationHidden: false → PUBLIC, absent or true → PRIVATE (default)
+    // Visibility - from @notification.customizable annotation (ANS defaults to PRIVATE)
+    // @notification.customizable: true → PUBLIC, absent or false → PRIVATE (default)
     String visibility = extractVisibility(event);
     if (visibility != null) {
       template.setVisibility(visibility);
@@ -195,19 +195,19 @@ public class NotificationTemplateBuilder {
   }
 
   /**
-   * Extract visibility from @UI.AdaptationHidden annotation.
-   * Returns "PUBLIC" if @UI.AdaptationHidden: false, null otherwise (ANS defaults to PRIVATE).
+   * Extract visibility from @notification.customizable annotation.
+   * Returns "PUBLIC" if @notification.customizable: true, null otherwise (ANS defaults to PRIVATE).
    */
   private String extractVisibility(CdsEvent event) {
     return event
-        .findAnnotation("UI.AdaptationHidden")
+        .findAnnotation("notification.customizable")
         .map(a -> {
           Object val = a.getValue();
-          // @UI.AdaptationHidden: false → template is PUBLIC (visible for customization)
-          if (Boolean.FALSE.equals(val) || "false".equalsIgnoreCase(String.valueOf(val))) {
+          // @notification.customizable: true → template is PUBLIC (visible for customization)
+          if (Boolean.TRUE.equals(val) || "true".equalsIgnoreCase(String.valueOf(val))) {
             return "PUBLIC";
           }
-          // @UI.AdaptationHidden: true or any other value → PRIVATE (default)
+          // @notification.customizable: false or any other value → PRIVATE (default)
           return null;
         })
         .orElse(null);
