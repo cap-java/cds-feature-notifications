@@ -69,7 +69,8 @@ public class NotificationTemplateBuilder {
     NotificationTemplates template = Struct.create(NotificationTemplates.class);
     template.setKey(key);
 
-    // Visibility - from @notification.template.visibility annotation (ANS defaults to PRIVATE)
+    // Visibility - from @UI.AdaptationHidden annotation (ANS defaults to PRIVATE)
+    // @UI.AdaptationHidden: false → PUBLIC, absent or true → PRIVATE (default)
     String visibility = extractVisibility(event);
     if (visibility != null) {
       template.setVisibility(visibility);
@@ -194,21 +195,21 @@ public class NotificationTemplateBuilder {
   }
 
   /**
-   * Extract visibility from @notification.template.visibility annotation. Returns null if not
-   * specified (ANS defaults to PRIVATE). Only PUBLIC and PRIVATE are valid values.
+   * Extract visibility from @UI.AdaptationHidden annotation.
+   * Returns "PUBLIC" if @UI.AdaptationHidden: false, null otherwise (ANS defaults to PRIVATE).
    */
   private String extractVisibility(CdsEvent event) {
     return event
-        .findAnnotation("notification.template.visibility")
+        .findAnnotation("UI.AdaptationHidden")
         .map(a -> {
           Object val = a.getValue();
-          if (val instanceof Map<?, ?> enumMap) {
-            // Enum: {#=PUBLIC}
-            return enumMap.values().stream().findFirst().map(Object::toString).orElse(null).toUpperCase();
+          // @UI.AdaptationHidden: false → template is PUBLIC (visible for customization)
+          if (Boolean.FALSE.equals(val) || "false".equalsIgnoreCase(String.valueOf(val))) {
+            return "PUBLIC";
           }
-          return val.toString().toUpperCase();
+          // @UI.AdaptationHidden: true or any other value → PRIVATE (default)
+          return null;
         })
-        .filter(v -> "PUBLIC".equals(v) || "PRIVATE".equals(v))
         .orElse(null);
   }
 
