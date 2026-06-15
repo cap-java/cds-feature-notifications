@@ -136,6 +136,27 @@
         </executions>
       </plugin>
 
+      <!-- JACOCO CODE COVERAGE -->
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <phase>test</phase>
+          </execution>
+        </executions>
+      </plugin>
+
       <!-- CDS Maven Plugin for generating Java classes from CSN -->
       <plugin>
         <groupId>com.sap.cds</groupId>
