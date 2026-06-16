@@ -60,60 +60,54 @@ public class LocalNotificationTemplateAutoProvisionerHandler implements EventHan
   }
 
   private void logTemplate(NotificationTemplates template) {
-    System.out.println("\n===============================================================");
-    System.out.println("Standalone NotificationTemplate (Local Mode - Not Sent to ANS)");
-    System.out.println("  Key: " + template.getKey());
-    System.out.println("  Visibility: " + template.getVisibility());
-    System.out.println(
-        "  Translations ("
-            + (template.getTranslations() != null ? template.getTranslations().size() : 0)
-            + "):");
+    logger.info("===============================================================");
+    logger.info("Standalone NotificationTemplate (Local Mode - Not Sent to ANS)");
+    logger.info(
+        """
+          Key: {}
+          Visibility: {}
+          Translations: {}""",
+        template.getKey(),
+        template.getVisibility(),
+        template.getTranslations() != null ? template.getTranslations().size() : 0);
 
     if (template.getTranslations() != null) {
       for (Translations translation : template.getTranslations()) {
-        System.out.println(
-            "    - Language: "
-                + translation.getLanguage()
-                + "\n"
-                + "      Syntax: "
-                + translation.getSyntax()
-                + "\n"
-                + "      Title: "
-                + translation.getTitle()
-                + "\n"
-                + "      Preview: "
-                + translation.getPreview()
-                + "\n"
-                + "      Body: "
-                + translation.getBody()
-                + "\n"
-                + "      Description: "
-                + translation.getDescription());
+        logger.info(
+            """
+              - Language: {}
+                Syntax: {}
+                Title: {}
+                Preview: {}
+                Body: {}
+                Description: {}""",
+            translation.getLanguage(),
+            translation.getSyntax(),
+            translation.getTitle(),
+            translation.getPreview(),
+            translation.getBody(),
+            translation.getDescription());
 
         if (translation.getEmail() != null) {
-          System.out.println(
-              "      Email Subject: "
-                  + translation.getEmail().getSubject()
-                  + "\n"
-                  + "      Email BodyHtml: "
-                  + (translation.getEmail().getBodyHtml() != null
-                      ? translation
-                              .getEmail()
-                              .getBodyHtml()
-                              .substring(
-                                  0, Math.min(100, translation.getEmail().getBodyHtml().length()))
-                          + "..."
-                      : "null")
-                  + "\n"
-                  + "      Email BodyText: "
-                  + translation.getEmail().getBodyText());
+          logger.info(
+              """
+                Email Subject: {}
+                Email BodyHtml: {}
+                Email BodyText: {}""",
+              translation.getEmail().getSubject(),
+              translation.getEmail().getBodyHtml() != null
+                  ? translation
+                          .getEmail()
+                          .getBodyHtml()
+                          .substring(0, Math.min(100, translation.getEmail().getBodyHtml().length()))
+                      + "..."
+                  : "null",
+              translation.getEmail().getBodyText());
         }
       }
     }
 
-    System.out.println("===============================================================\n");
-
-    logger.info(
-        "Standalone template '{}' logged (LOCAL MODE - not sent to ANS)", template.getKey());
+    logger.info("===============================================================");
+    logger.info("Standalone template '{}' logged (LOCAL MODE - not sent to ANS)", template.getKey());
   }
 }
