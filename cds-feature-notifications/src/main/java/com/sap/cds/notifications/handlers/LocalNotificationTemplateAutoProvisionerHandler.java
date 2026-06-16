@@ -5,6 +5,8 @@ package com.sap.cds.notifications.handlers;
 
 import cds.gen.notificationtemplateproviderservice.NotificationTemplates;
 import cds.gen.notificationtemplateproviderservice.Translations;
+
+import com.sap.cds.notifications.builders.NotificationTemplateBuilder;
 import com.sap.cds.services.application.ApplicationLifecycleService;
 import com.sap.cds.services.handler.EventHandler;
 import com.sap.cds.services.handler.annotations.On;

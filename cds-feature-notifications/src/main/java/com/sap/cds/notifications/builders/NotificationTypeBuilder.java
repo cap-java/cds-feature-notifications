@@ -1,7 +1,7 @@
 /*
  * © 2026 SAP SE or an SAP affiliate company and cds-feature-notifications contributors.
  */
-package com.sap.cds.notifications.handlers;
+package com.sap.cds.notifications.builders;
 
 import cds.gen.notificationtypeproviderservice.DeliveryChannels;
 import cds.gen.notificationtypeproviderservice.NotificationTypes;

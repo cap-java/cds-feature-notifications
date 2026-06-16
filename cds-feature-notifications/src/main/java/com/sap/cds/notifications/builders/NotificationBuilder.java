@@ -1,7 +1,7 @@
 /*
  * © 2026 SAP SE or an SAP affiliate company and cds-feature-notifications contributors.
  */
-package com.sap.cds.notifications.handlers;
+package com.sap.cds.notifications.builders;
 
 import cds.gen.notificationproviderservice.NotificationProperties;
 import cds.gen.notificationproviderservice.Notifications;
@@ -274,7 +274,7 @@ public class NotificationBuilder {
    * @param serviceCatalog service catalog to obtain the persistence service
    * @return query result containing a single row with column "result"
    */
-  static Result executeDummySelect(CqnValue resolvedExpression, ServiceCatalog serviceCatalog) {
+  public static Result executeDummySelect(CqnValue resolvedExpression, ServiceCatalog serviceCatalog) {
     Value<?> expr = ExpressionBuilder.create(resolvedExpression).value();
     PersistenceService ps =
         serviceCatalog.getService(PersistenceService.class, PersistenceService.DEFAULT_NAME);
@@ -298,7 +298,7 @@ public class NotificationBuilder {
    *     be null if both {@code value} and {@code term} are guaranteed to be literals
    * @return a tautology ({@code 1=1}) or contradiction ({@code 1=0}) predicate
    */
-  static CqnPredicate evaluateContainment(
+  public static CqnPredicate evaluateContainment(
       CqnContainmentTest.Position position,
       CqnValue value,
       CqnValue term,
@@ -431,7 +431,7 @@ public class NotificationBuilder {
 
   // Auto-detects UUID vs email and maps to GlobalUserId or RecipientId accordingly
   @VisibleForTesting
-  static Recipients createRecipientFromId(String recipientId) {
+  public static Recipients createRecipientFromId(String recipientId) {
     Recipients recipient = Struct.create(Recipients.class);
     if (isUUID(recipientId)) {
       recipient.setGlobalUserId(recipientId);
@@ -449,7 +449,7 @@ public class NotificationBuilder {
   }
 
   @VisibleForTesting
-  static boolean isUUID(String value) {
+  public static boolean isUUID(String value) {
     try {
       UUID.fromString(value);
       return true;
@@ -464,7 +464,7 @@ public class NotificationBuilder {
       Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
   @VisibleForTesting
-  static boolean isEmail(String value) {
+  public static boolean isEmail(String value) {
     return EMAIL_PATTERN.matcher(value).matches();
   }
 

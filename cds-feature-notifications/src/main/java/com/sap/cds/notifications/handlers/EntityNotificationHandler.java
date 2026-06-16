@@ -6,6 +6,7 @@ package com.sap.cds.notifications.handlers;
 import com.sap.cds.CdsData;
 import com.sap.cds.Result;
 import com.sap.cds.Struct;
+import com.sap.cds.notifications.builders.NotificationBuilder;
 import com.sap.cds.ql.CQL;
 import com.sap.cds.ql.cqn.CqnContainmentTest;
 import com.sap.cds.ql.cqn.CqnElementRef;

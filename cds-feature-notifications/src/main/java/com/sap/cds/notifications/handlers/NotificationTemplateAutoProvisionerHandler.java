@@ -6,6 +6,8 @@ package com.sap.cds.notifications.handlers;
 import cds.gen.notificationtemplateproviderservice.NotificationTemplateProviderService;
 import cds.gen.notificationtemplateproviderservice.NotificationTemplates;
 import cds.gen.notificationtemplateproviderservice.NotificationTemplates_;
+
+import com.sap.cds.notifications.builders.NotificationTemplateBuilder;
 import com.sap.cds.ql.Insert;
 import com.sap.cds.ql.Select;
 import com.sap.cds.ql.Update;

@@ -1,11 +1,13 @@
 /*
  * © 2026 SAP SE or an SAP affiliate company and cds-feature-notifications contributors.
  */
-package com.sap.cds.notifications.handlers;
+package com.sap.cds.notifications.builders;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import cds.gen.notificationproviderservice.Recipients;
+
+import com.sap.cds.notifications.builders.NotificationBuilder;
 import com.sap.cds.ql.CQL;
 import com.sap.cds.ql.cqn.CqnComparisonPredicate;
 import com.sap.cds.ql.cqn.CqnContainmentTest;

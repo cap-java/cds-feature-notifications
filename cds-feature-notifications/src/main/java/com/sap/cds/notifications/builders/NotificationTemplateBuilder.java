@@ -1,7 +1,7 @@
 /*
  * © 2026 SAP SE or an SAP affiliate company and cds-feature-notifications contributors.
  */
-package com.sap.cds.notifications.handlers;
+package com.sap.cds.notifications.builders;
 
 import cds.gen.notificationtemplateproviderservice.Email;
 import cds.gen.notificationtemplateproviderservice.NotificationTemplates;

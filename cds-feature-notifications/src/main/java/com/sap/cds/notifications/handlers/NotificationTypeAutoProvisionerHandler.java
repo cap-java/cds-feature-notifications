@@ -6,6 +6,8 @@ package com.sap.cds.notifications.handlers;
 import cds.gen.notificationtypeproviderservice.NotificationTypeProviderService;
 import cds.gen.notificationtypeproviderservice.NotificationTypes;
 import cds.gen.notificationtypeproviderservice.NotificationTypes_;
+
+import com.sap.cds.notifications.builders.NotificationTypeBuilder;
 import com.sap.cds.ql.Insert;
 import com.sap.cds.ql.Select;
 import com.sap.cds.ql.Update;
