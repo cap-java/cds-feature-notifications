@@ -148,10 +148,6 @@ public class NotificationServiceConfiguration implements CdsRuntimeConfiguration
                       .onBehalfOf(OnBehalfOf.TECHNICAL_USER_CURRENT_TENANT)
                       .build());
 
-      System.out.println("http destination is " + httpDestination);
-      System.out.println("http destination url is " + httpDestination.getUri());
-      System.out.println("http destination name value is" + httpDestination.get("name").get());
-
       // Add the destination to CDS runtime so RemoteServiceConfig can use it
       DestinationAccessor.prependDestinationLoader(
           new DefaultDestinationLoader()
