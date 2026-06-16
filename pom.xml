@@ -34,6 +34,7 @@
   <modules>
     <module>cds-feature-notifications</module>
     <module>sample-app</module>
+    <module>coverage-report</module>
   </modules>
 
   <scm>
