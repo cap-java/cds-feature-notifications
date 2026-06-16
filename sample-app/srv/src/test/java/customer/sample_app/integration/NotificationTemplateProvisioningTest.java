@@ -5,8 +5,11 @@ package customer.sample_app.integration;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import cds.gen.notificationtemplateproviderservice.NotificationTemplateProviderService;
 import cds.gen.notificationtemplateproviderservice.NotificationTemplates;
 import cds.gen.notificationtemplateproviderservice.Translations;
+import com.sap.cds.notifications.handlers.NotificationTemplateAutoProvisionerHandler;
+import com.sap.cds.services.runtime.CdsRuntime;
 import customer.sample_app.handlers.mock.NotificationTemplateProviderServiceMockHandler;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +17,7 @@ import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -31,6 +35,15 @@ public class NotificationTemplateProvisioningTest {
 
   /** Pattern to detect unresolved i18n placeholders like {i18n>KEY} */
   private static final Pattern UNRESOLVED_I18N = Pattern.compile("\\{i18n>[^}]+\\}");
+
+  @Autowired private CdsRuntime cdsRuntime;
+
+  @Autowired private NotificationTemplateProviderService notificationTemplateProviderService;
+
+  private NotificationTemplateAutoProvisionerHandler createProvisioner() {
+    return new NotificationTemplateAutoProvisionerHandler(
+        cdsRuntime, notificationTemplateProviderService);
+  }
 
   // ──────────────────────────────────────────────────────────────
   // Test 1: Templates are provisioned at startup
@@ -498,5 +511,38 @@ public class NotificationTemplateProvisioningTest {
           UNRESOLVED_I18N.matcher(value).find(),
           "Unresolved {i18n>...} placeholder in " + fieldName + " [" + lang + "]: " + value);
     }
+  }
+
+  // ──────────────────────────────────────────────────────────────
+  // Test: Re-provisioning updates existing templates
+  // ──────────────────────────────────────────────────────────────
+
+  @Test
+  void testReProvisioningUpdatesExistingTemplates() {
+    LOG.debug("==========================================");
+    LOG.debug("Test: Re-provisioning should UPDATE existing templates");
+    LOG.debug("==========================================");
+
+    int countBefore = NotificationTemplateProviderServiceMockHandler.getTemplateCount();
+    assertTrue(countBefore > 0, "Templates should already be provisioned at startup");
+
+    int updatesBefore =
+        NotificationTemplateProviderServiceMockHandler.getUpdateCount("CertificateExpiration");
+
+    createProvisioner().onApplicationPrepared();
+
+    int updatesAfter =
+        NotificationTemplateProviderServiceMockHandler.getUpdateCount("CertificateExpiration");
+    assertEquals(
+        updatesBefore + 1,
+        updatesAfter,
+        "CertificateExpiration template should have been updated once during re-provisioning");
+
+    assertEquals(
+        countBefore,
+        NotificationTemplateProviderServiceMockHandler.getTemplateCount(),
+        "Template count should remain the same after re-provisioning");
+
+    LOG.debug("Re-provisioning triggered UPDATE for existing templates");
   }
 }
