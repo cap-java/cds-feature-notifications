@@ -5,9 +5,14 @@ package com.sap.cds.notifications.helpers;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import com.sap.cds.adapter.edmx.EdmxI18nProvider;
 import com.sap.cds.services.runtime.CdsRuntime;
+import java.util.Collections;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -70,6 +75,47 @@ class I18nHelperTest {
     @Test
     void fileNotFound_returnsNull() {
       assertNull(i18nHelper.loadHtmlFromClasspath("non/existent/file.html", Map.of()));
+    }
+  }
+
+  @Nested
+  @DisplayName("getAvailableLocales")
+  class GetAvailableLocalesTests {
+
+    @Test
+    void nullProvider_fallsBackToEnglish() {
+      CdsRuntime runtime = mock(CdsRuntime.class);
+      when(runtime.getProvider(EdmxI18nProvider.class)).thenReturn(null);
+      I18nHelper helper = new I18nHelper(runtime);
+
+      Set<Locale> locales = helper.getAvailableLocales();
+      assertEquals(Set.of(Locale.ENGLISH), locales);
+    }
+
+    @Test
+    void emptyLocalesFromProvider_fallsBackToEnglish() {
+      EdmxI18nProvider provider = mock(EdmxI18nProvider.class);
+      when(provider.getLocales()).thenReturn(Collections.emptySet());
+      CdsRuntime runtime = mock(CdsRuntime.class);
+      when(runtime.getProvider(EdmxI18nProvider.class)).thenReturn(provider);
+      I18nHelper helper = new I18nHelper(runtime);
+
+      Set<Locale> locales = helper.getAvailableLocales();
+      assertEquals(Set.of(Locale.ENGLISH), locales);
+    }
+  }
+
+  @Nested
+  @DisplayName("getI18nTexts")
+  class GetI18nTextsTests {
+
+    @Test
+    void nullProvider_returnsEmptyMap() {
+      CdsRuntime runtime = mock(CdsRuntime.class);
+      when(runtime.getProvider(EdmxI18nProvider.class)).thenReturn(null);
+      I18nHelper helper = new I18nHelper(runtime);
+
+      assertTrue(helper.getI18nTexts(Locale.ENGLISH).isEmpty());
     }
   }
 }
