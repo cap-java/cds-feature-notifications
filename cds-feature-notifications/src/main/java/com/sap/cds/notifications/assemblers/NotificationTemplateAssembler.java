@@ -195,23 +195,11 @@ public class NotificationTemplateAssembler {
     return email;
   }
 
-  /**
-   * Extract visibility from @notification.customizable annotation.
-   * Returns "PUBLIC" if @notification.customizable: true, null otherwise (ANS defaults to PRIVATE).
-   */
   private String extractVisibility(CdsEvent event) {
-    return event
-        .findAnnotation("notification.customizable")
-        .map(a -> {
-          Object val = a.getValue();
-          // @notification.customizable: true → template is PUBLIC (visible for customization)
-          if (Boolean.TRUE.equals(val) || "true".equalsIgnoreCase(String.valueOf(val))) {
-            return "PUBLIC";
-          }
-          // @notification.customizable: false or any other value → PRIVATE (default)
-          return null;
-        })
-        .orElse(null);
+    return Boolean.TRUE.equals(
+            event.getAnnotationValue("notification.customizable", Boolean.FALSE))
+        ? "PUBLIC"
+        : null;
   }
 
   /**
