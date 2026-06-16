@@ -14,6 +14,7 @@ import com.sap.cds.reflect.CdsEvent;
 import com.sap.cds.reflect.CdsModel;
 import com.sap.cds.reflect.CdsSimpleType;
 import com.sap.cds.services.runtime.CdsRuntime;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -247,10 +248,10 @@ public class NotificationTemplateBuilder {
    * Schema types. Excludes the 'recipients' field as it's not a template variable.
    */
   private String buildPropertiesSchema(CdsEvent event) {
-    StringBuilder sb = new StringBuilder();
-    sb.append("{\"type\":\"object\",\"properties\":{");
+    Map<String, Object> schema = new LinkedHashMap<>();
+    schema.put("type", "object");
 
-    List<String> propertyEntries = new ArrayList<>();
+    Map<String, Object> properties = new LinkedHashMap<>();
     List<String> requiredFields = new ArrayList<>();
 
     event
@@ -258,25 +259,24 @@ public class NotificationTemplateBuilder {
         .forEach(
             element -> {
               String fieldName = element.getName();
-              // Skip recipients - it's not a template variable
               if (!"recipients".equals(fieldName)) {
                 String jsonType = cdsTypeToJsonSchemaType(element);
-                propertyEntries.add(
-                    String.format(
-                        "\"%s\":{\"type\":\"%s\",\"title\":\"%s\"}",
-                        fieldName, jsonType, fieldName));
-                requiredFields.add("\"" + fieldName + "\"");
+                properties.put(fieldName, Map.of("type", jsonType, "title", fieldName));
+                requiredFields.add(fieldName);
               }
             });
 
-    sb.append(String.join(",", propertyEntries));
-    sb.append("},\"required\":[");
-    sb.append(String.join(",", requiredFields));
-    sb.append("]}");
+    schema.put("properties", properties);
+    schema.put("required", requiredFields);
 
-    String schema = sb.toString();
-    logger.debug("Generated PropertiesSchema: {}", schema);
-    return schema;
+    try {
+      String schemaJson = new ObjectMapper().writeValueAsString(schema);
+      logger.debug("Generated PropertiesSchema: {}", schemaJson);
+      return schemaJson;
+    } catch (Exception e) {
+      logger.error("Failed to serialize PropertiesSchema", e);
+      return "{}";
+    }
   }
 
   /** Map CDS element type to JSON Schema type string. */
