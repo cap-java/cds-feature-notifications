@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import cds.gen.notificationproviderservice.Recipients;
 
-import com.sap.cds.notifications.builders.NotificationBuilder;
+import com.sap.cds.notifications.assemblers.NotificationAssembler;
 import com.sap.cds.ql.CQL;
 import com.sap.cds.ql.cqn.CqnComparisonPredicate;
 import com.sap.cds.ql.cqn.CqnContainmentTest;
@@ -20,7 +20,7 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * Unit tests for recipient auto-detection logic in {@link NotificationBuilder}. Covers isUUID,
+ * Unit tests for recipient auto-detection logic in {@link NotificationAssembler}. Covers isUUID,
  * isEmail, and createRecipientFromId including edge cases (malformed, null, empty).
  */
 class NotificationBuilderTest {
@@ -33,17 +33,17 @@ class NotificationBuilderTest {
 
     @Test
     void validLowercaseUUID() {
-      assertTrue(NotificationBuilder.isUUID("550e8400-e29b-41d4-a716-446655440000"));
+      assertTrue(NotificationAssembler.isUUID("550e8400-e29b-41d4-a716-446655440000"));
     }
 
     @Test
     void validUppercaseUUID() {
-      assertTrue(NotificationBuilder.isUUID("550E8400-E29B-41D4-A716-446655440000"));
+      assertTrue(NotificationAssembler.isUUID("550E8400-E29B-41D4-A716-446655440000"));
     }
 
     @Test
     void validRandomUUID() {
-      assertTrue(NotificationBuilder.isUUID(java.util.UUID.randomUUID().toString()));
+      assertTrue(NotificationAssembler.isUUID(java.util.UUID.randomUUID().toString()));
     }
 
     @ParameterizedTest
@@ -57,12 +57,12 @@ class NotificationBuilderTest {
           "   "
         })
     void invalidStringsReturnFalse(String value) {
-      assertFalse(NotificationBuilder.isUUID(value));
+      assertFalse(NotificationAssembler.isUUID(value));
     }
 
     @Test
     void nullThrowsNullPointerException() {
-      assertThrows(NullPointerException.class, () -> NotificationBuilder.isUUID(null));
+      assertThrows(NullPointerException.class, () -> NotificationAssembler.isUUID(null));
     }
   }
 
@@ -83,7 +83,7 @@ class NotificationBuilderTest {
           "user123@test-server.example.com"
         })
     void validEmailsReturnTrue(String email) {
-      assertTrue(NotificationBuilder.isEmail(email), "Should accept valid email: " + email);
+      assertTrue(NotificationAssembler.isEmail(email), "Should accept valid email: " + email);
     }
 
     @ParameterizedTest
@@ -100,12 +100,12 @@ class NotificationBuilderTest {
           "550e8400-e29b-41d4-a716-446655440000"
         })
     void invalidEmailsReturnFalse(String value) {
-      assertFalse(NotificationBuilder.isEmail(value), "Should reject invalid email: " + value);
+      assertFalse(NotificationAssembler.isEmail(value), "Should reject invalid email: " + value);
     }
 
     @Test
     void nullThrowsNullPointerException() {
-      assertThrows(NullPointerException.class, () -> NotificationBuilder.isEmail(null));
+      assertThrows(NullPointerException.class, () -> NotificationAssembler.isEmail(null));
     }
   }
 
@@ -118,7 +118,7 @@ class NotificationBuilderTest {
     @Test
     void validUUID_mapsToGlobalUserId() {
       String uuid = "550e8400-e29b-41d4-a716-446655440000";
-      Recipients recipient = NotificationBuilder.createRecipientFromId(uuid);
+      Recipients recipient = NotificationAssembler.createRecipientFromId(uuid);
 
       assertEquals(uuid, recipient.getGlobalUserId(), "UUID should be mapped to GlobalUserId");
       assertNull(recipient.getRecipientId(), "UUID recipient should not have RecipientId");
@@ -127,7 +127,7 @@ class NotificationBuilderTest {
     @Test
     void validEmail_mapsToRecipientId() {
       String email = "ops-team@example.com";
-      Recipients recipient = NotificationBuilder.createRecipientFromId(email);
+      Recipients recipient = NotificationAssembler.createRecipientFromId(email);
 
       assertEquals(email, recipient.getRecipientId(), "Email should be mapped to RecipientId");
       assertNull(recipient.getGlobalUserId(), "Email recipient should not have GlobalUserId");
@@ -139,7 +139,7 @@ class NotificationBuilderTest {
       IllegalArgumentException ex =
           assertThrows(
               IllegalArgumentException.class,
-              () -> NotificationBuilder.createRecipientFromId(value));
+              () -> NotificationAssembler.createRecipientFromId(value));
       assertTrue(
           ex.getMessage().contains("Unsupported recipient format"),
           "Exception message should mention unsupported format");
@@ -148,14 +148,14 @@ class NotificationBuilderTest {
     @Test
     void emptyString_throwsIllegalArgumentException() {
       assertThrows(
-          IllegalArgumentException.class, () -> NotificationBuilder.createRecipientFromId(""));
+          IllegalArgumentException.class, () -> NotificationAssembler.createRecipientFromId(""));
     }
 
     @ParameterizedTest
     @NullSource
     void null_throwsNullPointerException(String value) {
       assertThrows(
-          NullPointerException.class, () -> NotificationBuilder.createRecipientFromId(value));
+          NullPointerException.class, () -> NotificationAssembler.createRecipientFromId(value));
     }
   }
 
@@ -184,7 +184,7 @@ class NotificationBuilderTest {
     @Test
     void contains_caseSensitive_match() {
       CqnPredicate result =
-          NotificationBuilder.evaluateContainment(
+          NotificationAssembler.evaluateContainment(
               CqnContainmentTest.Position.ANY,
               CQL.val("Hello World"),
               CQL.val("World"),
@@ -196,7 +196,7 @@ class NotificationBuilderTest {
     @Test
     void contains_caseSensitive_noMatch() {
       CqnPredicate result =
-          NotificationBuilder.evaluateContainment(
+          NotificationAssembler.evaluateContainment(
               CqnContainmentTest.Position.ANY,
               CQL.val("Hello World"),
               CQL.val("world"),
@@ -210,7 +210,7 @@ class NotificationBuilderTest {
     @Test
     void contains_caseInsensitive_match() {
       CqnPredicate result =
-          NotificationBuilder.evaluateContainment(
+          NotificationAssembler.evaluateContainment(
               CqnContainmentTest.Position.ANY,
               CQL.val("production-server"),
               CQL.val("PRODUCTION"),
@@ -222,7 +222,7 @@ class NotificationBuilderTest {
     @Test
     void contains_caseInsensitive_noMatch() {
       CqnPredicate result =
-          NotificationBuilder.evaluateContainment(
+          NotificationAssembler.evaluateContainment(
               CqnContainmentTest.Position.ANY,
               CQL.val("Hello World"),
               CQL.val("missing"),
@@ -236,7 +236,7 @@ class NotificationBuilderTest {
     @Test
     void startsWith_caseSensitive_match() {
       CqnPredicate result =
-          NotificationBuilder.evaluateContainment(
+          NotificationAssembler.evaluateContainment(
               CqnContainmentTest.Position.START,
               CQL.val("CRITICAL-alert"),
               CQL.val("CRITICAL"),
@@ -248,7 +248,7 @@ class NotificationBuilderTest {
     @Test
     void startsWith_caseSensitive_noMatch() {
       CqnPredicate result =
-          NotificationBuilder.evaluateContainment(
+          NotificationAssembler.evaluateContainment(
               CqnContainmentTest.Position.START,
               CQL.val("CRITICAL-alert"),
               CQL.val("critical"),
@@ -262,7 +262,7 @@ class NotificationBuilderTest {
     @Test
     void startsWith_caseInsensitive_match() {
       CqnPredicate result =
-          NotificationBuilder.evaluateContainment(
+          NotificationAssembler.evaluateContainment(
               CqnContainmentTest.Position.START,
               CQL.val("CRITICAL-alert"),
               CQL.val("critical"),
@@ -274,7 +274,7 @@ class NotificationBuilderTest {
     @Test
     void startsWith_caseInsensitive_noMatch() {
       CqnPredicate result =
-          NotificationBuilder.evaluateContainment(
+          NotificationAssembler.evaluateContainment(
               CqnContainmentTest.Position.START,
               CQL.val("Hello World"),
               CQL.val("world"),
@@ -288,7 +288,7 @@ class NotificationBuilderTest {
     @Test
     void endsWith_caseSensitive_match() {
       CqnPredicate result =
-          NotificationBuilder.evaluateContainment(
+          NotificationAssembler.evaluateContainment(
               CqnContainmentTest.Position.END,
               CQL.val("server-PROD"),
               CQL.val("-PROD"),
@@ -300,7 +300,7 @@ class NotificationBuilderTest {
     @Test
     void endsWith_caseSensitive_noMatch() {
       CqnPredicate result =
-          NotificationBuilder.evaluateContainment(
+          NotificationAssembler.evaluateContainment(
               CqnContainmentTest.Position.END,
               CQL.val("server-PROD"),
               CQL.val("-prod"),
@@ -314,7 +314,7 @@ class NotificationBuilderTest {
     @Test
     void endsWith_caseInsensitive_match() {
       CqnPredicate result =
-          NotificationBuilder.evaluateContainment(
+          NotificationAssembler.evaluateContainment(
               CqnContainmentTest.Position.END,
               CQL.val("server-PROD"),
               CQL.val("-prod"),
@@ -326,7 +326,7 @@ class NotificationBuilderTest {
     @Test
     void endsWith_caseInsensitive_noMatch() {
       CqnPredicate result =
-          NotificationBuilder.evaluateContainment(
+          NotificationAssembler.evaluateContainment(
               CqnContainmentTest.Position.END,
               CQL.val("server-PROD"),
               CQL.val("-staging"),
@@ -340,7 +340,7 @@ class NotificationBuilderTest {
     @Test
     void emptyTerm_alwaysMatches() {
       CqnPredicate result =
-          NotificationBuilder.evaluateContainment(
+          NotificationAssembler.evaluateContainment(
               CqnContainmentTest.Position.ANY, CQL.val("anything"), CQL.val(""), false, null);
       assertTrue(isMatch(result));
     }
@@ -348,7 +348,7 @@ class NotificationBuilderTest {
     @Test
     void emptyValue_noMatch() {
       CqnPredicate result =
-          NotificationBuilder.evaluateContainment(
+          NotificationAssembler.evaluateContainment(
               CqnContainmentTest.Position.ANY, CQL.val(""), CQL.val("something"), false, null);
       assertFalse(isMatch(result));
     }
@@ -356,7 +356,7 @@ class NotificationBuilderTest {
     @Test
     void bothEmpty_matches() {
       CqnPredicate result =
-          NotificationBuilder.evaluateContainment(
+          NotificationAssembler.evaluateContainment(
               CqnContainmentTest.Position.ANY, CQL.val(""), CQL.val(""), false, null);
       assertTrue(isMatch(result));
     }

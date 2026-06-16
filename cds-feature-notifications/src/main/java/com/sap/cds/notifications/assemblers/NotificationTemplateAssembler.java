@@ -1,7 +1,7 @@
 /*
  * © 2026 SAP SE or an SAP affiliate company and cds-feature-notifications contributors.
  */
-package com.sap.cds.notifications.builders;
+package com.sap.cds.notifications.assemblers;
 
 import cds.gen.notificationtemplateproviderservice.Email;
 import cds.gen.notificationtemplateproviderservice.NotificationTemplates;
@@ -34,16 +34,16 @@ import org.slf4j.LoggerFactory;
  *   <li>{@code @notification.template.description} → Translation.Description
  * </ul>
  */
-public class NotificationTemplateBuilder {
+public class NotificationTemplateAssembler {
 
-  private static final Logger logger = LoggerFactory.getLogger(NotificationTemplateBuilder.class);
+  private static final Logger logger = LoggerFactory.getLogger(NotificationTemplateAssembler.class);
 
   private static final String DEFAULT_SYNTAX = "MUSTACHE";
 
   private final CdsRuntime runtime;
   private final I18nHelper i18nHelper;
 
-  public NotificationTemplateBuilder(CdsRuntime runtime) {
+  public NotificationTemplateAssembler(CdsRuntime runtime) {
     this.runtime = runtime;
     this.i18nHelper = new I18nHelper(runtime);
   }

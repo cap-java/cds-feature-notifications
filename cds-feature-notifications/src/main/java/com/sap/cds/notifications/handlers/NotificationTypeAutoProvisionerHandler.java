@@ -7,7 +7,7 @@ import cds.gen.notificationtypeproviderservice.NotificationTypeProviderService;
 import cds.gen.notificationtypeproviderservice.NotificationTypes;
 import cds.gen.notificationtypeproviderservice.NotificationTypes_;
 
-import com.sap.cds.notifications.builders.NotificationTypeBuilder;
+import com.sap.cds.notifications.assemblers.NotificationTypeAssembler;
 import com.sap.cds.ql.Insert;
 import com.sap.cds.ql.Select;
 import com.sap.cds.ql.Update;
@@ -27,12 +27,12 @@ public class NotificationTypeAutoProvisionerHandler implements EventHandler {
   private static final Logger logger =
       LoggerFactory.getLogger(NotificationTypeAutoProvisionerHandler.class);
 
-  private final NotificationTypeBuilder notificationTypeBuilder;
+  private final NotificationTypeAssembler notificationTypeBuilder;
   private final NotificationTypeProviderService notificationTypeProviderService;
 
   public NotificationTypeAutoProvisionerHandler(
       CdsRuntime runtime, NotificationTypeProviderService notificationTypeProviderService) {
-    this.notificationTypeBuilder = new NotificationTypeBuilder(runtime);
+    this.notificationTypeBuilder = new NotificationTypeAssembler(runtime);
     this.notificationTypeProviderService = notificationTypeProviderService;
   }
 

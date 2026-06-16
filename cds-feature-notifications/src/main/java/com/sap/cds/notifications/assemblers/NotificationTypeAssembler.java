@@ -1,7 +1,7 @@
 /*
  * © 2026 SAP SE or an SAP affiliate company and cds-feature-notifications contributors.
  */
-package com.sap.cds.notifications.builders;
+package com.sap.cds.notifications.assemblers;
 
 import cds.gen.notificationtypeproviderservice.DeliveryChannels;
 import cds.gen.notificationtypeproviderservice.NotificationTypes;
@@ -16,14 +16,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** Helper class to build NotificationType objects from CDS event annotations. */
-public class NotificationTypeBuilder {
+public class NotificationTypeAssembler {
 
-  private static final Logger logger = LoggerFactory.getLogger(NotificationTypeBuilder.class);
+  private static final Logger logger = LoggerFactory.getLogger(NotificationTypeAssembler.class);
 
   private final CdsRuntime runtime;
   private final I18nHelper i18nHelper;
 
-  public NotificationTypeBuilder(CdsRuntime runtime) {
+  public NotificationTypeAssembler(CdsRuntime runtime) {
     this.runtime = runtime;
     this.i18nHelper = new I18nHelper(runtime);
   }

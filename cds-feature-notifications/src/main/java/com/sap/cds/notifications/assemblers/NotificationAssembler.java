@@ -1,7 +1,7 @@
 /*
  * © 2026 SAP SE or an SAP affiliate company and cds-feature-notifications contributors.
  */
-package com.sap.cds.notifications.builders;
+package com.sap.cds.notifications.assemblers;
 
 import cds.gen.notificationproviderservice.NotificationProperties;
 import cds.gen.notificationproviderservice.Notifications;
@@ -45,16 +45,16 @@ import org.slf4j.LoggerFactory;
  * Helper class to build notification objects from event context. Reduces code duplication between
  * ProductionHandler and LocalHandler.
  */
-public class NotificationBuilder {
+public class NotificationAssembler {
 
-  private static final Logger logger = LoggerFactory.getLogger(NotificationBuilder.class);
+  private static final Logger logger = LoggerFactory.getLogger(NotificationAssembler.class);
 
   /** Valid priority values as defined by the SAP Alert Notification service. */
   private static final Set<String> VALID_PRIORITIES = Set.of("LOW", "NEUTRAL", "MEDIUM", "HIGH");
 
   private final CdsRuntime runtime;
 
-  public NotificationBuilder(CdsRuntime runtime) {
+  public NotificationAssembler(CdsRuntime runtime) {
     this.runtime = runtime;
   }
 
@@ -400,7 +400,7 @@ public class NotificationBuilder {
       recipientsList.addAll(
           list.stream()
               .map(String.class::cast)
-              .map(NotificationBuilder::createRecipientFromId)
+              .map(NotificationAssembler::createRecipientFromId)
               .toList());
     } else if (recipientsObj instanceof String) {
       String recipientsStr = ((String) recipientsObj).trim();

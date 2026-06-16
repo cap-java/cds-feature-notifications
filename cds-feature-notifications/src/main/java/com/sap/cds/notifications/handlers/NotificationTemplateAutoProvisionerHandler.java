@@ -7,7 +7,7 @@ import cds.gen.notificationtemplateproviderservice.NotificationTemplateProviderS
 import cds.gen.notificationtemplateproviderservice.NotificationTemplates;
 import cds.gen.notificationtemplateproviderservice.NotificationTemplates_;
 
-import com.sap.cds.notifications.builders.NotificationTemplateBuilder;
+import com.sap.cds.notifications.assemblers.NotificationTemplateAssembler;
 import com.sap.cds.ql.Insert;
 import com.sap.cds.ql.Select;
 import com.sap.cds.ql.Update;
@@ -32,13 +32,13 @@ public class NotificationTemplateAutoProvisionerHandler implements EventHandler 
   private static final Logger logger =
       LoggerFactory.getLogger(NotificationTemplateAutoProvisionerHandler.class);
 
-  private final NotificationTemplateBuilder notificationTemplateBuilder;
+  private final NotificationTemplateAssembler notificationTemplateBuilder;
   private final NotificationTemplateProviderService notificationTemplateProviderService;
 
   public NotificationTemplateAutoProvisionerHandler(
       CdsRuntime runtime,
       NotificationTemplateProviderService notificationTemplateProviderService) {
-    this.notificationTemplateBuilder = new NotificationTemplateBuilder(runtime);
+    this.notificationTemplateBuilder = new NotificationTemplateAssembler(runtime);
     this.notificationTemplateProviderService = notificationTemplateProviderService;
   }
 
