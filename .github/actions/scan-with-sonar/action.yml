@@ -44,17 +44,17 @@ runs:
       shell: bash
 
     - name: Build and test
-      run: mvn clean verify -ntp -B -pl cds-feature-notifications -am
+      run: mvn clean verify -ntp -B
       shell: bash
 
     - name: Verify JaCoCo reports exist
       run: |
         echo "=== Checking JaCoCo reports ==="
         find . -name "jacoco.xml" -type f
-        if [ -f "cds-feature-notifications/target/site/jacoco/jacoco.xml" ]; then
-          echo "Found: cds-feature-notifications/target/site/jacoco/jacoco.xml"
+        if [ -f "coverage-report/target/site/jacoco-aggregate/jacoco.xml" ]; then
+          echo "Found: coverage-report/target/site/jacoco-aggregate/jacoco.xml"
         else
-          echo "Missing: cds-feature-notifications/target/site/jacoco/jacoco.xml"
+          echo "Missing: coverage-report/target/site/jacoco-aggregate/jacoco.xml"
           exit 1
         fi
       shell: bash
@@ -69,7 +69,7 @@ runs:
         -Dsonar.qualitygate.wait=true
         -Dsonar.java.source=17
         -Dsonar.exclusions=**/sample-app/**
-        -Dsonar.coverage.jacoco.xmlReportPaths=${{ github.workspace }}/cds-feature-notifications/target/site/jacoco/jacoco.xml
+        -Dsonar.coverage.jacoco.xmlReportPaths=${{ github.workspace }}/coverage-report/target/site/jacoco-aggregate/jacoco.xml
         -Dsonar.coverage.exclusions=**/src/test/**,**/src/gen/**
         -B -ntp
       shell: bash

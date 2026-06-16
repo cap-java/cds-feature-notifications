@@ -13,8 +13,9 @@ jobs:
     strategy:
       matrix:
         java-version: [17, 21]
+      fail-fast: false
     name: Test (Java ${{ matrix.java-version }})
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
