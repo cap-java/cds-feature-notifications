@@ -110,7 +110,8 @@ public class NotificationAssembler {
             "Batch notification emit for event '{}' with empty data list, skipping", eventName);
         return List.of();
       }
-      logger.debug("Batch notification emit for event '{}': {} entries", eventName, dataList.size());
+      logger.debug(
+          "Batch notification emit for event '{}': {} entries", eventName, dataList.size());
       List<NotificationBuildResult> results = new ArrayList<>();
       for (Object item : dataList) {
         if (!(item instanceof CdsData cdsData)) {
@@ -274,7 +275,8 @@ public class NotificationAssembler {
    * @param serviceCatalog service catalog to obtain the persistence service
    * @return query result containing a single row with column "result"
    */
-  public static Result executeDummySelect(CqnValue resolvedExpression, ServiceCatalog serviceCatalog) {
+  public static Result executeDummySelect(
+      CqnValue resolvedExpression, ServiceCatalog serviceCatalog) {
     Value<?> expr = ExpressionBuilder.create(resolvedExpression).value();
     PersistenceService ps =
         serviceCatalog.getService(PersistenceService.class, PersistenceService.DEFAULT_NAME);

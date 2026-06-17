@@ -34,8 +34,8 @@ public class ContractDeadlineTestData {
   }
 
   /**
-   * Creates a ContractDeadline with deadline exactly 30 days away (boundary condition).
-   * {@code days_between($now, deadlineDate) = 30}, and {@code 30 < 30 = false} → LOW priority.
+   * Creates a ContractDeadline with deadline exactly 30 days away (boundary condition). {@code
+   * days_between($now, deadlineDate) = 30}, and {@code 30 < 30 = false} → LOW priority.
    */
   public static ContractDeadline createWithBoundaryDeadline() {
     ContractDeadline data = ContractDeadline.create();

@@ -5,7 +5,6 @@ package com.sap.cds.notifications.handlers;
 
 import cds.gen.notificationtemplateproviderservice.NotificationTemplates;
 import cds.gen.notificationtemplateproviderservice.Translations;
-
 import com.sap.cds.notifications.assemblers.NotificationTemplateAssembler;
 import com.sap.cds.services.application.ApplicationLifecycleService;
 import com.sap.cds.services.handler.EventHandler;
@@ -99,7 +98,8 @@ public class LocalNotificationTemplateAutoProvisionerHandler implements EventHan
                   ? translation
                           .getEmail()
                           .getBodyHtml()
-                          .substring(0, Math.min(100, translation.getEmail().getBodyHtml().length()))
+                          .substring(
+                              0, Math.min(100, translation.getEmail().getBodyHtml().length()))
                       + "..."
                   : "null",
               translation.getEmail().getBodyText());
@@ -108,6 +108,7 @@ public class LocalNotificationTemplateAutoProvisionerHandler implements EventHan
     }
 
     logger.info("===============================================================");
-    logger.info("Standalone template '{}' logged (LOCAL MODE - not sent to ANS)", template.getKey());
+    logger.info(
+        "Standalone template '{}' logged (LOCAL MODE - not sent to ANS)", template.getKey());
   }
 }

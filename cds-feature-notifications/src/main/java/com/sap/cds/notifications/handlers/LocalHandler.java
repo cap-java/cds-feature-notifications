@@ -6,7 +6,6 @@ package com.sap.cds.notifications.handlers;
 import cds.gen.notificationproviderservice.NotificationProperties;
 import cds.gen.notificationproviderservice.Notifications;
 import cds.gen.notificationproviderservice.Recipients;
-
 import com.sap.cds.notifications.assemblers.NotificationAssembler;
 import com.sap.cds.services.EventContext;
 import com.sap.cds.services.cds.ApplicationService;

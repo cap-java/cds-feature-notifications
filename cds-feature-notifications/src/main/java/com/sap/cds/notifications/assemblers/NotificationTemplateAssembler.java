@@ -7,6 +7,7 @@ import cds.gen.notificationtemplateproviderservice.Email;
 import cds.gen.notificationtemplateproviderservice.NotificationTemplates;
 import cds.gen.notificationtemplateproviderservice.Tags;
 import cds.gen.notificationtemplateproviderservice.Translations;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sap.cds.Struct;
 import com.sap.cds.notifications.helpers.I18nHelper;
 import com.sap.cds.reflect.CdsBaseType;
@@ -16,13 +17,12 @@ import com.sap.cds.reflect.CdsModel;
 import com.sap.cds.reflect.CdsSimpleType;
 import com.sap.cds.reflect.CdsType;
 import com.sap.cds.services.runtime.CdsRuntime;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Helper class to build standalone NotificationTemplate objects from CDS event annotations. 
+ * Helper class to build standalone NotificationTemplate objects from CDS event annotations.
  *
  * <p>Annotation mapping to standalone template fields:
  *
@@ -55,7 +55,8 @@ public class NotificationTemplateAssembler {
     List<NotificationTemplates> templates = new ArrayList<>();
     CdsModel model = runtime.getCdsModel();
 
-    model.events()
+    model
+        .events()
         .filter(event -> event.findAnnotation("notification.template.title").isPresent())
         .forEach(event -> extractTemplateFromEvent(event).ifPresent(templates::add));
 
@@ -121,7 +122,8 @@ public class NotificationTemplateAssembler {
     translation.setDisplayName(eventName);
 
     // Title (required) - from @notification.template.title
-    String title = i18nHelper.resolveAnnotationValue(event, "notification.template.title", i18nTexts);
+    String title =
+        i18nHelper.resolveAnnotationValue(event, "notification.template.title", i18nTexts);
     if (title == null || title.trim().isEmpty()) {
       throw new IllegalStateException(
           String.format(
@@ -132,19 +134,22 @@ public class NotificationTemplateAssembler {
     translation.setTitle(title);
 
     // Preview - from @notification.template.publicTitle
-    String preview = i18nHelper.resolveAnnotationValue(event, "notification.template.publicTitle", i18nTexts);
+    String preview =
+        i18nHelper.resolveAnnotationValue(event, "notification.template.publicTitle", i18nTexts);
     if (preview != null && !preview.trim().isEmpty()) {
       translation.setPreview(preview);
     }
 
     // Body - from @notification.template.subtitle
-    String body = i18nHelper.resolveAnnotationValue(event, "notification.template.subtitle", i18nTexts);
+    String body =
+        i18nHelper.resolveAnnotationValue(event, "notification.template.subtitle", i18nTexts);
     if (body != null && !body.trim().isEmpty()) {
       translation.setBody(body);
     }
 
     // Description - from @notification.template.description or @description
-    String description = i18nHelper.resolveAnnotationValue(event, "notification.template.description", i18nTexts);
+    String description =
+        i18nHelper.resolveAnnotationValue(event, "notification.template.description", i18nTexts);
     if (description == null) {
       description = i18nHelper.resolveAnnotationValue(event, "description", i18nTexts);
     }
@@ -198,15 +203,14 @@ public class NotificationTemplateAssembler {
   }
 
   private String extractVisibility(CdsEvent event) {
-    return Boolean.TRUE.equals(
-            event.getAnnotationValue("notification.customizable", Boolean.FALSE))
+    return Boolean.TRUE.equals(event.getAnnotationValue("notification.customizable", Boolean.FALSE))
         ? "PUBLIC"
         : null;
   }
 
   /**
-   * Extract source (service name) from the event's qualified name. E.g. "CatalogService.BookOrdered"
-   * → "CatalogService".
+   * Extract source (service name) from the event's qualified name. E.g.
+   * "CatalogService.BookOrdered" → "CatalogService".
    */
   private String extractSource(String qualifiedName) {
     int lastDot = qualifiedName.lastIndexOf('.');
@@ -289,5 +293,4 @@ public class NotificationTemplateAssembler {
       return "string";
     }
   }
-
 }

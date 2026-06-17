@@ -29,9 +29,11 @@ public class NotificationTypeAssembler {
     List<NotificationTypes> notificationTypes = new ArrayList<>();
     CdsModel model = runtime.getCdsModel();
 
-    model.events()
+    model
+        .events()
         .filter(event -> event.findAnnotation("notification.template.title").isPresent())
-        .forEach(event -> extractNotificationTypeFromEvent(event).ifPresent(notificationTypes::add));
+        .forEach(
+            event -> extractNotificationTypeFromEvent(event).ifPresent(notificationTypes::add));
 
     return notificationTypes;
   }
