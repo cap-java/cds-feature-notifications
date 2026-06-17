@@ -1,5 +1,5 @@
-name: 'Test Plugin and Sample'
-description: 'Tests emoji plugin, bookshop, and integration tests'
+name: 'Test Notifications Plugin and Sample'
+description: 'Builds and tests the notifications plugin, then runs sample app tests'
 inputs:
   java-version:
     description: 'Java version to use'
@@ -14,24 +14,24 @@ runs:
   using: 'composite'
   steps:
     - name: Set up Java
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
       with:
         distribution: 'temurin'
         java-version: ${{ inputs.java-version }}
         cache: maven
 
     - name: Set up Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
       with:
         node-version: ${{ inputs.node-version }}
         cache: 'npm'
 
-    - name: Build, Install and Test Emoji Plugin
+    - name: Build, Install and Test Notifications Plugin
       shell: bash
       run: |
         mvn clean install -B -V
 
-    - name: Test Bookshop App (Integration Tests)
+    - name: Test Sample App (Integration Tests)
       shell: bash
       working-directory: sample-app/srv
       run: |
