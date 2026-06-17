@@ -6,6 +6,8 @@ package com.sap.cds.notifications.handlers;
 import cds.gen.notificationproviderservice.NotificationProviderService;
 import cds.gen.notificationproviderservice.Notifications;
 import cds.gen.notificationproviderservice.Notifications_;
+
+import com.sap.cds.notifications.assemblers.NotificationAssembler;
 import com.sap.cds.ql.Insert;
 import com.sap.cds.services.EventContext;
 import com.sap.cds.services.cds.ApplicationService;
@@ -22,24 +24,24 @@ public class ProductionHandler implements EventHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(ProductionHandler.class);
   private final NotificationProviderService notificationProviderService;
-  private final NotificationBuilder notificationBuilder;
+  private final NotificationAssembler notificationBuilder;
 
   public ProductionHandler(
       NotificationProviderService notificationProviderService, CdsRuntime runtime) {
     this.notificationProviderService = notificationProviderService;
-    this.notificationBuilder = new NotificationBuilder(runtime);
+    this.notificationBuilder = new NotificationAssembler(runtime);
   }
 
   @On(event = "*")
   public void postNotifications(EventContext context) {
-    List<NotificationBuilder.NotificationBuildResult> results =
+    List<NotificationAssembler.NotificationBuildResult> results =
         notificationBuilder.buildNotifications(context);
     if (results.isEmpty()) {
       return;
     }
 
     String eventName = results.get(0).eventName();
-    logger.info("=== Processing {} notification(s) for event: {} ===", results.size(), eventName);
+    logger.debug("=== Processing {} notification(s) for event: {} ===", results.size(), eventName);
 
     int successCount = 0;
     Exception firstError = null;
@@ -66,7 +68,7 @@ public class ProductionHandler implements EventHandler {
       }
     }
 
-    logger.info(
+    logger.debug(
         "Sent {}/{} notification(s) for event: {}", successCount, results.size(), eventName);
 
     if (firstError != null) {

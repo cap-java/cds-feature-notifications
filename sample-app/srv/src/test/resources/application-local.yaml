@@ -1,0 +1,10 @@
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  sql.init.platform: h2
+cds:
+  environment:
+    production:
+      enabled: false

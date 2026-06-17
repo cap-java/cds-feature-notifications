@@ -188,6 +188,8 @@
                 <exclude>NotificationProviderService</exclude>
                 <exclude>NotificationTypeProviderService.**</exclude>
                 <exclude>NotificationTypeProviderService</exclude>
+                <exclude>NotificationTemplateProviderService.**</exclude>
+                <exclude>NotificationTemplateProviderService</exclude>
               </excludes>
             </configuration>
           </execution>

@@ -6,6 +6,8 @@ package com.sap.cds.notifications.handlers;
 import cds.gen.notificationtypeproviderservice.DeliveryChannels;
 import cds.gen.notificationtypeproviderservice.NotificationTypes;
 import cds.gen.notificationtypeproviderservice.Templates;
+
+import com.sap.cds.notifications.assemblers.NotificationTypeAssembler;
 import com.sap.cds.services.application.ApplicationLifecycleService;
 import com.sap.cds.services.handler.EventHandler;
 import com.sap.cds.services.handler.annotations.On;
@@ -21,10 +23,10 @@ public class LocalNotificationTypeAutoProvisionerHandler implements EventHandler
   private static final Logger logger =
       LoggerFactory.getLogger(LocalNotificationTypeAutoProvisionerHandler.class);
 
-  private final NotificationTypeBuilder notificationTypeBuilder;
+  private final NotificationTypeAssembler notificationTypeBuilder;
 
   public LocalNotificationTypeAutoProvisionerHandler(CdsRuntime runtime) {
-    this.notificationTypeBuilder = new NotificationTypeBuilder(runtime);
+    this.notificationTypeBuilder = new NotificationTypeAssembler(runtime);
   }
 
   @On(event = ApplicationLifecycleService.EVENT_APPLICATION_PREPARED)

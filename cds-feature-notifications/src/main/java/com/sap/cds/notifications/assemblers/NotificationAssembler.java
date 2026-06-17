@@ -1,7 +1,7 @@
 /*
  * © 2026 SAP SE or an SAP affiliate company and cds-feature-notifications contributors.
  */
-package com.sap.cds.notifications.handlers;
+package com.sap.cds.notifications.assemblers;
 
 import cds.gen.notificationproviderservice.NotificationProperties;
 import cds.gen.notificationproviderservice.Notifications;
@@ -45,16 +45,16 @@ import org.slf4j.LoggerFactory;
  * Helper class to build notification objects from event context. Reduces code duplication between
  * ProductionHandler and LocalHandler.
  */
-public class NotificationBuilder {
+public class NotificationAssembler {
 
-  private static final Logger logger = LoggerFactory.getLogger(NotificationBuilder.class);
+  private static final Logger logger = LoggerFactory.getLogger(NotificationAssembler.class);
 
   /** Valid priority values as defined by the SAP Alert Notification service. */
   private static final Set<String> VALID_PRIORITIES = Set.of("LOW", "NEUTRAL", "MEDIUM", "HIGH");
 
   private final CdsRuntime runtime;
 
-  public NotificationBuilder(CdsRuntime runtime) {
+  public NotificationAssembler(CdsRuntime runtime) {
     this.runtime = runtime;
   }
 
@@ -110,7 +110,7 @@ public class NotificationBuilder {
             "Batch notification emit for event '{}' with empty data list, skipping", eventName);
         return List.of();
       }
-      logger.info("Batch notification emit for event '{}': {} entries", eventName, dataList.size());
+      logger.debug("Batch notification emit for event '{}': {} entries", eventName, dataList.size());
       List<NotificationBuildResult> results = new ArrayList<>();
       for (Object item : dataList) {
         if (!(item instanceof CdsData cdsData)) {
@@ -155,6 +155,7 @@ public class NotificationBuilder {
     Notifications notification = Struct.create(Notifications.class);
     notification.setNotificationTypeKey(notificationTypeKey);
     notification.setNotificationTypeVersion("1");
+    notification.setNotificationTemplateKey(notificationTypeKey);
     notification.setPriority(priority);
     notification.setRecipients(recipientsList);
 
@@ -165,7 +166,7 @@ public class NotificationBuilder {
     List<NotificationProperties> properties = extractProperties(event, eventData);
     notification.setProperties(properties);
 
-    logger.info("Built notification with {} properties", properties.size());
+    logger.debug("Built notification with {} properties", properties.size());
 
     return new NotificationBuildResult(eventName, notification, event);
   }
@@ -250,7 +251,7 @@ public class NotificationBuilder {
               .map(row -> row.get("result"))
               .map(v -> v.toString().toUpperCase())
               .orElse("NEUTRAL");
-      logger.info("Dynamic priority evaluated via DB to: {}", priority);
+      logger.debug("Dynamic priority evaluated via DB to: {}", priority);
       return validatePriority(priority);
     } catch (Exception e) {
       logger.error(
@@ -273,7 +274,7 @@ public class NotificationBuilder {
    * @param serviceCatalog service catalog to obtain the persistence service
    * @return query result containing a single row with column "result"
    */
-  static Result executeDummySelect(CqnValue resolvedExpression, ServiceCatalog serviceCatalog) {
+  public static Result executeDummySelect(CqnValue resolvedExpression, ServiceCatalog serviceCatalog) {
     Value<?> expr = ExpressionBuilder.create(resolvedExpression).value();
     PersistenceService ps =
         serviceCatalog.getService(PersistenceService.class, PersistenceService.DEFAULT_NAME);
@@ -297,7 +298,7 @@ public class NotificationBuilder {
    *     be null if both {@code value} and {@code term} are guaranteed to be literals
    * @return a tautology ({@code 1=1}) or contradiction ({@code 1=0}) predicate
    */
-  static CqnPredicate evaluateContainment(
+  public static CqnPredicate evaluateContainment(
       CqnContainmentTest.Position position,
       CqnValue value,
       CqnValue term,
@@ -399,7 +400,7 @@ public class NotificationBuilder {
       recipientsList.addAll(
           list.stream()
               .map(String.class::cast)
-              .map(NotificationBuilder::createRecipientFromId)
+              .map(NotificationAssembler::createRecipientFromId)
               .toList());
     } else if (recipientsObj instanceof String) {
       String recipientsStr = ((String) recipientsObj).trim();
@@ -430,7 +431,7 @@ public class NotificationBuilder {
 
   // Auto-detects UUID vs email and maps to GlobalUserId or RecipientId accordingly
   @VisibleForTesting
-  static Recipients createRecipientFromId(String recipientId) {
+  public static Recipients createRecipientFromId(String recipientId) {
     Recipients recipient = Struct.create(Recipients.class);
     if (isUUID(recipientId)) {
       recipient.setGlobalUserId(recipientId);
@@ -448,7 +449,7 @@ public class NotificationBuilder {
   }
 
   @VisibleForTesting
-  static boolean isUUID(String value) {
+  public static boolean isUUID(String value) {
     try {
       UUID.fromString(value);
       return true;
@@ -463,7 +464,7 @@ public class NotificationBuilder {
       Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
   @VisibleForTesting
-  static boolean isEmail(String value) {
+  public static boolean isEmail(String value) {
     return EMAIL_PATTERN.matcher(value).matches();
   }
 

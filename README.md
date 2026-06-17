@@ -42,6 +42,7 @@ In **local mode**, notifications are logged to the console with no ANS binding r
   - [Identity Authentication Destination (Language Resolution)](#identity-authentication-destination-language-resolution)
     - [Step 1: Create a Technical User in Identity Authentication](#step-1-create-a-technical-user-in-identity-authentication)
     - [Step 2: Create the BTP Destination](#step-2-create-the-btp-destination)
+  - [Template Customization](#template-customization)
   - [Outbox](#outbox)
 - [Minimum Versions](#minimum-versions)
 - [Monitoring & Logging](#monitoring--logging)
@@ -138,6 +139,7 @@ The `template` section defines the visible content of the notification: titles, 
 | Annotation | Required | Description |
 |---|---|---|
 | `@description` | No | Description label of a notification type. Shown to administrators and end-users in the SAP Build Work Zone notification type management UI. |
+| `@notification.customizable` | No | Controls whether customer administrators can see and customize this template. `true` = PUBLIC (visible for customization), absent or `false` = PRIVATE (default). See [Template Customization](#template-customization). |
 | `@notification.template.title` | **Yes** | Detailed notification title, shown to the recipient and authorized users. May contain sensitive information (e.g. "Low stock: Wuthering Heights by Emily Brontë"). Mapped to `TemplateSensitive` in ANS. |
 | `@notification.template.publicTitle` | **Yes** | Short, non-sensitive title shown when the viewer is not authorized to see the full details (e.g. "Low Stock Alert"). Mapped to `TemplatePublic` in ANS. |
 | `@notification.template.subtitle` | **Yes** | Subtitle for the notification. |
@@ -150,6 +152,8 @@ The `template` section defines the visible content of the notification: titles, 
 | `@Common.SemanticObjectAction` | No | Maps to `NavigationTargetAction` in ANS. Specifies which action to trigger on the semantic object (e.g. `'display'`). |
 | `recipients` | **Yes** | Who receives the notification. Supports 4 formats (see [Recipient Formats](#recipient-formats)). |
 | Event fields | No | Define `{{variableName}}` (Mustache syntax) placeholders in your templates and matching fields in the CDS event. When you emit a notification, set these fields with the actual values. The plugin passes them to ANS, which replaces the placeholders at delivery time. |
+
+> **Important:** Event names must be **unique across all services** in your application. The event name is used as the key for both NotificationType and NotificationTemplate in ANS. If two services define an event with the same name (e.g. `LowStockAlert`), the last one provisioned will silently overwrite the other.
 
 #### Step 2: Add i18n Translations (Optional)
 
@@ -714,6 +718,27 @@ Replace `<tenant-ID>` with your Identity Authentication tenant ID.
 Once configured, ANS can resolve each recipient's language preference from IAS and select the matching translation when delivering email notifications. For SAP Build Work Zone notifications, the user's Work Zone language setting is used instead of IAS.
 
 For the full setup guide, see [Identity Directory Connectivity](https://help.sap.com/docs/task-center/sap-task-center/identity-directory-connectivity?q=destination) in the SAP Task Center documentation.
+
+### Template Customization
+
+The plugin automatically provisions notification templates to ANS during application startup. These templates enable customer administrators to create customized copies of your notification content for their organization. For details on how template customization works from the admin perspective, see the [Template Customization documentation](https://github.wdf.sap.corp/pages/sl-hybrid/ans/notifications-scenario/template-customization/).
+
+By default, templates are `PRIVATE` (not visible to customer admins). To make a template visible and customizable by admins, add `@notification.customizable: true`:
+
+```cds
+@notification : {
+   customizable: true,
+   template: {
+      title : '{i18n>TEMPLATE_SENSITIVE}',
+      ...
+   }
+}
+event BookOrdered {
+  ...
+}
+```
+
+> **Important:** Once a template is made `PUBLIC`, it **cannot be reverted to `PRIVATE`**. This is enforced by ANS. Making this a deliberate opt-in ensures that only templates intended for customization are exposed to customer administrators.
 
 ### Outbox
 

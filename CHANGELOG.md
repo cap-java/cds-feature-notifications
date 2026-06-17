@@ -31,6 +31,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Navigation target support via `@Common.SemanticObject` and `@Common.SemanticObjectAction` annotations for SAP Fiori Launchpad integration
 - Recipient language resolution via Identity Authentication Service (IAS) destination `Identity_Authentication_Connectivity_IDS`
 - Persistent outbox integration for guaranteed in-order delivery with automatic retry on failure
-- Automatic registration of `NotificationProviderService` and `NotificationTypeProviderService` as OData v2 remote services
+- Automatic registration of `NotificationProviderService`, `NotificationTypeProviderService`, and `NotificationTemplateProviderService` as OData v2 remote services
+- Standalone notification template provisioning via `@notification.customizable` annotation for user-customizable templates
 - Support for SAP ANS standalone service binding (`business-notifications` plan) and SAP Work Zone credentials
 - Sample application demonstrating programmatic and declarative notification patterns with integration tests for Java 17 and 21

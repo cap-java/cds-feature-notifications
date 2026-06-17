@@ -6,6 +6,8 @@ package com.sap.cds.notifications.handlers;
 import cds.gen.notificationtypeproviderservice.NotificationTypeProviderService;
 import cds.gen.notificationtypeproviderservice.NotificationTypes;
 import cds.gen.notificationtypeproviderservice.NotificationTypes_;
+
+import com.sap.cds.notifications.assemblers.NotificationTypeAssembler;
 import com.sap.cds.ql.Insert;
 import com.sap.cds.ql.Select;
 import com.sap.cds.ql.Update;
@@ -25,12 +27,12 @@ public class NotificationTypeAutoProvisionerHandler implements EventHandler {
   private static final Logger logger =
       LoggerFactory.getLogger(NotificationTypeAutoProvisionerHandler.class);
 
-  private final NotificationTypeBuilder notificationTypeBuilder;
+  private final NotificationTypeAssembler notificationTypeBuilder;
   private final NotificationTypeProviderService notificationTypeProviderService;
 
   public NotificationTypeAutoProvisionerHandler(
       CdsRuntime runtime, NotificationTypeProviderService notificationTypeProviderService) {
-    this.notificationTypeBuilder = new NotificationTypeBuilder(runtime);
+    this.notificationTypeBuilder = new NotificationTypeAssembler(runtime);
     this.notificationTypeProviderService = notificationTypeProviderService;
   }
 
@@ -55,7 +57,7 @@ public class NotificationTypeAutoProvisionerHandler implements EventHandler {
     // Fetch ALL existing notification types from ANS in a single call
     // to build a reliable Key → Id mapping.
     Map<String, String> existingTypeIds = fetchExistingNotificationTypeIds();
-    logger.info("Found {} existing notification types in ANS", existingTypeIds.size());
+    logger.debug("Found {} existing notification types in ANS", existingTypeIds.size());
 
     for (NotificationTypes notificationType : notificationTypes) {
       String key = notificationType.getNotificationTypeKey();
@@ -99,7 +101,7 @@ public class NotificationTypeAutoProvisionerHandler implements EventHandler {
       notificationTypeProviderService.run(
           Insert.into(NotificationTypes_.CDS_NAME).entry(notificationType));
 
-      logger.info(
+      logger.debug(
           "NotificationType '{}' created in ANS successfully",
           notificationType.getNotificationTypeKey());
     } catch (Exception e) {
@@ -108,7 +110,7 @@ public class NotificationTypeAutoProvisionerHandler implements EventHandler {
       if (errorMsg.contains("409")) {
         // Race condition: type was created between our GET-all and this INSERT.
         // Re-fetch this specific type's ID and update.
-        logger.info(
+        logger.debug(
             "NotificationType '{}' was created concurrently (409). Attempting update...",
             notificationType.getNotificationTypeKey());
         String id =
@@ -160,7 +162,7 @@ public class NotificationTypeAutoProvisionerHandler implements EventHandler {
   private void updateNotificationType(
       NotificationTypes notificationType, String notificationTypeId) {
     notificationType.setNotificationTypeId(notificationTypeId);
-    logger.info(
+    logger.debug(
         "Updating NotificationType '{}' (id={})",
         notificationType.getNotificationTypeKey(),
         notificationTypeId);
@@ -169,7 +171,7 @@ public class NotificationTypeAutoProvisionerHandler implements EventHandler {
       notificationTypeProviderService.run(
           Update.entity(NotificationTypes_.CDS_NAME).data(notificationType));
 
-      logger.info(
+      logger.debug(
           "NotificationType '{}' updated in ANS successfully",
           notificationType.getNotificationTypeKey());
     } catch (Exception e) {

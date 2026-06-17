@@ -6,6 +6,8 @@ package com.sap.cds.notifications.handlers;
 import cds.gen.notificationproviderservice.NotificationProperties;
 import cds.gen.notificationproviderservice.Notifications;
 import cds.gen.notificationproviderservice.Recipients;
+
+import com.sap.cds.notifications.assemblers.NotificationAssembler;
 import com.sap.cds.services.EventContext;
 import com.sap.cds.services.cds.ApplicationService;
 import com.sap.cds.services.handler.EventHandler;
@@ -20,15 +22,15 @@ import org.slf4j.LoggerFactory;
 public class LocalHandler implements EventHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(LocalHandler.class);
-  private final NotificationBuilder notificationBuilder;
+  private final NotificationAssembler notificationBuilder;
 
   public LocalHandler(CdsRuntime runtime) {
-    this.notificationBuilder = new NotificationBuilder(runtime);
+    this.notificationBuilder = new NotificationAssembler(runtime);
   }
 
   @On(event = "*")
   public void postNotifications(EventContext context) {
-    List<NotificationBuilder.NotificationBuildResult> results =
+    List<NotificationAssembler.NotificationBuildResult> results =
         notificationBuilder.buildNotifications(context);
     if (results.isEmpty()) {
       return;

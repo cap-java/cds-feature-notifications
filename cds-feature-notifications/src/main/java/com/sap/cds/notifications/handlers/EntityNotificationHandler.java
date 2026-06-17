@@ -6,6 +6,7 @@ package com.sap.cds.notifications.handlers;
 import com.sap.cds.CdsData;
 import com.sap.cds.Result;
 import com.sap.cds.Struct;
+import com.sap.cds.notifications.assemblers.NotificationAssembler;
 import com.sap.cds.ql.CQL;
 import com.sap.cds.ql.cqn.CqnContainmentTest;
 import com.sap.cds.ql.cqn.CqnElementRef;
@@ -172,7 +173,7 @@ public class EntityNotificationHandler implements EventHandler {
     // Optional: explicit parameter mapping (entity field → notification property)
     Map<?, ?> properties = notification.get("parameters") instanceof Map<?, ?> m ? m : null;
 
-    logger.info(
+    logger.debug(
         "Entity notification triggered: type='{}', event='{}', entity='{}'",
         notificationType,
         currentEvent,
@@ -279,7 +280,7 @@ public class EntityNotificationHandler implements EventHandler {
    *
    * <p>The event is looked up in the CDS model to determine its owning service, then emitted on
    * that service. Downstream {@code @On} handlers ({@link ProductionHandler} or {@link
-   * LocalHandler}) pick up the event and delegate to {@link NotificationBuilder}, which iterates
+   * LocalHandler}) pick up the event and delegate to {@link NotificationAssembler}, which iterates
    * the list and builds one ANS notification per entry.
    */
   private void emitBatchNotification(
@@ -307,7 +308,7 @@ public class EntityNotificationHandler implements EventHandler {
       EventContext notificationCtx = EventContext.create(notificationType, null);
       notificationCtx.put("data", batchData);
       service.emit(notificationCtx);
-      logger.info(
+      logger.debug(
           "Emitted {} notification(s) for event '{}' on service '{}'",
           batchData.size(),
           notificationType,
@@ -400,12 +401,12 @@ public class EntityNotificationHandler implements EventHandler {
                     CqnValue value,
                     CqnValue term,
                     boolean caseInsensitive) {
-                  return NotificationBuilder.evaluateContainment(
+                  return NotificationAssembler.evaluateContainment(
                       position, value, term, caseInsensitive, context.getServiceCatalog());
                 }
               });
 
-      Result result = NotificationBuilder.executeDummySelect(resolved, context.getServiceCatalog());
+      Result result = NotificationAssembler.executeDummySelect(resolved, context.getServiceCatalog());
 
       boolean conditionMet =
           result
