@@ -10,9 +10,11 @@ import cds.gen.notificationtemplateproviderservice.Translations;
 import com.sap.cds.Struct;
 import com.sap.cds.notifications.helpers.I18nHelper;
 import com.sap.cds.reflect.CdsBaseType;
+import com.sap.cds.reflect.CdsElementDefinition;
 import com.sap.cds.reflect.CdsEvent;
 import com.sap.cds.reflect.CdsModel;
 import com.sap.cds.reflect.CdsSimpleType;
+import com.sap.cds.reflect.CdsType;
 import com.sap.cds.services.runtime.CdsRuntime;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
@@ -268,9 +270,9 @@ public class NotificationTemplateAssembler {
   }
 
   /** Map CDS element type to JSON Schema type string. */
-  private String cdsTypeToJsonSchemaType(com.sap.cds.reflect.CdsElementDefinition element) {
+  private String cdsTypeToJsonSchemaType(CdsElementDefinition element) {
     try {
-      com.sap.cds.reflect.CdsType cdsType = element.getType();
+      CdsType cdsType = element.getType();
       if (!cdsType.isSimple()) {
         return "string";
       }
