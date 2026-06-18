@@ -4,14 +4,14 @@
 
   <parent>
     <groupId>customer</groupId>
-    <artifactId>sample-app-parent</artifactId>
+    <artifactId>integration-tests-parent</artifactId>
     <version>${revision}</version>
   </parent>
 
-  <artifactId>sample-app</artifactId>
+  <artifactId>integration-tests</artifactId>
   <packaging>jar</packaging>
 
-  <name>sample-app</name>
+  <name>integration-tests</name>
 
   <!-- ACTUAL DEPENDENCIES -->
   <dependencies>

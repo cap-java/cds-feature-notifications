@@ -9,11 +9,11 @@
   </parent>
 
   <groupId>customer</groupId>
-  <artifactId>sample-app-parent</artifactId>
+  <artifactId>integration-tests-parent</artifactId>
   <version>${revision}</version>
   <packaging>pom</packaging>
 
-  <name>sample-app parent</name>
+  <name>integration-tests parent</name>
 
   <modules>
     <module>srv</module>

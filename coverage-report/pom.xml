@@ -25,7 +25,7 @@
     <!-- Test module: only execution data is included, not classes -->
     <dependency>
       <groupId>customer</groupId>
-      <artifactId>sample-app</artifactId>
+      <artifactId>integration-tests</artifactId>
       <version>${revision}</version>
       <scope>test</scope>
     </dependency>
@@ -93,7 +93,7 @@
                   <directory>${project.basedir}/..</directory>
                   <includes>
                     <include>cds-feature-notifications/target/jacoco.exec</include>
-                    <include>sample-app/srv/target/jacoco.exec</include>
+                    <include>integration-tests/srv/target/jacoco.exec</include>
                   </includes>
                 </fileSet>
               </fileSets>
