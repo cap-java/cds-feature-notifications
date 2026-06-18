@@ -32,9 +32,8 @@ public class NotificationTemplateProviderServiceMockHandler implements EventHand
   private static final Logger logger =
       LoggerFactory.getLogger(NotificationTemplateProviderServiceMockHandler.class);
 
-  // In-memory storage for notification templates 
-  private static final Map<String, NotificationTemplates> templateStore =
-      new ConcurrentHashMap<>();
+  // In-memory storage for notification templates
+  private static final Map<String, NotificationTemplates> templateStore = new ConcurrentHashMap<>();
 
   // Tracks how many times each template key has been updated
   private static final Map<String, AtomicInteger> updateCountByKey = new ConcurrentHashMap<>();
@@ -108,9 +107,7 @@ public class NotificationTemplateProviderServiceMockHandler implements EventHand
               String key = updated.getKey();
               if (key != null && templateStore.containsKey(key)) {
                 templateStore.put(key, updated);
-                updateCountByKey
-                    .computeIfAbsent(key, k -> new AtomicInteger(0))
-                    .incrementAndGet();
+                updateCountByKey.computeIfAbsent(key, k -> new AtomicInteger(0)).incrementAndGet();
                 logger.debug("MockHandler updated notification template: Key={}", key);
               } else {
                 logger.warn("MockHandler UPDATE: no existing template with Key={}", key);

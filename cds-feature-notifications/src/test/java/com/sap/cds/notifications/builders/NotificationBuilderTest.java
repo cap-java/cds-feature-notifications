@@ -6,7 +6,6 @@ package com.sap.cds.notifications.builders;
 import static org.junit.jupiter.api.Assertions.*;
 
 import cds.gen.notificationproviderservice.Recipients;
-
 import com.sap.cds.notifications.assemblers.NotificationAssembler;
 import com.sap.cds.ql.CQL;
 import com.sap.cds.ql.cqn.CqnComparisonPredicate;

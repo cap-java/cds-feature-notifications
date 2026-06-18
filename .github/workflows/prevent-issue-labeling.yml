@@ -1,5 +1,7 @@
 name: Prevent "New" Label on Issues
 
+permissions: {}
+
 on:
   issues:
     types: [labeled]

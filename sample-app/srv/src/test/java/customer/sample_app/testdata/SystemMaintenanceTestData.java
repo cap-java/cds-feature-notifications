@@ -66,8 +66,8 @@ public class SystemMaintenanceTestData {
   }
 
   /**
-   * Creates a SystemMaintenance WITHOUT the impact field. The priority expression
-   * {@code contains(impact, 'critical')} will fail to resolve, triggering the NEUTRAL fallback.
+   * Creates a SystemMaintenance WITHOUT the impact field. The priority expression {@code
+   * contains(impact, 'critical')} will fail to resolve, triggering the NEUTRAL fallback.
    */
   public static SystemMaintenance createWithoutImpact() {
     SystemMaintenance data = SystemMaintenance.create();

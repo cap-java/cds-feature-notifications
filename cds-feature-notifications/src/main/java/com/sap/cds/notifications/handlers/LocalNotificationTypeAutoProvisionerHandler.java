@@ -6,7 +6,6 @@ package com.sap.cds.notifications.handlers;
 import cds.gen.notificationtypeproviderservice.DeliveryChannels;
 import cds.gen.notificationtypeproviderservice.NotificationTypes;
 import cds.gen.notificationtypeproviderservice.Templates;
-
 import com.sap.cds.notifications.assemblers.NotificationTypeAssembler;
 import com.sap.cds.services.application.ApplicationLifecycleService;
 import com.sap.cds.services.handler.EventHandler;

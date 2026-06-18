@@ -406,7 +406,8 @@ public class EntityNotificationHandler implements EventHandler {
                 }
               });
 
-      Result result = NotificationAssembler.executeDummySelect(resolved, context.getServiceCatalog());
+      Result result =
+          NotificationAssembler.executeDummySelect(resolved, context.getServiceCatalog());
 
       boolean conditionMet =
           result

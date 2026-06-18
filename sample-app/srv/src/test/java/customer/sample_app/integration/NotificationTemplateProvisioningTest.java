@@ -85,14 +85,21 @@ public class NotificationTemplateProvisioningTest {
     assertEquals("CertificateExpiration", template.getKey());
 
     // Visibility - @notification.customizable: true → PUBLIC
-    assertEquals("PUBLIC", template.getVisibility(), "Template with @notification.customizable: true should be PUBLIC");
+    assertEquals(
+        "PUBLIC",
+        template.getVisibility(),
+        "Template with @notification.customizable: true should be PUBLIC");
 
     // PropertiesSchema - should include all event elements EXCEPT recipients
     String schema = template.getPropertiesSchema();
     assertNotNull(schema, "PropertiesSchema should be set");
-    assertFalse(schema.contains("recipients"), "Schema should NOT contain 'recipients' (it's not a template variable)");
-    assertTrue(schema.contains("certificateName"), "Schema should contain 'certificateName' property");
-    assertTrue(schema.contains("expirationDate"), "Schema should contain 'expirationDate' property");
+    assertFalse(
+        schema.contains("recipients"),
+        "Schema should NOT contain 'recipients' (it's not a template variable)");
+    assertTrue(
+        schema.contains("certificateName"), "Schema should contain 'certificateName' property");
+    assertTrue(
+        schema.contains("expirationDate"), "Schema should contain 'expirationDate' property");
     assertTrue(schema.contains("name"), "Schema should contain 'name' property");
 
     // Translations
@@ -100,8 +107,11 @@ public class NotificationTemplateProvisioningTest {
     assertNotNull(translations, "Translations should not be null");
     assertFalse(translations.isEmpty(), "Translations should not be empty");
 
-    LOG.debug("CertificateExpiration template: Key={}, Visibility={}, Translations={}",
-        template.getKey(), template.getVisibility(), translations.size());
+    LOG.debug(
+        "CertificateExpiration template: Key={}, Visibility={}, Translations={}",
+        template.getKey(),
+        template.getVisibility(),
+        translations.size());
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -111,17 +121,21 @@ public class NotificationTemplateProvisioningTest {
   @Test
   void testVisibilityDefaultsToPrivate() {
     LOG.debug("==========================================");
-    LOG.debug("Test: Templates without @notification.customizable should have null visibility (PRIVATE)");
+    LOG.debug(
+        "Test: Templates without @notification.customizable should have null visibility (PRIVATE)");
     LOG.debug("==========================================");
 
-    // SystemMaintenance has no @notification.customizable → visibility should be null (ANS defaults PRIVATE)
+    // SystemMaintenance has no @notification.customizable → visibility should be null (ANS defaults
+    // PRIVATE)
     NotificationTemplates template =
         NotificationTemplateProviderServiceMockHandler.getTemplateByKey("SystemMaintenance");
     assertNotNull(template, "SystemMaintenance template should be provisioned");
-    assertNull(template.getVisibility(),
+    assertNull(
+        template.getVisibility(),
         "Template without @notification.customizable should have null visibility (ANS defaults to PRIVATE)");
 
-    LOG.debug("SystemMaintenance visibility: {} (null = ANS default PRIVATE)", template.getVisibility());
+    LOG.debug(
+        "SystemMaintenance visibility: {} (null = ANS default PRIVATE)", template.getVisibility());
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -159,7 +173,8 @@ public class NotificationTemplateProvisioningTest {
         assertNoUnresolvedI18n(t.getEmail().getBodyHtml(), "Email.BodyHtml", lang);
       }
 
-      LOG.debug("[{}] Title={}, Body={}, Preview={}", lang, t.getTitle(), t.getBody(), t.getPreview());
+      LOG.debug(
+          "[{}] Title={}, Body={}, Preview={}", lang, t.getTitle(), t.getBody(), t.getPreview());
     }
   }
 
@@ -180,13 +195,15 @@ public class NotificationTemplateProvisioningTest {
     List<Translations> translations = template.getTranslations();
 
     // The sample-app has i18n files for: en, de, tr, es
-    assertTrue(translations.size() >= 4,
+    assertTrue(
+        translations.size() >= 4,
         "Expected translations for at least 4 languages, got: " + translations.size());
 
     // Verify English
     Translations en = findTranslation(translations, "en");
     assertNotNull(en, "English translation should exist");
-    assertTrue(en.getTitle().contains("{{certificateName}}"),
+    assertTrue(
+        en.getTitle().contains("{{certificateName}}"),
         "English title should contain Mustache variable {{certificateName}}");
 
     // Verify German
@@ -214,7 +231,8 @@ public class NotificationTemplateProvisioningTest {
   @Test
   void testStaticTemplateTranslation() {
     LOG.debug("==========================================");
-    LOG.debug("Test: Templates with static strings should have same value across all locale translations");
+    LOG.debug(
+        "Test: Templates with static strings should have same value across all locale translations");
     LOG.debug("==========================================");
 
     // SystemMaintenance uses static strings (no {i18n>...} placeholders).
@@ -231,18 +249,23 @@ public class NotificationTemplateProvisioningTest {
     // Verify title contains Mustache variable
     Translations first = translations.get(0);
     assertNotNull(first.getTitle());
-    assertTrue(first.getTitle().contains("{{systemName}}"),
+    assertTrue(
+        first.getTitle().contains("{{systemName}}"),
         "Title should contain Mustache variable: " + first.getTitle());
 
     // All translations should have the same title (static string, no i18n differentiation)
     String expectedTitle = first.getTitle();
     for (Translations t : translations) {
-      assertEquals(expectedTitle, t.getTitle(),
+      assertEquals(
+          expectedTitle,
+          t.getTitle(),
           "Static template should have identical title across all locales, but lang '"
-              + t.getLanguage() + "' differs");
+              + t.getLanguage()
+              + "' differs");
     }
 
-    LOG.debug("Static template: {} translations, all with title: {}", translations.size(), expectedTitle);
+    LOG.debug(
+        "Static template: {} translations, all with title: {}", translations.size(), expectedTitle);
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -319,9 +342,11 @@ public class NotificationTemplateProvisioningTest {
     assertEquals("CertificateExpiration", en.getEvent(), "Event should be the event name");
 
     // DisplayName = event name
-    assertEquals("CertificateExpiration", en.getDisplayName(), "DisplayName should be the event name");
+    assertEquals(
+        "CertificateExpiration", en.getDisplayName(), "DisplayName should be the event name");
 
-    LOG.debug("Source={}, Event={}, DisplayName={}", en.getSource(), en.getEvent(), en.getDisplayName());
+    LOG.debug(
+        "Source={}, Event={}, DisplayName={}", en.getSource(), en.getEvent(), en.getDisplayName());
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -342,7 +367,8 @@ public class NotificationTemplateProvisioningTest {
     assertNotNull(schema, "PropertiesSchema should be set");
 
     // Should be valid JSON-like structure
-    assertTrue(schema.contains("properties") || schema.contains("type"),
+    assertTrue(
+        schema.contains("properties") || schema.contains("type"),
         "Schema should contain JSON Schema keywords: " + schema);
 
     LOG.debug("PropertiesSchema: {}", schema);
@@ -365,10 +391,12 @@ public class NotificationTemplateProvisioningTest {
     List<Translations> translations = template.getTranslations();
 
     // Verify Title (maps to @notification.template.title)
-    assertEquals("Certificate: {{certificateName}}", findTranslation(translations, "en").getTitle());
+    assertEquals(
+        "Certificate: {{certificateName}}", findTranslation(translations, "en").getTitle());
     assertEquals("Zertifikat: {{certificateName}}", findTranslation(translations, "de").getTitle());
     assertEquals("Sertifika: {{certificateName}}", findTranslation(translations, "tr").getTitle());
-    assertEquals("Certificado: {{certificateName}}", findTranslation(translations, "es").getTitle());
+    assertEquals(
+        "Certificado: {{certificateName}}", findTranslation(translations, "es").getTitle());
 
     // Verify Body (maps to @notification.template.subtitle)
     assertEquals("Certificate Expiration", findTranslation(translations, "en").getBody());
@@ -383,16 +411,26 @@ public class NotificationTemplateProvisioningTest {
     assertEquals("Expiración de Certificado", findTranslation(translations, "es").getPreview());
 
     // Verify Email Subject
-    assertEquals("Certificate Expiration Alert", findTranslation(translations, "en").getEmail().getSubject());
-    assertEquals("Zertifikatablauf-Warnung", findTranslation(translations, "de").getEmail().getSubject());
-    assertEquals("Sertifika Sona Erme Uyarısı", findTranslation(translations, "tr").getEmail().getSubject());
-    assertEquals("Alerta de Expiración de Certificado", findTranslation(translations, "es").getEmail().getSubject());
+    assertEquals(
+        "Certificate Expiration Alert",
+        findTranslation(translations, "en").getEmail().getSubject());
+    assertEquals(
+        "Zertifikatablauf-Warnung", findTranslation(translations, "de").getEmail().getSubject());
+    assertEquals(
+        "Sertifika Sona Erme Uyarısı", findTranslation(translations, "tr").getEmail().getSubject());
+    assertEquals(
+        "Alerta de Expiración de Certificado",
+        findTranslation(translations, "es").getEmail().getSubject());
 
     // Verify Description
-    assertEquals("Certificate Expiration Alert", findTranslation(translations, "en").getDescription());
+    assertEquals(
+        "Certificate Expiration Alert", findTranslation(translations, "en").getDescription());
     assertEquals("Zertifikatablauf-Warnung", findTranslation(translations, "de").getDescription());
-    assertEquals("Sertifika Sona Erme Uyarısı", findTranslation(translations, "tr").getDescription());
-    assertEquals("Alerta de Expiración de Certificado", findTranslation(translations, "es").getDescription());
+    assertEquals(
+        "Sertifika Sona Erme Uyarısı", findTranslation(translations, "tr").getDescription());
+    assertEquals(
+        "Alerta de Expiración de Certificado",
+        findTranslation(translations, "es").getDescription());
 
     LOG.debug("All 4 languages verified with exact i18n values");
   }
@@ -499,10 +537,7 @@ public class NotificationTemplateProvisioningTest {
   // ──────────────────────────────────────────────────────────────
 
   private Translations findTranslation(List<Translations> translations, String lang) {
-    return translations.stream()
-        .filter(t -> lang.equals(t.getLanguage()))
-        .findFirst()
-        .orElse(null);
+    return translations.stream().filter(t -> lang.equals(t.getLanguage())).findFirst().orElse(null);
   }
 
   private void assertNoUnresolvedI18n(String value, String fieldName, String lang) {

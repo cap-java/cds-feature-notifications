@@ -6,7 +6,6 @@ package com.sap.cds.notifications.handlers;
 import cds.gen.notificationtemplateproviderservice.NotificationTemplateProviderService;
 import cds.gen.notificationtemplateproviderservice.NotificationTemplates;
 import cds.gen.notificationtemplateproviderservice.NotificationTemplates_;
-
 import com.sap.cds.notifications.assemblers.NotificationTemplateAssembler;
 import com.sap.cds.ql.Insert;
 import com.sap.cds.ql.Select;
@@ -36,8 +35,7 @@ public class NotificationTemplateAutoProvisionerHandler implements EventHandler 
   private final NotificationTemplateProviderService notificationTemplateProviderService;
 
   public NotificationTemplateAutoProvisionerHandler(
-      CdsRuntime runtime,
-      NotificationTemplateProviderService notificationTemplateProviderService) {
+      CdsRuntime runtime, NotificationTemplateProviderService notificationTemplateProviderService) {
     this.notificationTemplateBuilder = new NotificationTemplateAssembler(runtime);
     this.notificationTemplateProviderService = notificationTemplateProviderService;
   }
@@ -91,8 +89,7 @@ public class NotificationTemplateAutoProvisionerHandler implements EventHandler 
           .filter(Objects::nonNull)
           .collect(Collectors.toSet());
     } catch (Exception e) {
-      logger.warn(
-          "Could not fetch existing standalone templates from ANS: {}", e.getMessage());
+      logger.warn("Could not fetch existing standalone templates from ANS: {}", e.getMessage());
       return Collections.emptySet();
     }
   }
@@ -130,8 +127,7 @@ public class NotificationTemplateAutoProvisionerHandler implements EventHandler 
             e);
       }
 
-      logger.error(
-          "Failed to create standalone template '{}' in ANS", template.getKey(), e);
+      logger.error("Failed to create standalone template '{}' in ANS", template.getKey(), e);
       throw e;
     }
   }
@@ -160,8 +156,7 @@ public class NotificationTemplateAutoProvisionerHandler implements EventHandler 
             e);
       }
 
-      logger.error(
-          "Failed to update standalone template '{}' in ANS", template.getKey(), e);
+      logger.error("Failed to update standalone template '{}' in ANS", template.getKey(), e);
       throw e;
     }
   }
