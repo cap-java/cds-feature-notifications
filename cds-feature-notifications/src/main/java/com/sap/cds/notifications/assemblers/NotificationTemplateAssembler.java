@@ -73,12 +73,9 @@ public class NotificationTemplateAssembler {
     NotificationTemplates template = Struct.create(NotificationTemplates.class);
     template.setKey(key);
 
-    // Visibility - from @notification.customizable annotation (ANS defaults to PRIVATE)
-    // @notification.customizable: true → PUBLIC, absent or false → PRIVATE (default)
-    String visibility = extractVisibility(event);
-    if (visibility != null) {
-      template.setVisibility(visibility);
-    }
+    // Visibility - from @notification.customizable annotation
+    // @notification.customizable: true → PUBLIC, absent or false → PRIVATE
+    template.setVisibility(extractVisibility(event));
 
     // PropertiesSchema - auto-generated from event elements
     String propertiesSchema = buildPropertiesSchema(event);
@@ -90,7 +87,7 @@ public class NotificationTemplateAssembler {
     List<Tags> tags = buildTags(source, eventName);
     template.setTags(tags);
 
-    Set<Locale> locales = i18nHelper.getAvailableLocales();
+    Set<Locale> locales = i18nHelper.getAvailableLocalesForEvent(event);
     logger.debug("Creating translations for {} discovered i18n locales", locales.size());
 
     List<Translations> translations = new ArrayList<>();
@@ -203,9 +200,11 @@ public class NotificationTemplateAssembler {
   }
 
   private String extractVisibility(CdsEvent event) {
-    return Boolean.TRUE.equals(event.getAnnotationValue("notification.customizable", Boolean.FALSE))
-        ? "PUBLIC"
-        : null;
+    var annotation = event.findAnnotation("notification.customizable");
+    if (annotation.isEmpty()) {
+      return "PRIVATE"; // absent → explicit PRIVATE (same as ANS default)
+    }
+    return Boolean.TRUE.equals(annotation.get().getValue()) ? "PUBLIC" : "PRIVATE";
   }
 
   /**
