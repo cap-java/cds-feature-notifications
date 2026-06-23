@@ -111,9 +111,10 @@ class NotificationTypeAssemblerTest {
   void deliveryChannels_parsedCorrectly() {
     CdsEvent event = mockEvent("BookOrdered", "New book order", "{{_group_count}} new orders");
     CdsAnnotation channelsAnno = mock(CdsAnnotation.class);
-    when(channelsAnno.getValue()).thenReturn(List.of(
-        Map.of("channel", "MAIL", "enabled", true, "defaultPreference", true)));
-    when(event.findAnnotation("notification.deliveryChannels")).thenReturn(Optional.of(channelsAnno));
+    when(channelsAnno.getValue())
+        .thenReturn(List.of(Map.of("channel", "MAIL", "enabled", true, "defaultPreference", true)));
+    when(event.findAnnotation("notification.deliveryChannels"))
+        .thenReturn(Optional.of(channelsAnno));
 
     List<NotificationTypes> result = build(event);
     assertNotNull(result.get(0).getDeliveryChannels());
