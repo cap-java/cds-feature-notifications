@@ -49,62 +49,36 @@ public class LocalNotificationTypeAutoProvisionerHandler implements EventHandler
   }
 
   private void logNotificationType(NotificationTypes notificationType) {
-    // Log to console instead of sending to ANS
-    System.out.println("\n===============================================================");
-    System.out.println("NotificationType (Local Mode - Not Sent to ANS)");
-    System.out.println("  Key: " + notificationType.getNotificationTypeKey());
-    System.out.println("  Version: " + notificationType.getNotificationTypeVersion());
-    System.out.println(
-        "  Templates ("
-            + (notificationType.getTemplates() != null ? notificationType.getTemplates().size() : 0)
-            + "):");
+    logger.info("┌──────────────────────────────────────────────────────────────┐");
+    logger.info("│ NotificationType (Local Mode - Not Sent to ANS)");
+    logger.info("│   Key:     {}", notificationType.getNotificationTypeKey());
+    logger.info("│   Version: {}", notificationType.getNotificationTypeVersion());
+    logger.info("│   Templates ({}):",
+        notificationType.getTemplates() != null ? notificationType.getTemplates().size() : 0);
 
     if (notificationType.getTemplates() != null) {
       for (Templates template : notificationType.getTemplates()) {
-        System.out.println(
-            "    - Language: "
-                + template.getLanguage()
-                + "\n"
-                + "      Public Title: "
-                + template.getTemplatePublic()
-                + "\n"
-                + "      Sensitive Title: "
-                + template.getTemplateSensitive()
-                + "\n"
-                + "      Grouped Title: "
-                + template.getTemplateGrouped()
-                + "\n"
-                + "      Subtitle: "
-                + template.getSubtitle()
-                + "\n"
-                + "      Email Subject: "
-                + template.getEmailSubject()
-                + "\n"
-                + "      Email HTML: "
-                + (template.getEmailHtml() != null
-                    ? template
-                            .getEmailHtml()
-                            .substring(0, Math.min(100, template.getEmailHtml().length()))
-                        + "..."
-                    : "null"));
+        logger.info("│     - Language:        {}", template.getLanguage());
+        logger.info("│       Public Title:    {}", template.getTemplatePublic());
+        logger.info("│       Sensitive Title: {}", template.getTemplateSensitive());
+        logger.info("│       Grouped Title:   {}", template.getTemplateGrouped());
+        logger.info("│       Subtitle:        {}", template.getSubtitle());
+        logger.info("│       Email Subject:   {}", template.getEmailSubject());
+        if (template.getEmailHtml() != null) {
+          String preview = template.getEmailHtml().substring(0, Math.min(100, template.getEmailHtml().length())) + "...";
+          logger.info("│       Email HTML:      {}", preview);
+        }
       }
     }
 
     if (notificationType.getDeliveryChannels() != null) {
-      System.out.println(
-          "  Delivery Channels (" + notificationType.getDeliveryChannels().size() + "):");
+      logger.info("│   Delivery Channels ({}):", notificationType.getDeliveryChannels().size());
       for (DeliveryChannels channel : notificationType.getDeliveryChannels()) {
-        System.out.println(
-            "    - Type: "
-                + channel.getType()
-                + ", Enabled: "
-                + channel.getEnabled()
-                + ", DefaultPreference: "
-                + channel.getDefaultPreference());
+        logger.info("│     - Type: {}, Enabled: {}, DefaultPreference: {}",
+            channel.getType(), channel.getEnabled(), channel.getDefaultPreference());
       }
     }
-
-    System.out.println("===============================================================\n");
+    logger.info("└──────────────────────────────────────────────────────────────┘");
 
     logger.info(
         "NotificationType '{}' logged (LOCAL MODE - not sent to ANS)",
