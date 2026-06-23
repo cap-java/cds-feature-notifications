@@ -86,73 +86,75 @@ public class NotificationTypeProvisioningTest {
   }
 
   // ──────────────────────────────────────────────────────────────
-  // Test 2: Re-provisioning keeps IDs stable (UPDATE, not INSERT)
+  // Test 2: Re-provisioning uses delete+create (new IDs assigned)
   // ──────────────────────────────────────────────────────────────
 
   @Test
   void testReProvisioningUpdatesEachTypeCorrectly() {
     LOG.debug("==========================================");
-    LOG.debug("Test: Re-provisioning should update each type without changing IDs");
+    LOG.debug("Test: Re-provisioning should delete and recreate each type");
     LOG.debug("==========================================");
 
-    Map<String, String> idsBefore = new HashMap<>();
-    for (NotificationTypes nt :
-        NotificationTypeProviderServiceMockHandler.getAllNotificationTypes()) {
-      idsBefore.put(nt.getNotificationTypeKey(), nt.getNotificationTypeId());
+    Map<String, Integer> deletesBefore = new HashMap<>();
+    for (String key : EXPECTED_KEYS) {
+      deletesBefore.put(key, NotificationTypeProviderServiceMockHandler.getDeleteCount(key));
     }
     assertEquals(
-        EXPECTED_KEYS.size(), idsBefore.size(), "All types should exist before re-provisioning");
+        EXPECTED_KEYS.size(), NotificationTypeProviderServiceMockHandler.getNotificationTypeCount(),
+        "All types should exist before re-provisioning");
 
     createProvisioner().onApplicationPrepared();
 
-    Map<String, String> idsAfter = new HashMap<>();
-    for (NotificationTypes nt :
-        NotificationTypeProviderServiceMockHandler.getAllNotificationTypes()) {
-      idsAfter.put(nt.getNotificationTypeKey(), nt.getNotificationTypeId());
+    for (String key : EXPECTED_KEYS) {
+      int deletesAfter = NotificationTypeProviderServiceMockHandler.getDeleteCount(key);
+      assertEquals(
+          deletesBefore.get(key) + 1,
+          deletesAfter,
+          "NotificationType '" + key + "' should have been deleted once during re-provisioning");
     }
 
     assertEquals(
-        idsBefore,
-        idsAfter,
-        "NotificationTypeIds should remain the same after re-provisioning (UPDATE, not INSERT)");
+        EXPECTED_KEYS.size(),
+        NotificationTypeProviderServiceMockHandler.getNotificationTypeCount(),
+        "All types should still exist after re-provisioning (delete+create)");
 
-    LOG.debug("Re-provisioning verified — all types retain their IDs");
+    LOG.debug("Re-provisioning verified — all types were deleted and recreated");
   }
 
   // ──────────────────────────────────────────────────────────────
-  // Test 3: Update count matches expected types
+  // Test 3: Re-provisioning deletes and recreates all types
   // ──────────────────────────────────────────────────────────────
 
   @Test
   void testReProvisioningUpdatesAllTypes() {
     LOG.debug("==========================================");
-    LOG.debug("Test: Re-provisioning should trigger UPDATE for each existing type");
+    LOG.debug("Test: Re-provisioning should trigger DELETE+CREATE for each existing type");
     LOG.debug("==========================================");
 
-    Map<String, Integer> countsBefore = new HashMap<>();
+    Map<String, Integer> deletesBefore = new HashMap<>();
     for (String key : EXPECTED_KEYS) {
-      countsBefore.put(key, NotificationTypeProviderServiceMockHandler.getUpdateCount(key));
+      deletesBefore.put(key, NotificationTypeProviderServiceMockHandler.getDeleteCount(key));
     }
 
     createProvisioner().onApplicationPrepared();
 
     for (String key : EXPECTED_KEYS) {
-      int before = countsBefore.get(key);
-      int after = NotificationTypeProviderServiceMockHandler.getUpdateCount(key);
+      int before = deletesBefore.get(key);
+      int after = NotificationTypeProviderServiceMockHandler.getDeleteCount(key);
 
       assertEquals(
           before + 1,
           after,
           "NotificationType '"
               + key
-              + "' should have been updated exactly once. Before: "
+              + "' should have been deleted exactly once. Before: "
               + before
               + ", After: "
               + after);
 
-      LOG.debug("Type '{}': update count {} → {}", key, before, after);
+      LOG.debug("Type '{}': delete count {} → {}", key, before, after);
     }
 
-    LOG.debug("All {} types were updated during re-provisioning", EXPECTED_KEYS.size());
+    LOG.debug("All {} types were deleted and recreated during re-provisioning", EXPECTED_KEYS.size());
   }
 }

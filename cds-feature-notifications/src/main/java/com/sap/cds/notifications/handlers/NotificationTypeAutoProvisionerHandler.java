@@ -7,9 +7,9 @@ import cds.gen.notificationtypeproviderservice.NotificationTypeProviderService;
 import cds.gen.notificationtypeproviderservice.NotificationTypes;
 import cds.gen.notificationtypeproviderservice.NotificationTypes_;
 import com.sap.cds.notifications.assemblers.NotificationTypeAssembler;
+import com.sap.cds.ql.Delete;
 import com.sap.cds.ql.Insert;
 import com.sap.cds.ql.Select;
-import com.sap.cds.ql.Update;
 import com.sap.cds.services.application.ApplicationLifecycleService;
 import com.sap.cds.services.handler.EventHandler;
 import com.sap.cds.services.handler.annotations.On;
@@ -160,44 +160,30 @@ public class NotificationTypeAutoProvisionerHandler implements EventHandler {
 
   private void updateNotificationType(
       NotificationTypes notificationType, String notificationTypeId) {
-    notificationType.setNotificationTypeId(notificationTypeId);
     logger.debug(
-        "Updating NotificationType '{}' (id={})",
+        "Updating NotificationType '{}' (id={}) via delete+create",
         notificationType.getNotificationTypeKey(),
         notificationTypeId);
 
     try {
+      // ANS does not allow mixing Translations and Templates on update,
+      // so we delete the existing type and recreate it cleanly.
       notificationTypeProviderService.run(
-          Update.entity(NotificationTypes_.CDS_NAME).data(notificationType));
+          Delete.from(NotificationTypes_.class)
+              .where(nt -> nt.NotificationTypeId().eq(notificationTypeId)));
 
       logger.debug(
-          "NotificationType '{}' updated in ANS successfully",
-          notificationType.getNotificationTypeKey());
+          "Deleted existing NotificationType '{}' (id={})",
+          notificationType.getNotificationTypeKey(),
+          notificationTypeId);
     } catch (Exception e) {
-      String errorMsg = e.getMessage() != null ? e.getMessage() : "";
-
-      if (errorMsg.contains("400")) {
-        logger.error(
-            "ANS rejected NotificationType update '{}' with 400 Bad Request. "
-                + "This usually means required fields are missing or invalid. "
-                + "Check that all required fields (publicTitle, title, groupedTitle, subtitle) are set. "
-                + "Error: {}",
-            notificationType.getNotificationTypeKey(),
-            errorMsg);
-        throw new IllegalStateException(
-            String.format(
-                "ANS rejected NotificationType update '%s' with 400 Bad Request. "
-                    + "Ensure all required template fields are properly configured in your CDS model and i18n files. Error: %s",
-                notificationType.getNotificationTypeKey(), errorMsg),
-            e);
-      }
-
-      logger.error(
-          "Failed to update NotificationType '{}' (id={})",
+      logger.warn(
+          "Failed to delete existing NotificationType '{}' (id={}): {}. Attempting create anyway.",
           notificationType.getNotificationTypeKey(),
           notificationTypeId,
-          e);
-      throw e;
+          e.getMessage());
     }
+
+    createNotificationType(notificationType);
   }
 }

@@ -6,6 +6,7 @@ package customer.sample_app.handlers.mock;
 import cds.gen.notificationtemplateproviderservice.NotificationTemplates;
 import cds.gen.notificationtemplateproviderservice.NotificationTemplates_;
 import com.sap.cds.services.cds.CdsCreateEventContext;
+import com.sap.cds.services.cds.CdsDeleteEventContext;
 import com.sap.cds.services.cds.CdsReadEventContext;
 import com.sap.cds.services.cds.CdsUpdateEventContext;
 import com.sap.cds.services.cds.CqnService;
@@ -37,6 +38,9 @@ public class NotificationTemplateProviderServiceMockHandler implements EventHand
 
   // Tracks how many times each template key has been updated
   private static final Map<String, AtomicInteger> updateCountByKey = new ConcurrentHashMap<>();
+
+  // Tracks how many times each template key has been deleted
+  private static final Map<String, AtomicInteger> deleteCountByKey = new ConcurrentHashMap<>();
 
   @On(event = CqnService.EVENT_CREATE, entity = NotificationTemplates_.CDS_NAME)
   public void interceptCreate(CdsCreateEventContext context) {
@@ -73,6 +77,26 @@ public class NotificationTemplateProviderServiceMockHandler implements EventHand
             });
 
     context.setResult(resultEntries);
+    context.setCompleted();
+  }
+
+  @On(event = CqnService.EVENT_DELETE, entity = NotificationTemplates_.CDS_NAME)
+  public void interceptDelete(CdsDeleteEventContext context) {
+    logger.debug("MockHandler intercepting NotificationTemplates DELETE");
+
+    context.getCqn().where().ifPresent(where -> {
+      String whereStr = where.toString();
+      templateStore.entrySet().removeIf(entry -> {
+        boolean matches = whereStr.contains(entry.getKey());
+        if (matches) {
+          deleteCountByKey.computeIfAbsent(entry.getKey(), k -> new AtomicInteger(0)).incrementAndGet();
+          logger.debug("MockHandler deleted notification template: Key={}", entry.getKey());
+        }
+        return matches;
+      });
+    });
+
+    context.setResult(Collections.emptyList());
     context.setCompleted();
   }
 
@@ -145,6 +169,7 @@ public class NotificationTemplateProviderServiceMockHandler implements EventHand
   public static void clearAllTemplates() {
     templateStore.clear();
     updateCountByKey.clear();
+    deleteCountByKey.clear();
     logger.debug("Mock NotificationTemplateProviderService: Cleared all templates");
   }
 
@@ -175,6 +200,11 @@ public class NotificationTemplateProviderServiceMockHandler implements EventHand
    */
   public static int getUpdateCount(String key) {
     AtomicInteger count = updateCountByKey.get(key);
+    return count != null ? count.get() : 0;
+  }
+
+  public static int getDeleteCount(String key) {
+    AtomicInteger count = deleteCountByKey.get(key);
     return count != null ? count.get() : 0;
   }
 }
