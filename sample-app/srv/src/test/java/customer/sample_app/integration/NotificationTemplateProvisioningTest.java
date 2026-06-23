@@ -121,8 +121,7 @@ public class NotificationTemplateProvisioningTest {
   @Test
   void testVisibilityDefaultsToPrivate() {
     LOG.debug("==========================================");
-    LOG.debug(
-        "Test: Templates without @notification.customizable should have PRIVATE visibility");
+    LOG.debug("Test: Templates without @notification.customizable should have PRIVATE visibility");
     LOG.debug("==========================================");
 
     // SystemMaintenance has no @notification.customizable → visibility should be PRIVATE
@@ -134,8 +133,7 @@ public class NotificationTemplateProvisioningTest {
         template.getVisibility(),
         "Template without @notification.customizable should have PRIVATE visibility");
 
-    LOG.debug(
-        "SystemMaintenance visibility: {}", template.getVisibility());
+    LOG.debug("SystemMaintenance visibility: {}", template.getVisibility());
   }
 
   // ──────────────────────────────────────────────────────────────

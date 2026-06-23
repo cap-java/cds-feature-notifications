@@ -53,7 +53,8 @@ public class LocalNotificationTypeAutoProvisionerHandler implements EventHandler
     logger.info("│ NotificationType (Local Mode - Not Sent to ANS)");
     logger.info("│   Key:     {}", notificationType.getNotificationTypeKey());
     logger.info("│   Version: {}", notificationType.getNotificationTypeVersion());
-    logger.info("│   Templates ({}):",
+    logger.info(
+        "│   Templates ({}):",
         notificationType.getTemplates() != null ? notificationType.getTemplates().size() : 0);
 
     if (notificationType.getTemplates() != null) {
@@ -65,7 +66,9 @@ public class LocalNotificationTypeAutoProvisionerHandler implements EventHandler
         logger.info("│       Subtitle:        {}", template.getSubtitle());
         logger.info("│       Email Subject:   {}", template.getEmailSubject());
         if (template.getEmailHtml() != null) {
-          String preview = template.getEmailHtml().substring(0, Math.min(100, template.getEmailHtml().length())) + "...";
+          String preview =
+              template.getEmailHtml().substring(0, Math.min(100, template.getEmailHtml().length()))
+                  + "...";
           logger.info("│       Email HTML:      {}", preview);
         }
       }
@@ -74,8 +77,11 @@ public class LocalNotificationTypeAutoProvisionerHandler implements EventHandler
     if (notificationType.getDeliveryChannels() != null) {
       logger.info("│   Delivery Channels ({}):", notificationType.getDeliveryChannels().size());
       for (DeliveryChannels channel : notificationType.getDeliveryChannels()) {
-        logger.info("│     - Type: {}, Enabled: {}, DefaultPreference: {}",
-            channel.getType(), channel.getEnabled(), channel.getDefaultPreference());
+        logger.info(
+            "│     - Type: {}, Enabled: {}, DefaultPreference: {}",
+            channel.getType(),
+            channel.getEnabled(),
+            channel.getDefaultPreference());
       }
     }
     logger.info("└──────────────────────────────────────────────────────────────┘");

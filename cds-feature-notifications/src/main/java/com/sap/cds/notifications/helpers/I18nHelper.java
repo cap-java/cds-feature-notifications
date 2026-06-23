@@ -75,14 +75,18 @@ public class I18nHelper {
         continue;
       }
       Map<String, String> localeTexts = getI18nTexts(locale);
-      String localeTitle = resolveAnnotationValue(event, "notification.template.title", localeTexts);
+      String localeTitle =
+          resolveAnnotationValue(event, "notification.template.title", localeTexts);
       if (!Objects.equals(enTitle, localeTitle)) {
         filtered.add(locale);
       }
     }
 
-    logger.debug("Filtered locales for '{}': {} (skipped {} without notification translations)",
-        event.getName(), filtered, allLocales.size() - filtered.size());
+    logger.debug(
+        "Filtered locales for '{}': {} (skipped {} without notification translations)",
+        event.getName(),
+        filtered,
+        allLocales.size() - filtered.size());
     return filtered;
   }
 

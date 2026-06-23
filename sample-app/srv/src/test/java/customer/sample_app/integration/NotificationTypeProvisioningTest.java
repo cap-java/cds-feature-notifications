@@ -100,7 +100,8 @@ public class NotificationTypeProvisioningTest {
       deletesBefore.put(key, NotificationTypeProviderServiceMockHandler.getDeleteCount(key));
     }
     assertEquals(
-        EXPECTED_KEYS.size(), NotificationTypeProviderServiceMockHandler.getNotificationTypeCount(),
+        EXPECTED_KEYS.size(),
+        NotificationTypeProviderServiceMockHandler.getNotificationTypeCount(),
         "All types should exist before re-provisioning");
 
     createProvisioner().onApplicationPrepared();
@@ -155,6 +156,7 @@ public class NotificationTypeProvisioningTest {
       LOG.debug("Type '{}': delete count {} → {}", key, before, after);
     }
 
-    LOG.debug("All {} types were deleted and recreated during re-provisioning", EXPECTED_KEYS.size());
+    LOG.debug(
+        "All {} types were deleted and recreated during re-provisioning", EXPECTED_KEYS.size());
   }
 }

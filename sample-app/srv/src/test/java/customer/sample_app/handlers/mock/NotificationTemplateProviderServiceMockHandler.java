@@ -84,17 +84,27 @@ public class NotificationTemplateProviderServiceMockHandler implements EventHand
   public void interceptDelete(CdsDeleteEventContext context) {
     logger.debug("MockHandler intercepting NotificationTemplates DELETE");
 
-    context.getCqn().where().ifPresent(where -> {
-      String whereStr = where.toString();
-      templateStore.entrySet().removeIf(entry -> {
-        boolean matches = whereStr.contains(entry.getKey());
-        if (matches) {
-          deleteCountByKey.computeIfAbsent(entry.getKey(), k -> new AtomicInteger(0)).incrementAndGet();
-          logger.debug("MockHandler deleted notification template: Key={}", entry.getKey());
-        }
-        return matches;
-      });
-    });
+    context
+        .getCqn()
+        .where()
+        .ifPresent(
+            where -> {
+              String whereStr = where.toString();
+              templateStore
+                  .entrySet()
+                  .removeIf(
+                      entry -> {
+                        boolean matches = whereStr.contains(entry.getKey());
+                        if (matches) {
+                          deleteCountByKey
+                              .computeIfAbsent(entry.getKey(), k -> new AtomicInteger(0))
+                              .incrementAndGet();
+                          logger.debug(
+                              "MockHandler deleted notification template: Key={}", entry.getKey());
+                        }
+                        return matches;
+                      });
+            });
 
     context.setResult(Collections.emptyList());
     context.setCompleted();

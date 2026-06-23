@@ -66,12 +66,14 @@ public class NotificationTypeAssembler {
 
   /** ANS Translation field constraints (per ANS API spec). */
   private static final int MAX_LANGUAGE_LENGTH = 20;
+
   private static final int MAX_TEXT_LENGTH = 256;
 
   /**
    * Extract Translations from CDS event annotations for all available i18n locales.
    *
    * <p>Mapping:
+   *
    * <ul>
    *   <li>{@code @notification.template.title} → DisplayName (required)
    *   <li>{@code @notification.template.groupedTitle} → GroupTitle (required)

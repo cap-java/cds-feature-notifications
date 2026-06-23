@@ -101,22 +101,32 @@ public class NotificationTypeProviderServiceMockHandler implements EventHandler 
   public void interceptDelete(CdsDeleteEventContext context) {
     logger.debug("MockHandler intercepting NotificationTypes DELETE");
 
-    context.getCqn().where().ifPresent(where -> {
-      // Extract the ID from the WHERE clause and delete from store
-      notificationTypeStore.entrySet().removeIf(entry -> {
-        NotificationTypes nt = entry.getValue();
-        String id = nt.getNotificationTypeId();
-        boolean matches = where.toString().contains(id != null ? id : "");
-        if (matches) {
-          String key = nt.getNotificationTypeKey();
-          String keyVersion = key + ":" + nt.getNotificationTypeVersion();
-          notificationTypeByKeyVersion.remove(keyVersion);
-          deleteCountByKey.computeIfAbsent(key, k -> new AtomicInteger(0)).incrementAndGet();
-          logger.debug("MockHandler deleted notification type: Key={}, ID={}", key, id);
-        }
-        return matches;
-      });
-    });
+    context
+        .getCqn()
+        .where()
+        .ifPresent(
+            where -> {
+              // Extract the ID from the WHERE clause and delete from store
+              notificationTypeStore
+                  .entrySet()
+                  .removeIf(
+                      entry -> {
+                        NotificationTypes nt = entry.getValue();
+                        String id = nt.getNotificationTypeId();
+                        boolean matches = where.toString().contains(id != null ? id : "");
+                        if (matches) {
+                          String key = nt.getNotificationTypeKey();
+                          String keyVersion = key + ":" + nt.getNotificationTypeVersion();
+                          notificationTypeByKeyVersion.remove(keyVersion);
+                          deleteCountByKey
+                              .computeIfAbsent(key, k -> new AtomicInteger(0))
+                              .incrementAndGet();
+                          logger.debug(
+                              "MockHandler deleted notification type: Key={}, ID={}", key, id);
+                        }
+                        return matches;
+                      });
+            });
 
     context.setResult(Collections.emptyList());
     context.setCompleted();
