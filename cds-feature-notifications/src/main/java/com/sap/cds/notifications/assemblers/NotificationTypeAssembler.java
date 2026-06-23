@@ -5,7 +5,9 @@ package com.sap.cds.notifications.assemblers;
 
 import cds.gen.notificationtypeproviderservice.DeliveryChannels;
 import cds.gen.notificationtypeproviderservice.NotificationTypes;
+import cds.gen.notificationtypeproviderservice.Translations;
 import com.sap.cds.Struct;
+import com.sap.cds.notifications.helpers.I18nHelper;
 import com.sap.cds.reflect.CdsEvent;
 import com.sap.cds.reflect.CdsModel;
 import com.sap.cds.services.runtime.CdsRuntime;
@@ -19,9 +21,11 @@ public class NotificationTypeAssembler {
   private static final Logger logger = LoggerFactory.getLogger(NotificationTypeAssembler.class);
 
   private final CdsRuntime runtime;
+  private final I18nHelper i18nHelper;
 
   public NotificationTypeAssembler(CdsRuntime runtime) {
     this.runtime = runtime;
+    this.i18nHelper = new I18nHelper(runtime);
   }
 
   /** Build all notification types from CDS model event annotations. */
@@ -46,14 +50,87 @@ public class NotificationTypeAssembler {
     nt.setNotificationTypeKey(key);
     nt.setNotificationTypeVersion("1");
 
+    // Extract translations (required by ANS — at least Translations or Templates must be present)
+    List<Translations> translations = extractTranslations(event);
+    nt.setTranslations(translations);
+
     // Extract delivery channels
     List<DeliveryChannels> deliveryChannels = extractDeliveryChannels(event);
     if (!deliveryChannels.isEmpty()) {
       nt.setDeliveryChannels(deliveryChannels);
     }
 
-    logger.debug("Extracted NotificationType: {}", key);
+    logger.debug("Extracted NotificationType: {} with {} translation(s)", key, translations.size());
     return Optional.of(nt);
+  }
+
+  /** ANS Translation field constraints (per ANS API spec). */
+  private static final int MAX_LANGUAGE_LENGTH = 20;
+  private static final int MAX_TEXT_LENGTH = 256;
+
+  /**
+   * Extract Translations from CDS event annotations for all available i18n locales.
+   *
+   * <p>Mapping:
+   * <ul>
+   *   <li>{@code @notification.template.title} → DisplayName (required)
+   *   <li>{@code @notification.template.groupedTitle} → GroupTitle (required)
+   *   <li>{@code @description} → Description (optional)
+   * </ul>
+   */
+  private List<Translations> extractTranslations(CdsEvent event) {
+    Set<Locale> locales = i18nHelper.getAvailableLocalesForEvent(event);
+    List<Translations> translations = new ArrayList<>();
+
+    for (Locale locale : locales) {
+      Map<String, String> i18nTexts = i18nHelper.getI18nTexts(locale);
+
+      Translations translation = Struct.create(Translations.class);
+      translation.setLanguage(truncate(locale.toLanguageTag(), MAX_LANGUAGE_LENGTH));
+
+      // DisplayName — from @notification.template.title
+      String displayName =
+          i18nHelper.resolveAnnotationValue(event, "notification.template.title", i18nTexts);
+      if (displayName == null || displayName.isBlank()) {
+        displayName = event.getName();
+      }
+      translation.setDisplayName(truncate(displayName, MAX_TEXT_LENGTH));
+
+      // GroupTitle — from @notification.template.groupedTitle (required)
+      String groupTitle =
+          i18nHelper.resolveAnnotationValue(event, "notification.template.groupedTitle", i18nTexts);
+      if (groupTitle == null || groupTitle.isBlank()) {
+        throw new IllegalStateException(
+            String.format(
+                "Missing required annotation: @notification.template.groupedTitle for event '%s'.",
+                event.getName()));
+      }
+      translation.setGroupTitle(truncate(groupTitle, MAX_TEXT_LENGTH));
+
+      translation.setSyntax("MUSTACHE");
+
+      // Description — from @description (optional)
+      String description = i18nHelper.resolveAnnotationValue(event, "description", i18nTexts);
+      if (description != null && !description.isBlank()) {
+        translation.setDescription(truncate(description, MAX_TEXT_LENGTH));
+      }
+
+      translations.add(translation);
+      logger.debug(
+          "Created NotificationType translation: lang={}, displayName={}, groupTitle={}",
+          locale.toLanguageTag(),
+          displayName,
+          groupTitle);
+    }
+
+    return translations;
+  }
+
+  private static String truncate(String value, int maxLength) {
+    if (value == null || value.length() <= maxLength) {
+      return value;
+    }
+    return value.substring(0, maxLength);
   }
 
   @SuppressWarnings("unchecked")
