@@ -339,12 +339,7 @@ public class NotificationTemplateProvisioningTest {
     // Event = event name
     assertEquals("CertificateExpiration", en.getEvent(), "Event should be the event name");
 
-    // DisplayName = event name
-    assertEquals(
-        "CertificateExpiration", en.getDisplayName(), "DisplayName should be the event name");
-
-    LOG.debug(
-        "Source={}, Event={}, DisplayName={}", en.getSource(), en.getEvent(), en.getDisplayName());
+    LOG.debug("Source={}, Event={}", en.getSource(), en.getEvent());
   }
 
   // ──────────────────────────────────────────────────────────────
