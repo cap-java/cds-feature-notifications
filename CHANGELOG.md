@@ -16,11 +16,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Support for email templates via `template.email.subject` and `template.email.html` fields
 - Mustache syntax (`{{variableName}}`) for dynamic content substitution in notification templates and notification type translations
 - i18n support via `{i18n>KEY}` placeholders in all template fields with automatic language detection per recipient
-- Translation locales filtered per event to exclude framework-only locales (e.g. `@sap/cds/common` translations) that have no app-specific notification texts
-- Automatic notification type provisioning to ANS at application startup (`NotificationTypeAutoProvisionerHandler`) using `Translations` payload to comply with ANS API spec
-- Required field validation for `@notification.template.groupedTitle` annotation — throws `IllegalStateException` at startup if missing
-- Re-provisioning of `NotificationType` and `NotificationTemplate` uses delete+create strategy to avoid ANS 400 rejection when existing type has `Templates` but new payload uses `Translations`, and because ANS does not provide a PATCH endpoint for templates
-- Explicit `PRIVATE` visibility set on `NotificationTemplate` when `@notification.customizable` annotation is absent
+- Automatic notification type provisioning to ANS at application startup
+- `NotificationTemplate` visibility defaults to `PRIVATE` when `@notification.customizable` annotation is absent
 - Local mode operation: logs notifications to console without requiring an ANS service binding (`LocalHandler`)
 - Production mode operation: sends notifications to SAP Alert Notification Service (`ProductionHandler`)
 - Mode toggled via `cds.environment.production.enabled` configuration property; defaults to local mode when property is not set or is `null`
