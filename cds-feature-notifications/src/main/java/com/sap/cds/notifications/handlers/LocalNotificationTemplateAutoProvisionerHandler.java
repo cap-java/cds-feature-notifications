@@ -88,12 +88,17 @@ public class LocalNotificationTemplateAutoProvisionerHandler implements EventHan
 
         if (translation.getEmail() != null) {
           logger.info("│    email subject:   {}", translation.getEmail().getSubject());
-          logger.info("│    email bodyText:  {}", translation.getEmail().getBodyText() != null
-              ? translation.getEmail().getBodyText()
-              : "(not set)");
+          logger.info(
+              "│    email bodyText:  {}",
+              translation.getEmail().getBodyText() != null
+                  ? translation.getEmail().getBodyText()
+                  : "(not set)");
           if (translation.getEmail().getBodyHtml() != null) {
-            logger.info("│    email bodyHtml:  {}",
-                translation.getEmail().getBodyHtml()
+            logger.info(
+                "│    email bodyHtml:  {}",
+                translation
+                    .getEmail()
+                    .getBodyHtml()
                     .replaceAll("<[^>]+>", " ")
                     .replaceAll("\\s+", " ")
                     .trim());
