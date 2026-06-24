@@ -113,10 +113,9 @@ public class NotificationTemplateAssembler {
     translation.setLanguage(lang);
     translation.setSyntax(DEFAULT_SYNTAX);
 
-    // Source, Event, DisplayName - for admin UI filtering and display
+    // Source, Event - for admin UI filtering and display
     translation.setSource(source);
     translation.setEvent(eventName);
-    translation.setDisplayName(eventName);
 
     // Title (required) - from @notification.template.title
     String title =
