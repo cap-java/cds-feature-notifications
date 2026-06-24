@@ -11,7 +11,10 @@ import com.sap.cds.services.handler.EventHandler;
 import com.sap.cds.services.handler.annotations.On;
 import com.sap.cds.services.handler.annotations.ServiceName;
 import com.sap.cds.services.runtime.CdsRuntime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,12 +36,8 @@ public class LocalNotificationTemplateAutoProvisionerHandler implements EventHan
 
   @On(event = ApplicationLifecycleService.EVENT_APPLICATION_PREPARED)
   public void onApplicationPrepared() {
-    logger.info(
-        "Auto-provisioning standalone NotificationTemplates from CDS annotations"
-            + " (LOCAL MODE - Logging Only)...");
     try {
       provisionNotificationTemplates();
-      logger.info("Standalone NotificationTemplate auto-provisioning completed (LOCAL MODE)");
     } catch (Exception e) {
       logger.error("Standalone NotificationTemplate auto-provisioning failed", e);
     }
@@ -49,9 +48,13 @@ public class LocalNotificationTemplateAutoProvisionerHandler implements EventHan
         notificationTemplateBuilder.buildAllNotificationTemplates();
 
     if (templates.isEmpty()) {
-      logger.info("No standalone NotificationTemplates found in CDS model (LOCAL MODE)");
+      logger.info("No standalone NotificationTemplates found in CDS model");
       return;
     }
+
+    logger.info("╔══════════════════════════════════════════════════════════════╗");
+    logger.info("║  NOTIFICATION TEMPLATES (Local Mode — Not Sent to ANS)      ║");
+    logger.info("╚══════════════════════════════════════════════════════════════╝");
 
     for (NotificationTemplates template : templates) {
       logTemplate(template);
@@ -59,56 +62,57 @@ public class LocalNotificationTemplateAutoProvisionerHandler implements EventHan
   }
 
   private void logTemplate(NotificationTemplates template) {
-    logger.info("===============================================================");
-    logger.info("Standalone NotificationTemplate (Local Mode - Not Sent to ANS)");
+    int translationCount =
+        template.getTranslations() != null ? template.getTranslations().size() : 0;
+
+    logger.info("┌──────────────────────────────────────────────────────────────┐");
     logger.info(
-        """
-          Key: {}
-          Visibility: {}
-          Translations: {}""",
+        "│ Template: '{}' | visibility={} | translations={}",
         template.getKey(),
         template.getVisibility(),
-        template.getTranslations() != null ? template.getTranslations().size() : 0);
+        translationCount);
+
+    if (template.getPropertiesSchema() != null) {
+      logger.info("│ Properties: {}", extractPropertyNames(template.getPropertiesSchema()));
+    }
+
+    logger.info("├──────────────────────────────────────────────────────────────┤");
 
     if (template.getTranslations() != null) {
       for (Translations translation : template.getTranslations()) {
-        logger.info(
-            """
-              - Language: {}
-                Syntax: {}
-                Title: {}
-                Preview: {}
-                Body: {}
-                Description: {}""",
-            translation.getLanguage(),
-            translation.getSyntax(),
-            translation.getTitle(),
-            translation.getPreview(),
-            translation.getBody(),
-            translation.getDescription());
+        logger.info("│  [{}]", translation.getLanguage());
+        logger.info("│    title:       {}", translation.getTitle());
+        logger.info("│    preview:     {}", translation.getPreview());
+        logger.info("│    body:        {}", translation.getBody());
+        logger.info("│    description: {}", translation.getDescription());
 
         if (translation.getEmail() != null) {
-          logger.info(
-              """
-                Email Subject: {}
-                Email BodyHtml: {}
-                Email BodyText: {}""",
-              translation.getEmail().getSubject(),
-              translation.getEmail().getBodyHtml() != null
-                  ? translation
-                          .getEmail()
-                          .getBodyHtml()
-                          .substring(
-                              0, Math.min(100, translation.getEmail().getBodyHtml().length()))
-                      + "..."
-                  : "null",
-              translation.getEmail().getBodyText());
+          logger.info("│    email subject:   {}", translation.getEmail().getSubject());
+          logger.info("│    email bodyText:  {}", translation.getEmail().getBodyText() != null
+              ? translation.getEmail().getBodyText()
+              : "(not set)");
+          if (translation.getEmail().getBodyHtml() != null) {
+            logger.info("│    email bodyHtml:  {}",
+                translation.getEmail().getBodyHtml()
+                    .replaceAll("<[^>]+>", " ")
+                    .replaceAll("\\s+", " ")
+                    .trim());
+          } else {
+            logger.info("│    email bodyHtml:  (not set)");
+          }
         }
+        logger.info("│");
       }
     }
+    logger.info("└──────────────────────────────────────────────────────────────┘");
+  }
 
-    logger.info("===============================================================");
-    logger.info(
-        "Standalone template '{}' logged (LOCAL MODE - not sent to ANS)", template.getKey());
+  private String extractPropertyNames(String propertiesSchema) {
+    List<String> names = new ArrayList<>();
+    Matcher matcher = Pattern.compile("\"([^\"]+)\":\\{\"type\"").matcher(propertiesSchema);
+    while (matcher.find()) {
+      names.add(matcher.group(1));
+    }
+    return names.isEmpty() ? "(none)" : String.join(", ", names);
   }
 }
