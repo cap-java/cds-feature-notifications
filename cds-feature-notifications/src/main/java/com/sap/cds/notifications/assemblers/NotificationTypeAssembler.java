@@ -70,7 +70,8 @@ public class NotificationTypeAssembler {
    * <p>Mapping:
    *
    * <ul>
-   *   <li>{@code @notification.template.publicTitle} → DisplayName (non-sensitive, shown in user preferences)</li>
+   *   <li>{@code @notification.template.publicTitle} → DisplayName (non-sensitive, shown in user
+   *       preferences)
    *   <li>{@code @notification.template.groupedTitle} → GroupTitle (required)
    *   <li>{@code @description} → Description (optional)
    * </ul>
@@ -85,7 +86,8 @@ public class NotificationTypeAssembler {
       Translations translation = Struct.create(Translations.class);
       translation.setLanguage(locale.toLanguageTag());
 
-      // DisplayName — from @notification.template.publicTitle (non-sensitive, shown in user preferences)
+      // DisplayName — from @notification.template.publicTitle (non-sensitive, shown in user
+      // preferences)
       String displayName =
           i18nHelper.resolveAnnotationValue(event, "notification.template.publicTitle", i18nTexts);
       if (displayName == null || displayName.isBlank()) {

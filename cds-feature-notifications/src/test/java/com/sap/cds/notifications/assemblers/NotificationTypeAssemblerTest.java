@@ -45,7 +45,8 @@ class NotificationTypeAssemblerTest {
     CdsAnnotation titleAnno = mock(CdsAnnotation.class);
     when(titleAnno.getValue()).thenReturn(title != null ? title : "");
     // @notification.template.title is used to filter events in buildAllNotificationTypes
-    when(event.findAnnotation("notification.template.title")).thenReturn(Optional.of(mock(CdsAnnotation.class)));
+    when(event.findAnnotation("notification.template.title"))
+        .thenReturn(Optional.of(mock(CdsAnnotation.class)));
     // @notification.template.publicTitle is used as DisplayName in Translations
     when(event.findAnnotation("notification.template.publicTitle"))
         .thenReturn(title != null ? Optional.of(titleAnno) : Optional.empty());
