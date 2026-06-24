@@ -553,29 +553,29 @@ public class NotificationTemplateProvisioningTest {
   @Test
   void testReProvisioningUpdatesExistingTemplates() {
     LOG.debug("==========================================");
-    LOG.debug("Test: Re-provisioning should UPDATE existing templates via PUT");
+    LOG.debug("Test: Re-provisioning should DELETE and recreate existing templates");
     LOG.debug("==========================================");
 
     int countBefore = NotificationTemplateProviderServiceMockHandler.getTemplateCount();
     assertTrue(countBefore > 0, "Templates should already be provisioned at startup");
 
-    int updatesBefore =
-        NotificationTemplateProviderServiceMockHandler.getUpdateCount("CertificateExpiration");
+    int deletesBefore =
+        NotificationTemplateProviderServiceMockHandler.getDeleteCount("CertificateExpiration");
 
     createProvisioner().onApplicationPrepared();
 
-    int updatesAfter =
-        NotificationTemplateProviderServiceMockHandler.getUpdateCount("CertificateExpiration");
+    int deletesAfter =
+        NotificationTemplateProviderServiceMockHandler.getDeleteCount("CertificateExpiration");
     assertEquals(
-        updatesBefore + 1,
-        updatesAfter,
-        "CertificateExpiration template should have been updated once during re-provisioning");
+        deletesBefore + 1,
+        deletesAfter,
+        "CertificateExpiration template should have been deleted once during re-provisioning");
 
     assertEquals(
         countBefore,
         NotificationTemplateProviderServiceMockHandler.getTemplateCount(),
         "Template count should remain the same after re-provisioning");
 
-    LOG.debug("Re-provisioning triggered PUT update for existing templates");
+    LOG.debug("Re-provisioning triggered DELETE+CREATE for existing templates");
   }
 }

@@ -7,9 +7,9 @@ import cds.gen.notificationtemplateproviderservice.NotificationTemplateProviderS
 import cds.gen.notificationtemplateproviderservice.NotificationTemplates;
 import cds.gen.notificationtemplateproviderservice.NotificationTemplates_;
 import com.sap.cds.notifications.assemblers.NotificationTemplateAssembler;
+import com.sap.cds.ql.Delete;
 import com.sap.cds.ql.Insert;
 import com.sap.cds.ql.Select;
-import com.sap.cds.ql.Update;
 import com.sap.cds.services.application.ApplicationLifecycleService;
 import com.sap.cds.services.handler.EventHandler;
 import com.sap.cds.services.handler.annotations.On;
@@ -133,19 +133,20 @@ public class NotificationTemplateAutoProvisionerHandler implements EventHandler 
   }
 
   private void updateTemplate(NotificationTemplates template) {
-    logger.debug("Updating standalone template '{}' via PUT", template.getKey());
+    logger.debug("Updating standalone template '{}' (delete + re-create)", template.getKey());
 
     try {
       notificationTemplateProviderService.run(
-          Update.entity(NotificationTemplates_.CDS_NAME)
-              .data(template)
-              .where(t -> t.get("Key").eq(template.getKey())));
+          Delete.from(NotificationTemplates_.class).where(nt -> nt.Key().eq(template.getKey())));
 
-      logger.debug(
-          "Standalone NotificationTemplate '{}' updated in ANS successfully", template.getKey());
+      logger.debug("Deleted existing standalone template '{}'", template.getKey());
     } catch (Exception e) {
-      logger.error("Failed to update standalone template '{}' in ANS", template.getKey(), e);
-      throw e;
+      logger.warn(
+          "Could not delete existing standalone template '{}': {}",
+          template.getKey(),
+          e.getMessage());
     }
+
+    createTemplate(template);
   }
 }
