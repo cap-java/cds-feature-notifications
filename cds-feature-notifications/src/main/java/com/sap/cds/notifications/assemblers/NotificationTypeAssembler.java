@@ -64,18 +64,13 @@ public class NotificationTypeAssembler {
     return Optional.of(nt);
   }
 
-  /** ANS Translation field constraints (per ANS API spec). */
-  private static final int MAX_LANGUAGE_LENGTH = 20;
-
-  private static final int MAX_TEXT_LENGTH = 256;
-
   /**
    * Extract Translations from CDS event annotations for all available i18n locales.
    *
    * <p>Mapping:
    *
    * <ul>
-   *   <li>{@code @notification.template.title} → DisplayName (required)
+   *   <li>{@code @notification.template.publicTitle} → DisplayName (non-sensitive, shown in user preferences)</li>
    *   <li>{@code @notification.template.groupedTitle} → GroupTitle (required)
    *   <li>{@code @description} → Description (optional)
    * </ul>
@@ -88,15 +83,18 @@ public class NotificationTypeAssembler {
       Map<String, String> i18nTexts = i18nHelper.getI18nTexts(locale);
 
       Translations translation = Struct.create(Translations.class);
-      translation.setLanguage(truncate(locale.toLanguageTag(), MAX_LANGUAGE_LENGTH));
+      translation.setLanguage(locale.toLanguageTag());
 
-      // DisplayName — from @notification.template.title
+      // DisplayName — from @notification.template.publicTitle (non-sensitive, shown in user preferences)
       String displayName =
-          i18nHelper.resolveAnnotationValue(event, "notification.template.title", i18nTexts);
+          i18nHelper.resolveAnnotationValue(event, "notification.template.publicTitle", i18nTexts);
       if (displayName == null || displayName.isBlank()) {
-        displayName = event.getName();
+        throw new IllegalStateException(
+            String.format(
+                "Missing required annotation: @notification.template.publicTitle for event '%s'.",
+                event.getName()));
       }
-      translation.setDisplayName(truncate(displayName, MAX_TEXT_LENGTH));
+      translation.setDisplayName(displayName);
 
       // GroupTitle — from @notification.template.groupedTitle (required)
       String groupTitle =
@@ -107,14 +105,14 @@ public class NotificationTypeAssembler {
                 "Missing required annotation: @notification.template.groupedTitle for event '%s'.",
                 event.getName()));
       }
-      translation.setGroupTitle(truncate(groupTitle, MAX_TEXT_LENGTH));
+      translation.setGroupTitle(groupTitle);
 
       translation.setSyntax("MUSTACHE");
 
       // Description — from @description (optional)
       String description = i18nHelper.resolveAnnotationValue(event, "description", i18nTexts);
       if (description != null && !description.isBlank()) {
-        translation.setDescription(truncate(description, MAX_TEXT_LENGTH));
+        translation.setDescription(description);
       }
 
       translations.add(translation);
@@ -126,13 +124,6 @@ public class NotificationTypeAssembler {
     }
 
     return translations;
-  }
-
-  private static String truncate(String value, int maxLength) {
-    if (value == null || value.length() <= maxLength) {
-      return value;
-    }
-    return value.substring(0, maxLength);
   }
 
   @SuppressWarnings("unchecked")

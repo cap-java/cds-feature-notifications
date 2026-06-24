@@ -44,7 +44,10 @@ class NotificationTypeAssemblerTest {
 
     CdsAnnotation titleAnno = mock(CdsAnnotation.class);
     when(titleAnno.getValue()).thenReturn(title != null ? title : "");
-    when(event.findAnnotation("notification.template.title"))
+    // @notification.template.title is used to filter events in buildAllNotificationTypes
+    when(event.findAnnotation("notification.template.title")).thenReturn(Optional.of(mock(CdsAnnotation.class)));
+    // @notification.template.publicTitle is used as DisplayName in Translations
+    when(event.findAnnotation("notification.template.publicTitle"))
         .thenReturn(title != null ? Optional.of(titleAnno) : Optional.empty());
 
     if (groupedTitle != null) {
@@ -88,10 +91,9 @@ class NotificationTypeAssemblerTest {
   }
 
   @Test
-  void displayNameExceeding256Chars_truncated() {
-    CdsEvent event = mockEvent("BookOrdered", "A".repeat(300), "{{_group_count}} new orders");
-    Translations t = build(event).get(0).getTranslations().get(0);
-    assertEquals(256, t.getDisplayName().length());
+  void missingPublicTitle_throwsIllegalStateException() {
+    CdsEvent event = mockEvent("BookOrdered", null, "{{_group_count}} new orders");
+    assertThrows(IllegalStateException.class, () -> build(event));
   }
 
   @Test
