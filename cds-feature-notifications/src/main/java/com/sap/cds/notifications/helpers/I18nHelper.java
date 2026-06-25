@@ -69,8 +69,14 @@ public class I18nHelper {
 
     Set<Locale> filtered = new LinkedHashSet<>();
     for (Locale locale : allLocales) {
-      // Always keep root ("und" = fallback for unknown locales) and English
-      if (locale.getLanguage().isEmpty() || "en".equals(locale.getLanguage())) {
+      // Locale.ROOT produces "und" (undefined) in BCP-47, which represents the default
+      // i18n.properties file. Map it to English since the content is the same and "und"
+      // is not a valid ANS language code.
+      if (locale.getLanguage().isEmpty()) {
+        filtered.add(Locale.ENGLISH);
+        continue;
+      }
+      if ("en".equals(locale.getLanguage())) {
         filtered.add(locale);
         continue;
       }
