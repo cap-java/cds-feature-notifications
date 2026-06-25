@@ -116,13 +116,13 @@ public class NotificationTemplateAutoProvisionerHandler implements EventHandler 
       if (errorMsg.contains("400")) {
         logger.error(
             "ANS rejected standalone template '{}' with 400 Bad Request. "
-                + "Check that all required fields (Title in Translation) are set. Error: {}",
+                + "Check that all required fields are set and field values do not exceed ANS length limits. Error: {}",
             template.getKey(),
             errorMsg);
         throw new IllegalStateException(
             String.format(
                 "ANS rejected standalone template '%s' with 400 Bad Request. "
-                    + "Ensure @notification.template annotations are properly configured. Error: %s",
+                    + "Check that all required fields are set and field values do not exceed ANS length limits. Error: %s",
                 template.getKey(), errorMsg),
             e);
       }
