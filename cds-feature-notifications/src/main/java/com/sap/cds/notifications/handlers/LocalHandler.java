@@ -64,8 +64,7 @@ public class LocalHandler implements EventHandler {
               .map(r -> r.getRecipientId() != null ? r.getRecipientId() : r.getGlobalUserId())
               .collect(Collectors.joining(", "));
 
-      String priority =
-          notification.getPriority() != null ? notification.getPriority() : "NEUTRAL";
+      String priority = notification.getPriority() != null ? notification.getPriority() : "NEUTRAL";
 
       String index = results.size() > 1 ? " (" + (i + 1) + "/" + results.size() + ")" : "";
 
@@ -89,18 +88,21 @@ public class LocalHandler implements EventHandler {
           logger.info("│    Body (text): {}", emailBodyText);
         }
         if (emailBodyHtml != null) {
-          String htmlContent = emailBodyHtml.endsWith(".html")
-              ? i18nHelper.loadHtmlFromClasspath(emailBodyHtml, i18nHelper.getI18nTexts(Locale.ENGLISH))
-              : emailBodyHtml;
+          String htmlContent =
+              emailBodyHtml.endsWith(".html")
+                  ? i18nHelper.loadHtmlFromClasspath(
+                      emailBodyHtml, i18nHelper.getI18nTexts(Locale.ENGLISH))
+                  : emailBodyHtml;
           if (htmlContent != null) {
             for (Map.Entry<String, String> entry : props.entrySet()) {
               htmlContent = htmlContent.replace("{{" + entry.getKey() + "}}", entry.getValue());
             }
             int bodyStart = htmlContent.toLowerCase().indexOf("<body");
             int bodyEnd = htmlContent.toLowerCase().indexOf("</body>");
-            String bodyContent = (bodyStart >= 0 && bodyEnd > bodyStart)
-                ? htmlContent.substring(htmlContent.indexOf('>', bodyStart) + 1, bodyEnd)
-                : htmlContent;
+            String bodyContent =
+                (bodyStart >= 0 && bodyEnd > bodyStart)
+                    ? htmlContent.substring(htmlContent.indexOf('>', bodyStart) + 1, bodyEnd)
+                    : htmlContent;
             logger.info(
                 "│    Body: {}",
                 bodyContent.replaceAll("<[^>]+>", " ").replaceAll("\\s+", " ").trim());
@@ -119,8 +121,7 @@ public class LocalHandler implements EventHandler {
     context.setCompleted();
   }
 
-  private String renderTemplate(
-      CdsEvent event, String annotationPath, Map<String, String> props) {
+  private String renderTemplate(CdsEvent event, String annotationPath, Map<String, String> props) {
     Map<String, String> i18nTexts = i18nHelper.getI18nTexts(Locale.ENGLISH);
     String template = i18nHelper.resolveAnnotationValue(event, annotationPath, i18nTexts);
     if (template == null) {
