@@ -105,11 +105,12 @@ public class NotificationTemplateAutoProvisionerHandler implements EventHandler 
       String errorMsg = e.getMessage() != null ? e.getMessage() : "";
 
       if (errorMsg.contains("409")) {
-        // Race condition: template was created between our GET and INSERT
-        logger.debug(
-            "Standalone template '{}' was created concurrently (409). Attempting update...",
+        // Template was created concurrently (race condition) — skip to avoid an
+        // update loop (updateTemplate would DELETE+CREATE, and if DELETE keeps
+        // failing the CREATE would 409 again, causing an infinite loop).
+        logger.warn(
+            "Standalone template '{}' already exists (409). Skipping to avoid update loop.",
             template.getKey());
-        updateTemplate(template);
         return;
       }
 
