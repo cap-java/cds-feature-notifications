@@ -7,9 +7,9 @@ import cds.gen.notificationtypeproviderservice.NotificationTypeProviderService;
 import cds.gen.notificationtypeproviderservice.NotificationTypes;
 import cds.gen.notificationtypeproviderservice.NotificationTypes_;
 import com.sap.cds.notifications.assemblers.NotificationTypeAssembler;
-import com.sap.cds.ql.Delete;
 import com.sap.cds.ql.Insert;
 import com.sap.cds.ql.Select;
+import com.sap.cds.ql.Update;
 import com.sap.cds.services.application.ApplicationLifecycleService;
 import com.sap.cds.services.handler.EventHandler;
 import com.sap.cds.services.handler.annotations.On;
@@ -160,29 +160,40 @@ public class NotificationTypeAutoProvisionerHandler implements EventHandler {
   private void updateNotificationType(
       NotificationTypes notificationType, String notificationTypeId) {
     logger.debug(
-        "Updating NotificationType '{}' (id={}) via delete+create",
+        "Updating NotificationType '{}' (id={}) via PATCH",
         notificationType.getNotificationTypeKey(),
         notificationTypeId);
 
     try {
-      // ANS does not allow mixing Translations and Templates on update,
-      // so we delete the existing type and recreate it cleanly.
+      notificationType.setNotificationTypeId(notificationTypeId);
       notificationTypeProviderService.run(
-          Delete.from(NotificationTypes_.class)
-              .where(nt -> nt.NotificationTypeId().eq(notificationTypeId)));
+          Update.entity(NotificationTypes_.CDS_NAME).data(notificationType));
 
       logger.debug(
-          "Deleted existing NotificationType '{}' (id={})",
-          notificationType.getNotificationTypeKey(),
-          notificationTypeId);
+          "NotificationType '{}' updated in ANS successfully",
+          notificationType.getNotificationTypeKey());
     } catch (Exception e) {
-      logger.warn(
-          "Failed to delete existing NotificationType '{}' (id={}): {}. Attempting create anyway.",
+      String errorMsg = e.getMessage() != null ? e.getMessage() : "";
+      if (errorMsg.contains("400")) {
+        logger.error(
+            "ANS rejected NotificationType update '{}' with 400 Bad Request. "
+                + "Check that all required fields are set and field values do not exceed ANS length limits. "
+                + "Error: {}",
+            notificationType.getNotificationTypeKey(),
+            errorMsg);
+        throw new IllegalStateException(
+            String.format(
+                "ANS rejected NotificationType update '%s' with 400 Bad Request. "
+                    + "Check that all required fields are set and field values do not exceed ANS length limits. Error: %s",
+                notificationType.getNotificationTypeKey(), errorMsg),
+            e);
+      }
+      logger.error(
+          "Failed to update NotificationType '{}' (id={})",
           notificationType.getNotificationTypeKey(),
           notificationTypeId,
-          e.getMessage());
+          e);
+      throw e;
     }
-
-    createNotificationType(notificationType);
   }
 }
