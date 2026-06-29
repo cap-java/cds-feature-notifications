@@ -87,6 +87,8 @@ Also add excludes for the plugin's remote service models so they are not generat
   <exclude>NotificationProviderService</exclude>
   <exclude>NotificationTypeProviderService.**</exclude>
   <exclude>NotificationTypeProviderService</exclude>
+  <exclude>NotificationTemplateProviderService.**</exclude>
+  <exclude>NotificationTemplateProviderService</exclude>
 </excludes>
 ```
 
@@ -140,8 +142,8 @@ The `template` section defines the visible content of the notification: titles, 
 |---|---|---|
 | `@description` | No | Description label of a notification type. Shown to administrators and end-users in the SAP Build Work Zone notification type management UI. |
 | `@notification.customizable` | No | Controls whether customer administrators can see and customize this template. `true` = PUBLIC (visible for customization), absent or `false` = PRIVATE (default). See [Template Customization](#template-customization). |
-| `@notification.template.title` | **Yes** | Detailed notification title, shown to the recipient and authorized users. May contain sensitive information (e.g. "Low stock: Wuthering Heights by Emily Brontë"). Mapped to `TemplateSensitive` in ANS. |
-| `@notification.template.publicTitle` | **Yes** | Short, non-sensitive title shown when the viewer is not authorized to see the full details (e.g. "Low Stock Alert"). Mapped to `TemplatePublic` in ANS. |
+| `@notification.template.title` | **Yes** | Detailed notification title, shown to the recipient and authorized users. May contain sensitive information (e.g. "Low stock: Wuthering Heights by Emily Brontë"). |
+| `@notification.template.publicTitle` | **Yes** | Short, non-sensitive title shown when the viewer is not authorized to see the full details (e.g. "Low Stock Alert"). |
 | `@notification.template.subtitle` | **Yes** | Subtitle for the notification. |
 | `@notification.template.groupedTitle` | **Yes** | Title shown when multiple notifications of the same type are collapsed into a single group (e.g. "Low stock alerts"). |
 | `@notification.template.email.subject` | No | Email subject line. |
@@ -344,7 +346,7 @@ The plugin intercepts the specified CRUD events, evaluates the `where` condition
 
 #### Step 6: Run in Local Mode
 
-By default, `cds.environment.production.enabled` is `false` in `srv/src/main/resources/application.yaml`, so the plugin logs notifications to the console instead of sending them to ANS:
+By default, the plugin runs in local mode and logs notifications to the console instead of sending them to ANS:
 
 ```bash
 mvn spring-boot:run -pl srv
@@ -353,19 +355,22 @@ mvn spring-boot:run -pl srv
 Since the handler in [Option 1](#option-1-emit-from-java-code) emits notifications after a book read operation (`@After(event = CqnService.EVENT_READ)`), browsing to the Books endpoint triggers a read, which executes the handler and emits the notifications. Browse to `http://localhost:8080/odata/v4/CatalogService/Books` and you'll see output like:
 
 ```
----------------------------------------------------------------
-Notification (Local Mode - Not Sent to ANS)
-  Event: LowStockAlert
-  NotificationTypeKey: LowStockAlert
-  NotificationTypeVersion: 1
-  Priority: HIGH
-  Recipients:
-    - your.email@example.com
-  Properties (3):
-    - bookTitle: Wuthering Heights
-    - author: Emily Brontë
-    - stock: 12
----------------------------------------------------------------
+┌──────────────────────────────────────────────────────────────┐
+│  LOCAL NOTIFICATION (not sent to ANS)
+├──────────────────────────────────────────────────────────────┤
+│  From:     noreply@notifications.local
+│  To:       your.email@example.com
+│  Subject:  Low Stock Alert: Wuthering Heights
+│  Priority: HIGH
+├──────────────────────────────────────────────────────────────┤
+│  Stock: 12 remaining
+│
+│  Notification Type: LowStockAlert
+│  Parameters:
+│    - bookTitle = Wuthering Heights
+│    - author = Emily Brontë
+│    - stock = 12
+└──────────────────────────────────────────────────────────────┘
 ```
 
 If you used [Option 2](#option-2-declarative-via-cds-entity-annotations) instead, the same notifications would be emitted when you create or update a book with stock below 100, since the `@notifications` annotation is configured with `on: ['CREATE', 'UPDATE']` and `where: ($self.stock < 100)`.
@@ -391,9 +396,12 @@ cds:
       enabled: true
 ```
 
+> **Note:** If this property is omitted, the plugin defaults to local mode (console output only, no ANS required).
+
 In production mode:
 - **`ProductionHandler`** sends notifications to ANS (instead of console logging)
 - **`NotificationTypeAutoProvisionerHandler`** provisions and syncs notification types in ANS automatically at startup. You only need to maintain your CDS annotations and i18n files.
+- **`NotificationTemplateAutoProvisionerHandler`** provisions and syncs standalone notification templates in ANS automatically at startup, based on the same CDS annotations and i18n files.
 - The **persistent outbox** ensures reliable, ordered delivery
 
 ### Connect to ANS
@@ -445,33 +453,6 @@ Or as a separate JSON configuration:
 |---|---|---|---|
 | `emailSenderAddress` | Yes | String | Email address from which emails will be sent. The domain can be the ANS default domain (`notifications.sap.com`), an SAP Internet Mail Services domain, or a custom domain. |
 | `emailSenderName` | No | String | Human-readable name displayed as the sender in emails. If not specified, `emailSenderAddress` is shown instead. |
-
-**Domain setup options:**
-
-| Option | Setup |
-|---|---|
-| **Default domain** (`@notifications.sap.com`) | **Prerequisite:** You must first create a mailbox for the requested email sender address. If you need an Exchange mailbox, you can [request one here](https://sapit-home-prod-004.launchpad.cfapps.eu10.hana.ondemand.com/site#rmmt2uiuser-Display?sap-ui-app-id-hint=1dc4d034-7c78-4d79-bc17-39a70945fce6&/). Then submit an [email sender verification request](https://jira.tools.sap/secure/CreateIssueDetails!init.jspa?pid=122031&summary=Verify%20email%20sender%20address%20for%20ANS-owned%20email%20infrastructure&issuetype=12&customfield_25741=98780&priority=3&description=Hello%20colleagues%2C%5C%5CCould%20I%20get%20my%20email%20sender%20address%20verified%20in%20order%20to%20use%20ANS-provided%20email%20infrastructure.%0A%0APlease%20provide%20the%20following%20information%3A%0A1.%20What%20is%20the%20email%20notification%20scenario%3F%20Provide%20a%20short%20summary.%0A2.%20Who%20is%20the%20contact%3F%20That%20is%20needed%20to%20reach%20out%20in%20case%20of%20questions%20or%20problems.%0A3.%20To%20what%20kind%20of%20users%20will%20you%20send%20emails%3F%20App%20users%20or%20external%20to%20the%20app%3F%0A4.%20If%20sending%20to%20external%20users%20is%20needed%2C%20how%20will%20the%20app%20verify%20their%20email%20addresses%3F%0A5.%20On%20which%20BTP%20regions%20should%20the%20email%20sending%20be%20enabled%3F%0A6.%20What%20is%20the%20expected%20average%20and%20max%20number%20of%20sent%20mails%20per%20day%20and%20month%3F%0A7.%20A%20mailbox%20for%20the%20requested%20email%20sender%20address%20must%20exist%20in%20advance.%20In%20case%20you%20need%20an%20Exchange%20mailbox%2C%20you%20can%20request%20one%20here%3A%20https%3A%2F%2Fsapit-home-prod-004.launchpad.cfapps.eu10.hana.ondemand.com%2Fsite%23rmmt2uiuser-Display%3Fsap-ui-app-id-hint%3D1dc4d034-7c78-4d79-bc17-39a70945fce6%26%2F%0A%0AEmail%20sender%20address%3A%20%3Cinsert%20your%20sender%20address%20here%3E%0AGlobal%20account%3A%20%3Cinsert%20your%20provider%20global%20account%20here%3E) providing the full sender address and your provider global account. Once approved, update your instance and test the email delivery. |
-| **SAP Internet Mail Services domain** | If your provider is Internet Mail Services, contact them (`internet@sap.com`) with the DKIM records so they can configure them (see email template below). Once configured, submit an [email sender verification request](https://jira.tools.sap/secure/CreateIssueDetails!init.jspa?pid=122031&summary=Verify%20email%20sender%20address%20for%20ANS-owned%20email%20infrastructure&issuetype=12&customfield_25741=98780&priority=3&description=Hello%20colleagues,%5C%5CCould%20I%20get%20my%20email%20%20sender%20address%20verified%20in%20order%20to%20use%20ANS-provided%20email%20infrastructure%20%5C%5C%20%20email%20sender%20address:%20%3Cinsert%20your%20sender%20address%20here%3E%20%20Global%20account:%3Cinsert%20your%20provider%20global%20account%20here%3E) providing the sender address, provider global account, and evidence of the successful DKIM configuration. |
-| **Custom domain** | Contact the ANS team at `DL_58B295755F99B7BFE4000005@global.corp.sap` with your domain details. They will provide DKIM DNS records to set up with your DNS provider. After validation, test the email delivery. |
-
-**Example email to Internet Mail Services for DKIM setup:**
-
-```
-TO: internet@sap.com
-Subject: Configure DNS record to use ANS owned email infrastructure
-
-Dear Internet Mail Services team,
-We would like to use Alert Notification Service owned email infrastructure.
-We need to register the following DKIM records for ANS to use the 'example.domain.com' domain.
-Can you help create the records on your end?
-
-DKIM records: <insert DKIM records here>
-
-Best,
-<Team>
-```
-
-For the full configuration reference, see [Configuration](https://github.wdf.sap.corp/pages/sl-hybrid/ans/notifications-scenario/onboarding-and-integration/onboard-standalone-app/#configuration) in the ANS documentation.
 
 #### Option 2: Work Zone Notification Credentials
 
@@ -721,7 +702,7 @@ For the full setup guide, see [Identity Directory Connectivity](https://help.sap
 
 ### Template Customization
 
-The plugin automatically provisions notification templates to ANS during application startup. These templates enable customer administrators to create customized copies of your notification content for their organization. For details on how template customization works from the admin perspective, see the [Template Customization documentation](https://github.wdf.sap.corp/pages/sl-hybrid/ans/notifications-scenario/template-customization/).
+The plugin automatically provisions notification templates to ANS during application startup. These templates enable customer administrators to create customized copies of your notification content for their organization.
 
 By default, templates are `PRIVATE` (not visible to customer admins). To make a template visible and customizable by admins, add `@notification.customizable: true`:
 

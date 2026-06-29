@@ -65,3 +65,6 @@ app/*/dist
 
 # VitePress
 _docs/.vitepress/cache
+
+# Internal notes (SAP-only, not for public repo)
+INTERNAL_NOTES.md
