@@ -33,6 +33,10 @@ cds:
           password: myPass
           roles:
             - cds.Developer
+  index-page.enabled: true
+  environment:
+    production:
+      enabled: true
 ---
 spring:
   config.activate.on-profile: test
@@ -46,15 +50,6 @@ cds:
             - cds.Developer
   data-source.auto-config.enabled: false
   index-page.enabled: true
-  #remote:
-    #services:
-      #NotificationProviderService:
-        #destination.name: SAP_Notifications
-        #type: odata-v2
-        #http:
-          #suffix: /v2
-          #service: Notification.svc
-          #csrf.enabled: true
   environment:
     production:
       enabled: true

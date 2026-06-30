@@ -45,7 +45,7 @@ public class CatalogServiceHandler implements EventHandler {
 
     // Create CertificateExpiration event
     CertificateExpiration certificateExpiration = CertificateExpiration.create();
-    certificateExpiration.setRecipients("buse.halis@sap.com");
+    certificateExpiration.setRecipients("admin@example.com");
     certificateExpiration.setName("user");
     certificateExpiration.setCertificateName("Cert");
     certificateExpiration.setExpirationDate(LocalDate.of(2026, 3, 15));
