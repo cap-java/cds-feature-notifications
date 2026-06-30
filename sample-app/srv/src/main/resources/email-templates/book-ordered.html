@@ -1,0 +1,38 @@
+<html>
+<head>
+  <meta charset='UTF-8'>
+  <title>{i18n>BOOK_ORDERED_EMAIL_TITLE}</title>
+</head>
+<body style='font-family: Arial, sans-serif; background-color: #f8f9fa; padding: 20px;'>
+  <table align='center' style='max-width: 600px; width: 100%; background-color: #ffffff; border: 1px solid #ddd; border-radius: 8px;'>
+    <tr>
+      <td style='padding: 20px; background-color: #4CAF50; color: white; text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px;'>
+        <h2>{i18n>BOOK_ORDERED_EMAIL_HEADER}</h2>
+      </td>
+    </tr>
+    <tr>
+      <td style='padding: 20px;'>
+        <p>{i18n>BOOK_ORDERED_EMAIL_GREETING},</p>
+        <p>{i18n>BOOK_ORDERED_EMAIL_BODY_LINE1}</p>
+        <p>
+          {i18n>BOOK_ORDERED_EMAIL_BODY_LINE2}
+          <strong>{{quantity}}</strong> {i18n>BOOK_ORDERED_EMAIL_BODY_LINE3}
+          <strong>{{bookTitle}}</strong>.
+        </p>
+        <p style='text-align: center;'>
+          <a href='#'
+             style='display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 4px;'>
+            {i18n>BOOK_ORDERED_EMAIL_BUTTON}
+          </a>
+        </p>
+        <p>{i18n>BOOK_ORDERED_EMAIL_SIGNATURE}<br>Bookshop</p>
+      </td>
+    </tr>
+    <tr>
+      <td style='padding: 10px; text-align: center; font-size: 12px; color: #888; background-color: #f1f1f1; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;'>
+        {i18n>BOOK_ORDERED_EMAIL_FOOTER}
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

@@ -1,0 +1,59 @@
+---
+management:
+  endpoint:
+    health:
+      show-components: always
+      probes:
+        enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health
+  health:
+    defaults:
+      enabled: false
+    ping:
+      enabled: true
+    db:
+      enabled: true
+logging:
+  level:
+    '[com.sap.cds.services.impl.runtime.CdsRuntimeImpl]': DEBUG
+    '[com.sap.cloud.sdk.datamodel.odata]': DEBUG
+    '[com.sap.cds.services.impl.odata]': DEBUG
+---
+spring:
+  config.activate.on-profile: default
+  sql.init.platform: h2
+cds:
+  index-page:
+    enabled: true
+  security:
+    mock:
+      enabled: true
+      users:
+        - name: admin@example.com
+          password: admin
+          roles:
+            - admin
+        - name: user@example.com
+          password: user
+  environment:
+    production:
+      enabled: false
+---
+spring:
+  config.activate.on-profile: test
+cds:
+  security:
+    mock:
+      users:
+        - name: admin
+          password: admin
+          roles:
+            - admin
+  data-source.auto-config.enabled: false
+  index-page.enabled: true
+  environment:
+    production:
+      enabled: false
