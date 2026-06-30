@@ -96,7 +96,7 @@ public class NotificationServiceConfiguration implements CdsRuntimeConfiguration
           OutboxService.PERSISTENT_ORDERED_NAME);
     }
 
-    if (environment.getProduction().isEnabled()) {
+    if (Boolean.TRUE.equals(environment.getProduction().isEnabled())) {
       logger.info("Production mode enabled - using ProductionHandler");
       configurer.eventHandler(new ProductionHandler(outboxedSvc, configurer.getCdsRuntime()));
       // Register handler for auto-provisioning standalone templates on application prepared event

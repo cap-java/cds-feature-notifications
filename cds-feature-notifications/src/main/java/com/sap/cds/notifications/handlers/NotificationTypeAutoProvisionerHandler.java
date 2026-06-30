@@ -137,15 +137,14 @@ public class NotificationTypeAutoProvisionerHandler implements EventHandler {
       if (errorMsg.contains("400")) {
         logger.error(
             "ANS rejected NotificationType '{}' with 400 Bad Request. "
-                + "This usually means required fields are missing or invalid. "
-                + "Check that all required fields (publicTitle, title, groupedTitle, subtitle) are set. "
+                + "Check that all required fields are set and field values do not exceed ANS length limits. "
                 + "Error: {}",
             notificationType.getNotificationTypeKey(),
             errorMsg);
         throw new IllegalStateException(
             String.format(
                 "ANS rejected NotificationType '%s' with 400 Bad Request. "
-                    + "Ensure all required template fields are properly configured in your CDS model and i18n files. Error: %s",
+                    + "Check that all required fields are set and field values do not exceed ANS length limits. Error: %s",
                 notificationType.getNotificationTypeKey(), errorMsg),
             e);
       }
@@ -160,13 +159,13 @@ public class NotificationTypeAutoProvisionerHandler implements EventHandler {
 
   private void updateNotificationType(
       NotificationTypes notificationType, String notificationTypeId) {
-    notificationType.setNotificationTypeId(notificationTypeId);
     logger.debug(
-        "Updating NotificationType '{}' (id={})",
+        "Updating NotificationType '{}' (id={}) via PATCH",
         notificationType.getNotificationTypeKey(),
         notificationTypeId);
 
     try {
+      notificationType.setNotificationTypeId(notificationTypeId);
       notificationTypeProviderService.run(
           Update.entity(NotificationTypes_.CDS_NAME).data(notificationType));
 
@@ -175,23 +174,20 @@ public class NotificationTypeAutoProvisionerHandler implements EventHandler {
           notificationType.getNotificationTypeKey());
     } catch (Exception e) {
       String errorMsg = e.getMessage() != null ? e.getMessage() : "";
-
       if (errorMsg.contains("400")) {
         logger.error(
             "ANS rejected NotificationType update '{}' with 400 Bad Request. "
-                + "This usually means required fields are missing or invalid. "
-                + "Check that all required fields (publicTitle, title, groupedTitle, subtitle) are set. "
+                + "Check that all required fields are set and field values do not exceed ANS length limits. "
                 + "Error: {}",
             notificationType.getNotificationTypeKey(),
             errorMsg);
         throw new IllegalStateException(
             String.format(
                 "ANS rejected NotificationType update '%s' with 400 Bad Request. "
-                    + "Ensure all required template fields are properly configured in your CDS model and i18n files. Error: %s",
+                    + "Check that all required fields are set and field values do not exceed ANS length limits. Error: %s",
                 notificationType.getNotificationTypeKey(), errorMsg),
             e);
       }
-
       logger.error(
           "Failed to update NotificationType '{}' (id={})",
           notificationType.getNotificationTypeKey(),

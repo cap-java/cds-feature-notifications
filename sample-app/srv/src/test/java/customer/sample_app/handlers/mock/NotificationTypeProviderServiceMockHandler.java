@@ -6,6 +6,7 @@ package customer.sample_app.handlers.mock;
 import cds.gen.notificationtypeproviderservice.NotificationTypes;
 import cds.gen.notificationtypeproviderservice.NotificationTypes_;
 import com.sap.cds.services.cds.CdsCreateEventContext;
+import com.sap.cds.services.cds.CdsDeleteEventContext;
 import com.sap.cds.services.cds.CdsReadEventContext;
 import com.sap.cds.services.cds.CdsUpdateEventContext;
 import com.sap.cds.services.cds.CqnService;
@@ -42,6 +43,9 @@ public class NotificationTypeProviderServiceMockHandler implements EventHandler 
 
   // Tracks how many times each NotificationTypeKey has been updated
   private static final Map<String, AtomicInteger> updateCountByKey = new ConcurrentHashMap<>();
+
+  // Tracks how many times each NotificationTypeKey has been deleted
+  private static final Map<String, AtomicInteger> deleteCountByKey = new ConcurrentHashMap<>();
 
   @On(event = CqnService.EVENT_CREATE, entity = NotificationTypes_.CDS_NAME)
   public void interceptCreate(CdsCreateEventContext context) {
@@ -90,6 +94,41 @@ public class NotificationTypeProviderServiceMockHandler implements EventHandler 
 
     // Set result and mark as completed to prevent RemoteODataHandler from executing
     context.setResult(resultEntries);
+    context.setCompleted();
+  }
+
+  @On(event = CqnService.EVENT_DELETE, entity = NotificationTypes_.CDS_NAME)
+  public void interceptDelete(CdsDeleteEventContext context) {
+    logger.debug("MockHandler intercepting NotificationTypes DELETE");
+
+    context
+        .getCqn()
+        .where()
+        .ifPresent(
+            where -> {
+              // Extract the ID from the WHERE clause and delete from store
+              notificationTypeStore
+                  .entrySet()
+                  .removeIf(
+                      entry -> {
+                        NotificationTypes nt = entry.getValue();
+                        String id = nt.getNotificationTypeId();
+                        boolean matches = where.toString().contains(id != null ? id : "");
+                        if (matches) {
+                          String key = nt.getNotificationTypeKey();
+                          String keyVersion = key + ":" + nt.getNotificationTypeVersion();
+                          notificationTypeByKeyVersion.remove(keyVersion);
+                          deleteCountByKey
+                              .computeIfAbsent(key, k -> new AtomicInteger(0))
+                              .incrementAndGet();
+                          logger.debug(
+                              "MockHandler deleted notification type: Key={}, ID={}", key, id);
+                        }
+                        return matches;
+                      });
+            });
+
+    context.setResult(Collections.emptyList());
     context.setCompleted();
   }
 
@@ -180,6 +219,7 @@ public class NotificationTypeProviderServiceMockHandler implements EventHandler 
     notificationTypeStore.clear();
     notificationTypeByKeyVersion.clear();
     updateCountByKey.clear();
+    deleteCountByKey.clear();
     logger.debug("Mock NotificationTypeProviderService: Cleared all notification types");
   }
 
@@ -223,6 +263,11 @@ public class NotificationTypeProviderServiceMockHandler implements EventHandler 
    */
   public static int getUpdateCount(String notificationTypeKey) {
     AtomicInteger count = updateCountByKey.get(notificationTypeKey);
+    return count != null ? count.get() : 0;
+  }
+
+  public static int getDeleteCount(String notificationTypeKey) {
+    AtomicInteger count = deleteCountByKey.get(notificationTypeKey);
     return count != null ? count.get() : 0;
   }
 

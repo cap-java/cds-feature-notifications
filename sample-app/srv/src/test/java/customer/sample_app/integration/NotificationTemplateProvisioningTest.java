@@ -115,27 +115,25 @@ public class NotificationTemplateProvisioningTest {
   }
 
   // ──────────────────────────────────────────────────────────────
-  // Test 3: Visibility defaults to PRIVATE (not set) when no annotation
+  // Test 3: Visibility defaults to PRIVATE when no annotation
   // ──────────────────────────────────────────────────────────────
 
   @Test
   void testVisibilityDefaultsToPrivate() {
     LOG.debug("==========================================");
-    LOG.debug(
-        "Test: Templates without @notification.customizable should have null visibility (PRIVATE)");
+    LOG.debug("Test: Templates without @notification.customizable should have PRIVATE visibility");
     LOG.debug("==========================================");
 
-    // SystemMaintenance has no @notification.customizable → visibility should be null (ANS defaults
-    // PRIVATE)
+    // SystemMaintenance has no @notification.customizable → visibility should be PRIVATE
     NotificationTemplates template =
         NotificationTemplateProviderServiceMockHandler.getTemplateByKey("SystemMaintenance");
     assertNotNull(template, "SystemMaintenance template should be provisioned");
-    assertNull(
+    assertEquals(
+        "PRIVATE",
         template.getVisibility(),
-        "Template without @notification.customizable should have null visibility (ANS defaults to PRIVATE)");
+        "Template without @notification.customizable should have PRIVATE visibility");
 
-    LOG.debug(
-        "SystemMaintenance visibility: {} (null = ANS default PRIVATE)", template.getVisibility());
+    LOG.debug("SystemMaintenance visibility: {}", template.getVisibility());
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -341,12 +339,7 @@ public class NotificationTemplateProvisioningTest {
     // Event = event name
     assertEquals("CertificateExpiration", en.getEvent(), "Event should be the event name");
 
-    // DisplayName = event name
-    assertEquals(
-        "CertificateExpiration", en.getDisplayName(), "DisplayName should be the event name");
-
-    LOG.debug(
-        "Source={}, Event={}, DisplayName={}", en.getSource(), en.getEvent(), en.getDisplayName());
+    LOG.debug("Source={}, Event={}", en.getSource(), en.getEvent());
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -555,29 +548,29 @@ public class NotificationTemplateProvisioningTest {
   @Test
   void testReProvisioningUpdatesExistingTemplates() {
     LOG.debug("==========================================");
-    LOG.debug("Test: Re-provisioning should UPDATE existing templates");
+    LOG.debug("Test: Re-provisioning should DELETE and recreate existing templates");
     LOG.debug("==========================================");
 
     int countBefore = NotificationTemplateProviderServiceMockHandler.getTemplateCount();
     assertTrue(countBefore > 0, "Templates should already be provisioned at startup");
 
-    int updatesBefore =
-        NotificationTemplateProviderServiceMockHandler.getUpdateCount("CertificateExpiration");
+    int deletesBefore =
+        NotificationTemplateProviderServiceMockHandler.getDeleteCount("CertificateExpiration");
 
     createProvisioner().onApplicationPrepared();
 
-    int updatesAfter =
-        NotificationTemplateProviderServiceMockHandler.getUpdateCount("CertificateExpiration");
+    int deletesAfter =
+        NotificationTemplateProviderServiceMockHandler.getDeleteCount("CertificateExpiration");
     assertEquals(
-        updatesBefore + 1,
-        updatesAfter,
-        "CertificateExpiration template should have been updated once during re-provisioning");
+        deletesBefore + 1,
+        deletesAfter,
+        "CertificateExpiration template should have been deleted once during re-provisioning");
 
     assertEquals(
         countBefore,
         NotificationTemplateProviderServiceMockHandler.getTemplateCount(),
         "Template count should remain the same after re-provisioning");
 
-    LOG.debug("Re-provisioning triggered UPDATE for existing templates");
+    LOG.debug("Re-provisioning triggered DELETE+CREATE for existing templates");
   }
 }

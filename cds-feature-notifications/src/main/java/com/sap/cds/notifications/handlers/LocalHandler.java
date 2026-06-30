@@ -5,8 +5,9 @@ package com.sap.cds.notifications.handlers;
 
 import cds.gen.notificationproviderservice.NotificationProperties;
 import cds.gen.notificationproviderservice.Notifications;
-import cds.gen.notificationproviderservice.Recipients;
 import com.sap.cds.notifications.assemblers.NotificationAssembler;
+import com.sap.cds.notifications.helpers.I18nHelper;
+import com.sap.cds.reflect.CdsEvent;
 import com.sap.cds.services.EventContext;
 import com.sap.cds.services.cds.ApplicationService;
 import com.sap.cds.services.handler.EventHandler;
@@ -14,6 +15,9 @@ import com.sap.cds.services.handler.annotations.On;
 import com.sap.cds.services.handler.annotations.ServiceName;
 import com.sap.cds.services.runtime.CdsRuntime;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +26,11 @@ public class LocalHandler implements EventHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(LocalHandler.class);
   private final NotificationAssembler notificationBuilder;
+  private final I18nHelper i18nHelper;
 
   public LocalHandler(CdsRuntime runtime) {
     this.notificationBuilder = new NotificationAssembler(runtime);
+    this.i18nHelper = new I18nHelper(runtime);
   }
 
   @On(event = "*")
@@ -35,43 +41,95 @@ public class LocalHandler implements EventHandler {
       return;
     }
 
-    String eventName = results.get(0).eventName();
-    logger.info(
-        "=== Processing {} notification(s) (LOCAL MODE) for event: {} ===",
-        results.size(),
-        eventName);
-
     for (int i = 0; i < results.size(); i++) {
-      Notifications notification = results.get(i).notification();
+      NotificationAssembler.NotificationBuildResult result = results.get(i);
+      Notifications notification = result.notification();
+      CdsEvent event = result.event();
 
-      logger.info("---------------------------------------------------------------");
-      if (results.size() > 1) {
-        logger.info("Notification {}/{} (Local Mode - Not Sent to ANS)", i + 1, results.size());
-      } else {
-        logger.info("Notification (Local Mode - Not Sent to ANS)");
-      }
-      logger.info("  Event: {}", eventName);
-      logger.info("  NotificationTypeKey: {}", notification.getNotificationTypeKey());
-      logger.info("  NotificationTypeVersion: {}", notification.getNotificationTypeVersion());
+      Map<String, String> props =
+          notification.getProperties().stream()
+              .collect(
+                  Collectors.toMap(
+                      NotificationProperties::getKey,
+                      p -> p.getValue() != null ? p.getValue() : ""));
+
+      String title = renderTemplate(event, "notification.template.title", props);
+      String subtitle = renderTemplate(event, "notification.template.subtitle", props);
+      String emailSubject = renderTemplate(event, "notification.template.email.subject", props);
+      String emailBodyText = renderTemplate(event, "notification.template.email.text", props);
+      String emailBodyHtml = renderTemplate(event, "notification.template.email.html", props);
+
+      String recipientList =
+          notification.getRecipients().stream()
+              .map(r -> r.getRecipientId() != null ? r.getRecipientId() : r.getGlobalUserId())
+              .collect(Collectors.joining(", "));
+
+      String priority = notification.getPriority() != null ? notification.getPriority() : "NEUTRAL";
+
+      String index = results.size() > 1 ? " (" + (i + 1) + "/" + results.size() + ")" : "";
+
+      logger.info("┌──────────────────────────────────────────────────────────────┐");
+      logger.info("│  LOCAL NOTIFICATION{} (not sent to ANS)", index);
+      logger.info("├──────────────────────────────────────────────────────────────┤");
+      logger.info("│  From:     noreply@notifications.local");
+      logger.info("│  To:       {}", recipientList);
       logger.info(
-          "  Priority: {}",
-          notification.getPriority() != null ? notification.getPriority() : "NEUTRAL");
-      logger.info("  Recipients:");
-      for (Recipients recipient : notification.getRecipients()) {
-        String recipientInfo =
-            recipient.getRecipientId() != null
-                ? recipient.getRecipientId()
-                : "GlobalUserId=" + recipient.getGlobalUserId();
-        logger.info("    - {}", recipientInfo);
+          "│  Subject:  {}",
+          emailSubject != null ? emailSubject : (title != null ? title : result.eventName()));
+      logger.info("│  Priority: {}", priority);
+      logger.info("├──────────────────────────────────────────────────────────────┤");
+      if (subtitle != null) {
+        logger.info("│  {}", subtitle);
       }
-      logger.info("  Properties ({}):", notification.getProperties().size());
-      for (NotificationProperties prop : notification.getProperties()) {
-        logger.info("    - {}: {}", prop.getKey(), prop.getValue());
+      if (emailBodyText != null || emailBodyHtml != null) {
+        logger.info("│");
+        logger.info("│  Email:");
+        if (emailBodyText != null) {
+          logger.info("│    Body (text): {}", emailBodyText);
+        }
+        if (emailBodyHtml != null) {
+          String htmlContent =
+              emailBodyHtml.endsWith(".html")
+                  ? i18nHelper.loadHtmlFromClasspath(
+                      emailBodyHtml, i18nHelper.getI18nTexts(Locale.ENGLISH))
+                  : emailBodyHtml;
+          if (htmlContent != null) {
+            for (Map.Entry<String, String> entry : props.entrySet()) {
+              htmlContent = htmlContent.replace("{{" + entry.getKey() + "}}", entry.getValue());
+            }
+            int bodyStart = htmlContent.toLowerCase().indexOf("<body");
+            int bodyEnd = htmlContent.toLowerCase().indexOf("</body>");
+            String bodyContent =
+                (bodyStart >= 0 && bodyEnd > bodyStart)
+                    ? htmlContent.substring(htmlContent.indexOf('>', bodyStart) + 1, bodyEnd)
+                    : htmlContent;
+            logger.info(
+                "│    Body: {}",
+                bodyContent.replaceAll("<[^>]+>", " ").replaceAll("\\s+", " ").trim());
+          }
+        }
       }
-      logger.info("---------------------------------------------------------------");
+      logger.info("│");
+      logger.info("│  Notification Type: {}", result.eventName());
+      if (!props.isEmpty()) {
+        logger.info("│  Parameters:");
+        props.forEach((key, value) -> logger.info("│    - {} = {}", key, value));
+      }
+      logger.info("└──────────────────────────────────────────────────────────────┘");
     }
 
-    logger.info("{} notification(s) logged successfully for event: {}", results.size(), eventName);
     context.setCompleted();
+  }
+
+  private String renderTemplate(CdsEvent event, String annotationPath, Map<String, String> props) {
+    Map<String, String> i18nTexts = i18nHelper.getI18nTexts(Locale.ENGLISH);
+    String template = i18nHelper.resolveAnnotationValue(event, annotationPath, i18nTexts);
+    if (template == null) {
+      return null;
+    }
+    for (Map.Entry<String, String> entry : props.entrySet()) {
+      template = template.replace("{{" + entry.getKey() + "}}", entry.getValue());
+    }
+    return template;
   }
 }

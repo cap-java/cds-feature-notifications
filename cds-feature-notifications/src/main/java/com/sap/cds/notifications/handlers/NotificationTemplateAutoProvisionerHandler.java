@@ -7,9 +7,9 @@ import cds.gen.notificationtemplateproviderservice.NotificationTemplateProviderS
 import cds.gen.notificationtemplateproviderservice.NotificationTemplates;
 import cds.gen.notificationtemplateproviderservice.NotificationTemplates_;
 import com.sap.cds.notifications.assemblers.NotificationTemplateAssembler;
+import com.sap.cds.ql.Delete;
 import com.sap.cds.ql.Insert;
 import com.sap.cds.ql.Select;
-import com.sap.cds.ql.Update;
 import com.sap.cds.services.application.ApplicationLifecycleService;
 import com.sap.cds.services.handler.EventHandler;
 import com.sap.cds.services.handler.annotations.On;
@@ -105,24 +105,23 @@ public class NotificationTemplateAutoProvisionerHandler implements EventHandler 
       String errorMsg = e.getMessage() != null ? e.getMessage() : "";
 
       if (errorMsg.contains("409")) {
-        // Race condition: template was created between our GET and INSERT
-        logger.debug(
-            "Standalone template '{}' was created concurrently (409). Attempting update...",
-            template.getKey());
-        updateTemplate(template);
+        // Template was created concurrently (race condition) — skip to avoid an
+        // update loop (updateTemplate would DELETE+CREATE, and if DELETE keeps
+        // failing the CREATE would 409 again, causing an infinite loop).
+        logger.warn("Standalone template '{}' already exists (409). Skipping.", template.getKey());
         return;
       }
 
       if (errorMsg.contains("400")) {
         logger.error(
             "ANS rejected standalone template '{}' with 400 Bad Request. "
-                + "Check that all required fields (Title in Translation) are set. Error: {}",
+                + "Check that all required fields are set and field values do not exceed ANS length limits. Error: {}",
             template.getKey(),
             errorMsg);
         throw new IllegalStateException(
             String.format(
                 "ANS rejected standalone template '%s' with 400 Bad Request. "
-                    + "Ensure @notification.template annotations are properly configured. Error: %s",
+                    + "Check that all required fields are set and field values do not exceed ANS length limits. Error: %s",
                 template.getKey(), errorMsg),
             e);
       }
@@ -133,31 +132,21 @@ public class NotificationTemplateAutoProvisionerHandler implements EventHandler 
   }
 
   private void updateTemplate(NotificationTemplates template) {
-    logger.debug("Updating standalone template '{}'", template.getKey());
+    logger.debug("Updating standalone template '{}' (delete + re-create)", template.getKey());
 
     try {
       notificationTemplateProviderService.run(
-          Update.entity(NotificationTemplates_.CDS_NAME).data(template));
+          Delete.from(NotificationTemplates_.class).where(nt -> nt.Key().eq(template.getKey())));
 
-      logger.debug(
-          "Standalone NotificationTemplate '{}' updated in ANS successfully", template.getKey());
+      logger.debug("Deleted existing standalone template '{}'", template.getKey());
     } catch (Exception e) {
-      String errorMsg = e.getMessage() != null ? e.getMessage() : "";
-
-      if (errorMsg.contains("400")) {
-        logger.error(
-            "ANS rejected standalone template update '{}' with 400 Bad Request. Error: {}",
-            template.getKey(),
-            errorMsg);
-        throw new IllegalStateException(
-            String.format(
-                "ANS rejected standalone template update '%s' with 400 Bad Request. Error: %s",
-                template.getKey(), errorMsg),
-            e);
-      }
-
-      logger.error("Failed to update standalone template '{}' in ANS", template.getKey(), e);
-      throw e;
+      logger.warn(
+          "Could not delete existing standalone template '{}': {}",
+          template.getKey(),
+          e.getMessage());
+      return;
     }
+
+    createTemplate(template);
   }
 }

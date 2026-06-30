@@ -1,12 +1,11 @@
 /*
  * © 2026 SAP SE or an SAP affiliate company and cds-feature-notifications contributors.
  */
-package com.sap.cds.notifications.builders;
+package com.sap.cds.notifications.assemblers;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import cds.gen.notificationproviderservice.Recipients;
-import com.sap.cds.notifications.assemblers.NotificationAssembler;
 import com.sap.cds.ql.CQL;
 import com.sap.cds.ql.cqn.CqnComparisonPredicate;
 import com.sap.cds.ql.cqn.CqnContainmentTest;
@@ -22,7 +21,7 @@ import org.junit.jupiter.params.provider.ValueSource;
  * Unit tests for recipient auto-detection logic in {@link NotificationAssembler}. Covers isUUID,
  * isEmail, and createRecipientFromId including edge cases (malformed, null, empty).
  */
-class NotificationBuilderTest {
+class NotificationAssemblerTest {
 
   // ── isUUID ────────────────────────────────────────────────────────────────
 

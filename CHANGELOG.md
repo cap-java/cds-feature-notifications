@@ -14,12 +14,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - CAP Java plugin for integrating SAP Alert Notification Service (ANS) with CAP Java applications
 - `@notification` annotation on CDS events to define notification types and standalone notification templates
 - Support for email templates via `template.email.subject` and `template.email.html` fields
-- Mustache syntax (`{{variableName}}`) for dynamic content substitution in templates
+- Mustache syntax (`{{variableName}}`) for dynamic content substitution in notification templates and notification type translations
 - i18n support via `{i18n>KEY}` placeholders in all template fields with automatic language detection per recipient
-- Automatic notification type provisioning to ANS at application startup (`NotificationTypeAutoProvisionerHandler`)
+- Automatic notification type provisioning to ANS at application startup
+- `NotificationTemplate` visibility defaults to `PRIVATE` when `@notification.customizable` annotation is absent
 - Local mode operation: logs notifications to console without requiring an ANS service binding (`LocalHandler`)
 - Production mode operation: sends notifications to SAP Alert Notification Service (`ProductionHandler`)
-- Mode toggled via `cds.environment.production.enabled` configuration property
+- Mode toggled via `cds.environment.production.enabled` configuration property; defaults to local mode when property is not set or is `null`
 - Programmatic notification emission by injecting the generated `NotificationService` in CAP event handlers
 - Declarative notification triggering via `@notifications` annotation on CDS entities for `CREATE`, `UPDATE`, and `DELETE` events
 - Support for static and dynamic notification priorities (`#LOW`, `#NEUTRAL`, `#MEDIUM`, `#HIGH`) evaluated via CDS expressions at runtime
