@@ -108,9 +108,7 @@ public class NotificationTemplateAutoProvisionerHandler implements EventHandler 
         // Template was created concurrently (race condition) — skip to avoid an
         // update loop (updateTemplate would DELETE+CREATE, and if DELETE keeps
         // failing the CREATE would 409 again, causing an infinite loop).
-        logger.warn(
-            "Standalone template '{}' already exists (409). Skipping to avoid update loop.",
-            template.getKey());
+        logger.warn("Standalone template '{}' already exists (409). Skipping.", template.getKey());
         return;
       }
 
@@ -146,6 +144,7 @@ public class NotificationTemplateAutoProvisionerHandler implements EventHandler 
           "Could not delete existing standalone template '{}': {}",
           template.getKey(),
           e.getMessage());
+      return;
     }
 
     createTemplate(template);
