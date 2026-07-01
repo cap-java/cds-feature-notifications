@@ -33,6 +33,6 @@ runs:
 
     - name: Test Sample App (Integration Tests)
       shell: bash
-      working-directory: sample-app/srv
+      working-directory: integration-tests/srv
       run: |
         mvn test -B -V

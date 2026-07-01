@@ -1,9 +1,2 @@
 {
-  "cds": {
-    "requires": {
-      "outbox": {
-        "kind": "persistent-outbox"
-      }
-    }
-  }
 }

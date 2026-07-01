@@ -26,13 +26,21 @@ spring:
   config.activate.on-profile: default
   sql.init.platform: h2
 cds:
+  index-page:
+    enabled: true
   security:
     mock:
+      enabled: true
       users:
-        - name: test.user@example.com
-          password: myPass
+        - name: admin@example.com
+          password: admin
           roles:
-            - cds.Developer
+            - admin
+        - name: user@example.com
+          password: user
+  environment:
+    production:
+      enabled: false
 ---
 spring:
   config.activate.on-profile: test
@@ -40,22 +48,12 @@ cds:
   security:
     mock:
       users:
-        - name: test.user@example.com
-          password: myPass
+        - name: admin
+          password: admin
           roles:
-            - cds.Developer
+            - admin
   data-source.auto-config.enabled: false
   index-page.enabled: true
-  #remote:
-    #services:
-      #NotificationProviderService:
-        #destination.name: SAP_Notifications
-        #type: odata-v2
-        #http:
-          #suffix: /v2
-          #service: Notification.svc
-          #csrf.enabled: true
   environment:
     production:
-      enabled: true
-
+      enabled: false

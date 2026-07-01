@@ -68,7 +68,7 @@ runs:
         -Dsonar.projectVersion=${{ steps.get-revision.outputs.REVISION }}
         -Dsonar.qualitygate.wait=true
         -Dsonar.java.source=17
-        -Dsonar.exclusions=**/sample-app/**
+        -Dsonar.exclusions=**/integration-tests/**
         -Dsonar.coverage.jacoco.xmlReportPaths=${{ github.workspace }}/coverage-report/target/site/jacoco-aggregate/jacoco.xml
         -Dsonar.coverage.exclusions=**/src/test/**,**/src/gen/**
         -B -ntp
