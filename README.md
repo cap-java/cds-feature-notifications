@@ -8,7 +8,7 @@ A CAP Java plugin that integrates SAP Alert Notification service (ANS) with the 
 
 The `cds-feature-notifications` plugin enables out-of-the-box notification handling for CAP Java applications. Annotate CDS events with `@notification`, emit them from a handler or annotate entities with `@notifications` for automatic delivery triggered by CRUD events, actions, or functions. The plugin takes care of the rest and delivers notifications via [SAP Alert Notification service (ANS)](https://help.sap.com/docs/alert-notification).
 
-In **local mode**, notifications are logged to the console with no ANS binding required. In **production mode**, notifications are delivered through Web (SAP Build Work Zone) and Email channels. You can either create a standalone ANS service instance or use Work Zone's built-in notification credentials. Both approaches are covered in the [Production Mode](#production-mode) section.
+In **local mode**, notifications are logged to the console with no ANS binding required. In **production mode**, notifications are delivered through Web (SAP Build Work Zone) and Email channels. Production mode is activated automatically when an `alert-notification` service binding is detected, or can be enabled explicitly via configuration. You can either create a standalone ANS service instance or use Work Zone's built-in notification credentials. Both approaches are covered in the [Production Mode](#production-mode) section.
 
 ## Table of Contents
 
@@ -387,7 +387,7 @@ Both approaches require the same setup: enable production mode, then provide an 
 
 ### Enable Production Mode
 
-In `srv/src/main/resources/application.yaml`, enable production mode:
+Production mode is activated automatically when an `alert-notification` service binding is detected at startup. You can also enable it explicitly in `srv/src/main/resources/application.yaml`, for example for hybrid testing against a remote ANS instance without a local binding:
 
 ```yaml
 cds:
@@ -396,7 +396,7 @@ cds:
       enabled: true
 ```
 
-> **Note:** If this property is omitted, the plugin defaults to local mode (console output only, no ANS required).
+If neither a binding is present nor the property is set, the plugin defaults to local mode (console output only, no ANS required).
 
 In production mode:
 - **`ProductionHandler`** sends notifications to ANS (instead of console logging)
