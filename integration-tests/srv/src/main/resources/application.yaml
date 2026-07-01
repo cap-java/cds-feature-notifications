@@ -29,14 +29,14 @@ cds:
   security:
     mock:
       users:
-        - name: test.user@example.com
-          password: myPass
+        - name: admin
+          password: admin
           roles:
             - cds.Developer
   index-page.enabled: true
   environment:
     production:
-      enabled: true
+      enabled: false
 ---
 spring:
   config.activate.on-profile: test
@@ -44,8 +44,8 @@ cds:
   security:
     mock:
       users:
-        - name: test.user@example.com
-          password: myPass
+        - name: admin
+          password: admin
           roles:
             - cds.Developer
   data-source.auto-config.enabled: false
