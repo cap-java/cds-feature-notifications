@@ -20,8 +20,6 @@
   </modules>
 
   <properties>
-    <!-- OUR VERSION -->
-    <revision>1.0.0-SNAPSHOT</revision>
 
     <!-- DEPENDENCIES VERSION -->
     <jdk.version>17</jdk.version>

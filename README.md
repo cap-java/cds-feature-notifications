@@ -74,7 +74,7 @@ Add the plugin to your `srv/pom.xml`:
 <dependency>
     <groupId>com.sap.cds</groupId>
     <artifactId>cds-feature-notifications</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version><the-version></version>
 </dependency>
 ```
 

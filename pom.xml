@@ -57,14 +57,14 @@
   </distributionManagement>
 
   <properties>
-    <revision>1.0.0-SNAPSHOT</revision>
+    <revision>0.0.1-alpha</revision>
     <java.version>17</java.version>
     <maven.compiler.release>${java.version}</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <!-- Versions of CAP Java and cds-dk used for build and integrations tests -->
     <!-- https://central.sonatype.com/artifact/com.sap.cds/cds-services-api/versions -->
-    <cds.services.version>4.9.0</cds.services.version>
+    <cds.services.version>4.9.1</cds.services.version>
     <!-- https://www.npmjs.com/package/@sap/cds-dk?activeTab=versions -->
     <cds.cdsdk-version>8.9.11</cds.cdsdk-version>
 
@@ -88,7 +88,7 @@
       <dependency>
         <groupId>com.sap.cloud.sdk</groupId>
         <artifactId>sdk-bom</artifactId>
-        <version>5.24.0</version>
+        <version>5.31.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -121,6 +121,55 @@
         <artifactId>cds-feature-notifications</artifactId>
         <version>${revision}</version>
       </dependency>
+
+      <!-- Security overrides: force versions not yet shipped by cds-services-bom -->
+      <!-- These can possibly be removed when upgrading to cds.services 5.0.0 -->
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>2.22.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>2.22</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>2.22.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk18on</artifactId>
+        <version>1.84</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcpkix-jdk18on</artifactId>
+        <version>1.84</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jetbrains.kotlin</groupId>
+        <artifactId>kotlin-stdlib</artifactId>
+        <version>1.9.25</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jetbrains.kotlin</groupId>
+        <artifactId>kotlin-stdlib-common</artifactId>
+        <version>1.9.25</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jetbrains.kotlin</groupId>
+        <artifactId>kotlin-stdlib-jdk7</artifactId>
+        <version>1.9.25</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jetbrains.kotlin</groupId>
+        <artifactId>kotlin-stdlib-jdk8</artifactId>
+        <version>1.9.25</version>
+      </dependency>
+      <!-- Security overrides end -->
     </dependencies>
   </dependencyManagement>
 
