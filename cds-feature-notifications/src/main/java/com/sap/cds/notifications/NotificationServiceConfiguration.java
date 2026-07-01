@@ -151,7 +151,7 @@ public class NotificationServiceConfiguration implements CdsRuntimeConfiguration
         runtime
             .getEnvironment()
             .getServiceBindings()
-            .filter(b -> b.getServiceName().get().equals("alert-notification"))
+            .filter(b -> b.getServiceName().map(n -> n.equals("alert-notification")).orElse(false))
             .findFirst()
             .orElse(null);
 
