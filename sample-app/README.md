@@ -18,8 +18,7 @@ This sample demonstrates how to use the `cds-feature-notifications` plugin in a 
 ## Prerequisites
 
 - Java 17 or higher
-- Maven 3.6 or higher
-- Node.js 18 or higher
+- Maven 3.6.3 or higher
 - npm
 - CAP Java (`com.sap.cds:cds-services-bom`) **4.9.0 or higher**
 
@@ -47,8 +46,7 @@ This sample demonstrates how to use the `cds-feature-notifications` plugin in a 
    ```
 
 5. **Access the application**:
-   - Browse Books: http://localhost:8080/browse/index.html
-   - Admin Books: http://localhost:8080/admin-books/index.html
+   - http://localhost:8080/index.html
 
 ## Notification Examples
 
@@ -152,7 +150,7 @@ event LowStockAlert {
 @notifications: [{
   type      : 'LowStockAlert',
   on        : ['UPDATE'],
-  recipients: $self.createdBy,
+  recipients: 'admin@example.com',
   where     : ($self.stock < 10),
   parameters: {
     bookTitle: $self.title,
@@ -199,7 +197,7 @@ event StockReplenished {
 @notifications: [{
   type      : 'StockReplenished',
   on        : ['restock'],
-  recipients: $self.createdBy,
+  recipients: 'admin@example.com',
   parameters: {
     bookTitle: $self.title,
     newStock : $self.stock,
@@ -297,7 +295,22 @@ No configuration needed. Notifications are logged to the console instead of bein
 
 You will see log output like:
 ```
-INFO - [LocalHandler] Notification sent: BookOrdered → recipient: admin
+┌──────────────────────────────────────────────────────────────┐
+│  LOCAL NOTIFICATION (not sent to ANS)
+├──────────────────────────────────────────────────────────────┤
+│  From:     noreply@notifications.local
+│  To:       admin@example.com
+│  Subject:  Order Confirmation: Wuthering Heights
+│  Priority: HIGH
+├──────────────────────────────────────────────────────────────┤
+│  1 copy ordered
+│
+│  Notification Type: BookOrdered
+│  Parameters:
+│    - bookTitle = Wuthering Heights
+│    - quantity = 1
+│    - buyer = admin
+└──────────────────────────────────────────────────────────────┘
 ```
 
 ### Production Mode
@@ -328,11 +341,6 @@ For local testing against a real ANS instance, use the `DestinationConfiguration
    - `host` — ANS API URL
    - `destinationName` — must be `SAP_Notifications` (matches the plugin's expected destination name)
 3. Run with `cds.environment.production.enabled: true`
-
-## Troubleshooting
-
-- **Port conflicts**: If port 8080 is in use, specify a different port: `mvn spring-boot:run -Dspring-boot.run.arguments="--server.port=8081"`
-- **Plugin not found**: Make sure you ran `mvn install -pl cds-feature-notifications -DskipTests` from the project root first
 
 ## Advanced Topics
 
