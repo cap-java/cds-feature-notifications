@@ -6,7 +6,6 @@
 *.sqlite-shm
 schema*.sql
 default-env.json
-default-env.jsonc
 
 **/bin/
 **/target/

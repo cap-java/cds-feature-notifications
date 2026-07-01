@@ -23,14 +23,13 @@ import com.sap.cloud.security.config.ClientIdentity;
 @ServiceName(ApplicationLifecycleService.DEFAULT_NAME)
 public class DestinationConfiguration implements EventHandler {
 
-	@Before(event = ApplicationLifecycleService.EVENT_APPLICATION_PREPARED)
-	public void registerDestination() {
-        // ANS credentials
-        final String clientId = "";
-        final String clientSecret = "";
-        final String tokenUrl = "";
-        final String host = "";
-        final String destinationName = "";
+    @Before(event = ApplicationLifecycleService.EVENT_APPLICATION_PREPARED)
+    public void registerDestination() {
+        final String clientId = "<clientId>";
+        final String clientSecret = "<clientSecret>";
+        final String tokenUrl = "<tokenUrl>";
+        final String host = "<host>";
+        final String destinationName = "SAP_Notifications";
 
         ClientIdentity clientCredentials = new ClientCredentials(clientId, clientSecret);
 

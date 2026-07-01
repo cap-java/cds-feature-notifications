@@ -33,7 +33,7 @@
 
   <modules>
     <module>cds-feature-notifications</module>
-    <module>sample-app</module>
+    <module>integration-tests</module>
     <module>coverage-report</module>
   </modules>
 
