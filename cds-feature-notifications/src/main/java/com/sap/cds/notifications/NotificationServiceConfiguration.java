@@ -96,8 +96,24 @@ public class NotificationServiceConfiguration implements CdsRuntimeConfiguration
           OutboxService.PERSISTENT_ORDERED_NAME);
     }
 
-    if (Boolean.TRUE.equals(environment.getProduction().isEnabled())) {
-      logger.info("Production mode enabled - using ProductionHandler");
+    boolean ansBindingPresent =
+        configurer
+            .getCdsRuntime()
+            .getEnvironment()
+            .getServiceBindings()
+            .anyMatch(
+                b -> b.getServiceName().map(n -> n.equals("alert-notification")).orElse(false));
+
+    boolean productionEnabled =
+        environment.getProduction() != null
+            && Boolean.TRUE.equals(environment.getProduction().isEnabled());
+
+    if (productionEnabled || ansBindingPresent) {
+      if (ansBindingPresent && !productionEnabled) {
+        logger.info("alert-notification binding detected - using ProductionHandler");
+      } else {
+        logger.info("Production mode enabled - using ProductionHandler");
+      }
       configurer.eventHandler(new ProductionHandler(outboxedSvc, configurer.getCdsRuntime()));
       // Register handler for auto-provisioning standalone templates on application prepared event
       configurer.eventHandler(
@@ -135,7 +151,7 @@ public class NotificationServiceConfiguration implements CdsRuntimeConfiguration
         runtime
             .getEnvironment()
             .getServiceBindings()
-            .filter(b -> b.getServiceName().get().equals("alert-notification"))
+            .filter(b -> b.getServiceName().map(n -> n.equals("alert-notification")).orElse(false))
             .findFirst()
             .orElse(null);
 
