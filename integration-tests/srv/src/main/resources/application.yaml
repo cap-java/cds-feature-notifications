@@ -44,8 +44,8 @@ cds:
   security:
     mock:
       users:
-        - name: admin@example.com
-          password: admin
+        - name: test.user@example.com
+          password: test
           roles:
             - cds.Developer
   data-source.auto-config.enabled: false
