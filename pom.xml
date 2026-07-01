@@ -374,7 +374,6 @@
             <configuration>
               <publishingServerId>central</publishingServerId>
               <excludeArtifacts>
-                <excludeArtifact>cds-feature-notifications-root</excludeArtifact>
                 <excludeArtifact>sample-app-parent</excludeArtifact>
                 <excludeArtifact>sample-app</excludeArtifact>
                 <excludeArtifact>cds-feature-notifications-coverage-report</excludeArtifact>
