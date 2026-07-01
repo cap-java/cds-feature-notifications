@@ -44,7 +44,7 @@ cds:
   security:
     mock:
       users:
-        - name: admin
+        - name: admin@example.com
           password: admin
           roles:
             - cds.Developer
