@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 public class I18nHelper {
 
   private static final Logger logger = LoggerFactory.getLogger(I18nHelper.class);
+  private static final String I18N_PREFIX = "{i18n>";
 
   private final CdsRuntime runtime;
   private EdmxI18nProvider i18nProvider;
@@ -83,7 +84,7 @@ public class I18nHelper {
       Map<String, String> localeTexts = getI18nTexts(locale);
       String localeTitle =
           resolveAnnotationValue(event, "notification.template.title", localeTexts);
-      if (!Objects.equals(enTitle, localeTitle)) {
+      if (!Objects.equals(enTitle, localeTitle) && !hasUnresolvedI18n(localeTitle)) {
         filtered.add(locale);
       }
     }
@@ -129,14 +130,18 @@ public class I18nHelper {
    * "{i18n>GREETING}, {i18n>BODY}").
    */
   public String resolveI18n(String value, Map<String, String> i18nTexts) {
-    if (value == null || !value.contains("{i18n>")) {
+    if (value == null || !value.contains(I18N_PREFIX)) {
       return value;
     }
 
     for (Map.Entry<String, String> entry : i18nTexts.entrySet()) {
-      value = value.replace("{i18n>" + entry.getKey() + "}", entry.getValue());
+      value = value.replace(I18N_PREFIX + entry.getKey() + "}", entry.getValue());
     }
     return value;
+  }
+
+  private boolean hasUnresolvedI18n(String value) {
+    return value != null && value.contains(I18N_PREFIX);
   }
 
   /**

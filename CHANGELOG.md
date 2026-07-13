@@ -6,6 +6,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## Version 0.0.2-alpha - 2026-07-14
+- Updated cds.services.version to 5.0.0
+
 ## Version 0.0.1-alpha - 2026-07-01
 
 Initial release.
