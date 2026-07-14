@@ -58,8 +58,8 @@ public class I18nHelper {
   /**
    * Get locales that have actual notification translations for the given event. Compares each
    * locale's resolved {@code notification.template.title} against the English value. A locale is
-   * included only if its title differs from English AND is fully resolved (no unresolved
-   * {@code {i18n>KEY}} placeholders remain). English is always included.
+   * included only if its title differs from English AND is fully resolved (no unresolved {@code
+   * {i18n>KEY}} placeholders remain). English is always included.
    *
    * <p>This filters out locales that only exist because of {@code @sap/cds/common} framework
    * translations (e.g. "Created By" in 37 languages) but have no app-specific notification texts.
@@ -134,8 +134,8 @@ public class I18nHelper {
    * single-placeholder values (e.g. "{i18n>TITLE}") and multi-placeholder values (e.g.
    * "{i18n>GREETING}, {i18n>BODY}").
    *
-   * @return the resolved string, or {@code null} if any placeholder could not be resolved (i.e.
-   *     the key was not present in {@code i18nTexts})
+   * @return the resolved string, or {@code null} if any placeholder could not be resolved (i.e. the
+   *     key was not present in {@code i18nTexts})
    */
   public String resolveI18n(String value, Map<String, String> i18nTexts) {
     if (value == null || !value.contains(I18N_PREFIX)) {
