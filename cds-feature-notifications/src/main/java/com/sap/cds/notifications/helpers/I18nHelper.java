@@ -176,6 +176,10 @@ public class I18nHelper {
 
     // Resolve {i18n>KEY} placeholders in the HTML content
     String resolvedHtml = resolveI18n(content, i18nTexts);
+    if (resolvedHtml == null) {
+      logger.error("Unresolved i18n placeholder(s) in HTML template: {}", filePath);
+      return null;
+    }
 
     // Minify HTML: remove comments and unnecessary whitespace
     String compactHtml =
