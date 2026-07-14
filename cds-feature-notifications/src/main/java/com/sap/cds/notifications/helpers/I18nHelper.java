@@ -57,11 +57,16 @@ public class I18nHelper {
 
   /**
    * Get locales that have actual notification translations for the given event. Compares each
-   * locale's resolved {@code notification.template.title} against the English value. If they
-   * differ, the locale has a real translation and is included. English is always included.
+   * locale's resolved {@code notification.template.title} against the English value. A locale is
+   * included only if its title differs from English AND is fully resolved (no unresolved
+   * {@code {i18n>KEY}} placeholders remain). English is always included.
    *
    * <p>This filters out locales that only exist because of {@code @sap/cds/common} framework
    * translations (e.g. "Created By" in 37 languages) but have no app-specific notification texts.
+   *
+   * <p>Note: {@link #resolveI18n(String, java.util.Map)} returns {@code null} when any placeholder
+   * cannot be resolved. Such locales are excluded to prevent raw placeholder strings from reaching
+   * ANS.
    */
   public Set<Locale> getAvailableLocalesForEvent(CdsEvent event) {
     Set<Locale> allLocales = getAvailableLocales();
@@ -84,7 +89,7 @@ public class I18nHelper {
       Map<String, String> localeTexts = getI18nTexts(locale);
       String localeTitle =
           resolveAnnotationValue(event, "notification.template.title", localeTexts);
-      if (!Objects.equals(enTitle, localeTitle) && !hasUnresolvedI18n(localeTitle)) {
+      if (localeTitle != null && !Objects.equals(enTitle, localeTitle)) {
         filtered.add(locale);
       }
     }
@@ -128,6 +133,9 @@ public class I18nHelper {
    * Resolve all {i18n>KEY} patterns in a string using the i18n texts map. Supports both
    * single-placeholder values (e.g. "{i18n>TITLE}") and multi-placeholder values (e.g.
    * "{i18n>GREETING}, {i18n>BODY}").
+   *
+   * @return the resolved string, or {@code null} if any placeholder could not be resolved (i.e.
+   *     the key was not present in {@code i18nTexts})
    */
   public String resolveI18n(String value, Map<String, String> i18nTexts) {
     if (value == null || !value.contains(I18N_PREFIX)) {
@@ -137,11 +145,7 @@ public class I18nHelper {
     for (Map.Entry<String, String> entry : i18nTexts.entrySet()) {
       value = value.replace(I18N_PREFIX + entry.getKey() + "}", entry.getValue());
     }
-    return value;
-  }
-
-  private boolean hasUnresolvedI18n(String value) {
-    return value != null && value.contains(I18N_PREFIX);
+    return value.contains(I18N_PREFIX) ? null : value;
   }
 
   /**

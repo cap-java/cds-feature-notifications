@@ -50,9 +50,9 @@ class I18nHelperTest {
     }
 
     @Test
-    void unknownKey_notReplaced() {
+    void unknownKey_returnsNull() {
       String input = "{i18n>UNKNOWN_KEY}";
-      assertEquals(input, i18nHelper.resolveI18n(input, Map.of("SUBTITLE", "Book Order")));
+      assertNull(i18nHelper.resolveI18n(input, Map.of("SUBTITLE", "Book Order")));
     }
 
     @Test
