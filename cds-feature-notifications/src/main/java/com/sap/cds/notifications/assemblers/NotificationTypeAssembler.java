@@ -93,8 +93,9 @@ public class NotificationTypeAssembler {
       if (displayName == null || displayName.isBlank()) {
         throw new IllegalStateException(
             String.format(
-                "Missing required annotation: @notification.template.publicTitle for event '%s'.",
-                event.getName()));
+                "Missing or unresolved @notification.template.publicTitle for event '%s', locale '%s'. "
+                    + "Ensure the annotation is present and the i18n key exists in your properties file.",
+                event.getName(), locale.toLanguageTag()));
       }
       translation.setDisplayName(displayName);
 
@@ -104,8 +105,9 @@ public class NotificationTypeAssembler {
       if (groupTitle == null || groupTitle.isBlank()) {
         throw new IllegalStateException(
             String.format(
-                "Missing required annotation: @notification.template.groupedTitle for event '%s'.",
-                event.getName()));
+                "Missing or unresolved @notification.template.groupedTitle for event '%s', locale '%s'. "
+                    + "Ensure the annotation is present and the i18n key exists in your properties file.",
+                event.getName(), locale.toLanguageTag()));
       }
       translation.setGroupTitle(groupTitle);
 

@@ -123,9 +123,9 @@ public class NotificationTemplateAssembler {
     if (title == null || title.trim().isEmpty()) {
       throw new IllegalStateException(
           String.format(
-              "Missing required annotation: @notification.template.title for event '%s'. "
-                  + "The standalone template API requires a Title to be set.",
-              event.getName()));
+              "Missing or unresolved @notification.template.title for event '%s', locale '%s'. "
+                  + "Ensure the annotation is present and the i18n key exists in your properties file.",
+              event.getName(), lang));
     }
     translation.setTitle(title);
 
