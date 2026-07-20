@@ -68,10 +68,6 @@
     <!-- https://www.npmjs.com/package/@sap/cds-dk?activeTab=versions -->
     <cds.cdsdk-version>10.0.4</cds.cdsdk-version>
 
-    <!-- Latest versions of CAP Java and cds-dk used for integrations tests only -->
-    <cds.services.latest-test-version>5.0.0</cds.services.latest-test-version>
-    <cds.cdsdk.latest-test-version>9.5.0</cds.cdsdk.latest-test-version>
-
     <spotless.check.skip>true</spotless.check.skip>
   </properties>
 
