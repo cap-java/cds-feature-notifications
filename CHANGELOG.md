@@ -13,6 +13,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ### Fixed
 
 ## Version 0.0.2-alpha - 2026-07-20
+### Added
+- Navigation target parameters support: event fields annotated with the `key` keyword are sent as `TargetParameters` to ANS, enabling notifications to navigate directly to a specific record in the target application
+
 ### Changed
 - Updated cds.services.version to 5.0.0
 

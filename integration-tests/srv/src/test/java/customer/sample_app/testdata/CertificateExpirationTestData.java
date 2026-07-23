@@ -18,6 +18,7 @@ public class CertificateExpirationTestData {
     CertificateExpiration data = CertificateExpiration.create();
     data.setRecipients("test@example.com");
     data.setName("Test User");
+    data.setCertId("cert-123");
     data.setCertificateName("SSL Certificate");
     data.setExpirationDate(LocalDate.of(2026, 12, 31));
     data.setRenewLink("https://example.com/renew");
@@ -31,6 +32,7 @@ public class CertificateExpirationTestData {
     CertificateExpiration data = CertificateExpiration.create();
     data.setRecipients("550e8400-e29b-41d4-a716-446655440000");
     data.setName("UUID User");
+    data.setCertId("cert-456");
     data.setCertificateName("SSL Certificate");
     data.setExpirationDate(LocalDate.of(2026, 12, 31));
     data.setRenewLink("https://example.com/renew");
@@ -43,6 +45,7 @@ public class CertificateExpirationTestData {
   public static CertificateExpiration createWithoutRecipients() {
     CertificateExpiration data = CertificateExpiration.create();
     data.setName("Admin User");
+    data.setCertId("cert-789");
     data.setCertificateName("SSL Certificate");
     data.setExpirationDate(LocalDate.of(2026, 12, 31));
     data.setRenewLink("https://example.com/renew");
@@ -86,6 +89,7 @@ public class CertificateExpirationTestData {
   public static class Builder {
     private String recipients = "default@example.com";
     private String name = "Default User";
+    private String certId = "cert-default";
     private String certificateName = "Default Certificate";
     private LocalDate expirationDate = LocalDate.of(2026, 12, 31);
     private String renewLink = "https://example.com/renew";
@@ -99,6 +103,11 @@ public class CertificateExpirationTestData {
 
     public Builder name(String name) {
       this.name = name;
+      return this;
+    }
+
+    public Builder certId(String certId) {
+      this.certId = certId;
       return this;
     }
 
@@ -131,6 +140,7 @@ public class CertificateExpirationTestData {
       CertificateExpiration data = CertificateExpiration.create();
       data.setRecipients(recipients);
       data.setName(name);
+      data.setCertId(certId);
       data.setCertificateName(certificateName);
       data.setExpirationDate(expirationDate);
       data.setRenewLink(renewLink);

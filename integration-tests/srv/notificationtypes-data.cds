@@ -165,7 +165,8 @@ service NotificationService {
   event CertificateExpiration {
     recipients: String;
     name: String;
-    certificateName: String;                  
+    key certId: String;
+    certificateName: String;
     expirationDate: Date;
     renewLink: String;
     year: Integer;

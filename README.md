@@ -38,6 +38,7 @@ In **local mode**, notifications are logged to the console with no ANS binding r
     - [Case 3: Structured Recipient](#case-3-structured-recipient)
     - [Case 4: Array of Structured Recipients](#case-4-array-of-structured-recipients)
   - [Dynamic Priority](#dynamic-priority)
+  - [Navigation Target Parameters](#navigation-target-parameters)
   - [Batch Notifications](#batch-notifications)
   - [Identity Authentication Destination (Language Resolution)](#identity-authentication-destination-language-resolution)
     - [Step 1: Create a Technical User in Identity Authentication](#step-1-create-a-technical-user-in-identity-authentication)
@@ -153,7 +154,7 @@ The `template` section defines the visible content of the notification: titles, 
 | `@Common.SemanticObject` | No | Maps to `NavigationTargetObject` in ANS. Used for SAP Fiori launchpad navigation. Allows users to navigate directly to the relevant Fiori application when clicking the notification in SAP Build Work Zone. |
 | `@Common.SemanticObjectAction` | No | Maps to `NavigationTargetAction` in ANS. Specifies which action to trigger on the semantic object (e.g. `'display'`). |
 | `recipients` | **Yes** | Who receives the notification. Supports 4 formats (see [Recipient Formats](#recipient-formats)). |
-| Event fields | No | Define `{{variableName}}` (Mustache syntax) placeholders in your templates and matching fields in the CDS event. When you emit a notification, set these fields with the actual values. The plugin passes them to ANS, which replaces the placeholders at delivery time. |
+| Event fields | No | Define `{{variableName}}` (Mustache syntax) placeholders in your templates and matching fields in the CDS event. When you emit a notification, set these fields with the actual values. The plugin passes them to ANS, which replaces the placeholders at delivery time. You can also mark fields with the `key` keyword to send them as navigation target parameters, allowing the notification to link directly to a specific record. See [Navigation Target Parameters](#navigation-target-parameters). |
 
 > **Important:** Event names must be **unique across all services** in your application. The event name is used as the key for both NotificationType and NotificationTemplate in ANS. If two services define an event with the same name (e.g. `LowStockAlert`), the last one provisioned will silently overwrite the other.
 
@@ -645,6 +646,35 @@ priority : (years_between(startDate, endDate) > 5 ? 'MEDIUM' : 'LOW')
 The expression must evaluate to one of the four priority string values: `'HIGH'`, `'MEDIUM'`, `'LOW'`, or `'NEUTRAL'`. For the full list of portable CQL operators and functions, see [Standard Functions](https://cap.cloud.sap/docs/guides/databases/cap-level-dbs#standard-functions) in the CAP documentation.
 
 > These expressions are also supported in entity-level [`where`](#option-2-declarative-via-cds-entity-annotations) conditions. In that context the expression must evaluate to a **boolean** rather than a priority string, e.g. `where : (contains($self.title, 'Java'))` instead of `priority : (contains(title, 'Java') ? 'HIGH' : 'LOW')`.
+
+### Navigation Target Parameters
+
+When you link a notification to an application using `@Common.SemanticObject` and `@Common.SemanticObjectAction`, you can additionally define navigation target parameters by marking event fields with the `key` keyword. This allows the notification to navigate directly to a specific record in the target application.
+
+```cds
+@Common.SemanticObject       : 'Books'
+@Common.SemanticObjectAction : 'display'
+event BookOrdered {
+  recipients : String;
+  key bookId : UUID;         // → TargetParameters: navigates to specific book
+  bookTitle  : String;       // → template placeholder
+  quantity   : Integer;      // → template placeholder
+  buyer      : String;       // → template placeholder
+}
+```
+
+When emitting the notification, set the `bookId` field with the actual record identifier:
+
+```java
+BookOrdered data = BookOrdered.create();
+data.setRecipients("user@example.com");
+data.setBookId(book.getId());
+data.setBookTitle(book.getTitle());
+data.setQuantity(quantity);
+data.setBuyer(buyer);
+```
+
+Clicking the notification in SAP Build Work Zone then opens the specific `Books(bookId)` record rather than the Books list.
 
 ### Batch Notifications
 
