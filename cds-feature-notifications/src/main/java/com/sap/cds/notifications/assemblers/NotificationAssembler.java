@@ -3,6 +3,7 @@
  */
 package com.sap.cds.notifications.assemblers;
 
+import cds.gen.notificationproviderservice.NavigationTargetParams;
 import cds.gen.notificationproviderservice.NotificationProperties;
 import cds.gen.notificationproviderservice.Notifications;
 import cds.gen.notificationproviderservice.Recipients;
@@ -166,6 +167,12 @@ public class NotificationAssembler {
     // Add all fields from event data as properties
     List<NotificationProperties> properties = extractProperties(event, eventData);
     notification.setProperties(properties);
+
+    // Add key fields from event data as target parameters
+    List<NavigationTargetParams> targetParams = extractTargetParameters(event, eventData);
+    if (!targetParams.isEmpty()) {
+      notification.setTargetParameters(targetParams);
+    }
 
     logger.debug("Built notification with {} properties", properties.size());
 
@@ -478,8 +485,7 @@ public class NotificationAssembler {
         .forEach(
             element -> {
               String fieldName = element.getName();
-              // Skip recipients as it's already processed
-              if (!fieldName.equals("recipients")) {
+              if (!fieldName.equals("recipients") && !element.isKey()) {
                 Object value = eventData.get(fieldName);
                 if (value != null) {
                   NotificationProperties prop = Struct.create(NotificationProperties.class);
@@ -492,6 +498,29 @@ public class NotificationAssembler {
             });
 
     return properties;
+  }
+
+  private List<NavigationTargetParams> extractTargetParameters(CdsEvent event, CdsData eventData) {
+    List<NavigationTargetParams> targetParams = new ArrayList<>();
+
+    event
+        .elements()
+        .forEach(
+            element -> {
+              if (element.isKey()) {
+                String fieldName = element.getName();
+                Object value = eventData.get(fieldName);
+                if (value != null) {
+                  NavigationTargetParams param = Struct.create(NavigationTargetParams.class);
+                  param.setKey(fieldName);
+                  param.setValue(value.toString());
+                  targetParams.add(param);
+                  logger.debug("Added target parameter: {} = {}", fieldName, value);
+                }
+              }
+            });
+
+    return targetParams;
   }
 
   /** Result object containing the built notification and related metadata. */

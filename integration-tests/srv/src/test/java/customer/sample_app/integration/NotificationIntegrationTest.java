@@ -20,6 +20,7 @@ import cds.gen.my.notifications.notificationservice.ServerIncident;
 import cds.gen.my.notifications.notificationservice.ServerIncidentContext;
 import cds.gen.my.notifications.notificationservice.SystemMaintenance;
 import cds.gen.my.notifications.notificationservice.SystemMaintenanceContext;
+import cds.gen.notificationproviderservice.NavigationTargetParams;
 import cds.gen.notificationproviderservice.Notifications;
 import cds.gen.notificationproviderservice.Recipients;
 import cds.gen.notificationtypeproviderservice.NotificationTypes;
@@ -1116,5 +1117,34 @@ public class NotificationIntegrationTest {
         "LOW",
         stored.getPriority(),
         "Priority should be LOW when concat result does not contain 'PROD-critical'");
+  }
+
+  @Test
+  void testKeyFieldsAreSetAsTargetParameters() {
+    // Given: CertificateExpiration with certId (key field)
+    CertificateExpiration data = CertificateExpirationTestData.createValidCertificateExpiration();
+    CertificateExpirationContext ctx = CertificateExpirationContext.create();
+    ctx.setData(data);
+
+    // When
+    notificationService.emit(ctx);
+
+    await()
+        .atMost(5, SECONDS)
+        .until(() -> NotificationProviderServiceMockHandler.getNotificationCount() > 0);
+
+    // Then: certId should be in TargetParameters, not in Properties
+    Notifications stored = NotificationProviderServiceMockHandler.getAllNotifications().get(0);
+
+    List<NavigationTargetParams> targetParams = stored.getTargetParameters();
+    assertNotNull(targetParams, "TargetParameters should not be null");
+    assertEquals(1, targetParams.size(), "Should have 1 target parameter (certId)");
+    assertEquals("certId", targetParams.get(0).getKey(), "Target parameter key should be certId");
+    assertEquals("cert-123", targetParams.get(0).getValue(), "Target parameter value should match");
+
+    // certId should NOT be in Properties
+    boolean certIdInProperties =
+        stored.getProperties().stream().anyMatch(p -> "certId".equals(p.getKey()));
+    assertFalse(certIdInProperties, "certId should not appear in Properties");
   }
 }
