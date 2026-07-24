@@ -110,7 +110,15 @@ public class I18nHelper {
   public Map<String, String> getI18nTexts(Locale locale) {
     EdmxI18nProvider provider = getProvider();
     if (provider != null) {
-      return provider.getTexts(locale);
+      Map<String, String> texts = new HashMap<>(provider.getTexts(locale));
+      // Also include Locale.ROOT (default i18n.properties) as fallback so that apps without an
+      // explicit i18n_en.properties file work correctly. putIfAbsent ensures that locale-specific
+      // entries from i18n_en.properties take precedence over root entries when both exist.
+      if (Locale.ENGLISH.equals(locale)) {
+        Map<String, String> rootTexts = provider.getTexts(Locale.ROOT);
+        rootTexts.forEach(texts::putIfAbsent);
+      }
+      return texts;
     }
     logger.warn("EdmxI18nProvider not available, i18n resolution will not work");
     return Collections.emptyMap();
