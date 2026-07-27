@@ -8,11 +8,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Added
 
-### Changed
-
 ### Fixed
 
-## Version 0.0.2-alpha - 2026-07-20
+### Changed
+
+### Removed
+
+## [Unreleased]
+
+### Added
+- Navigation target parameters support: event fields annotated with the `key` keyword are sent as `TargetParameters` to ANS, enabling notifications to navigate directly to a specific record in the target application
+
 ### Fixed
 - Fall back to `Locale.ROOT` (`i18n.properties`) when no explicit `i18n_en.properties` exists, so applications following the CAP default i18n convention no longer fail at startup with unresolved English placeholders
 

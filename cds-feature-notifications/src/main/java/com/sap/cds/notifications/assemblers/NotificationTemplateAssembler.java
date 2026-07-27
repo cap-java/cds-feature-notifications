@@ -251,7 +251,7 @@ public class NotificationTemplateAssembler {
         .forEach(
             element -> {
               String fieldName = element.getName();
-              if (!"recipients".equals(fieldName)) {
+              if (!"recipients".equals(fieldName) && !element.isKey()) {
                 String jsonType = cdsTypeToJsonSchemaType(element);
                 properties.put(fieldName, Map.of("type", jsonType, "title", fieldName));
                 requiredFields.add(fieldName);
