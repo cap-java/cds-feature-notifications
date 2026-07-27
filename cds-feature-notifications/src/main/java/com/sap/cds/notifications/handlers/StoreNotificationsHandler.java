@@ -10,6 +10,7 @@ import cds.gen.notificationproviderservice.Recipients;
 import cds.gen.sap.cds.notifications.NotificationProperties;
 import cds.gen.sap.cds.notifications.NotificationTargetParameters;
 import com.sap.cds.ql.Insert;
+import com.sap.cds.services.Service;
 import com.sap.cds.services.cds.CdsCreateEventContext;
 import com.sap.cds.services.cds.CqnService;
 import com.sap.cds.services.handler.EventHandler;
@@ -23,9 +24,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ServiceName(
-    value = NotificationProviderService_.CDS_NAME,
-    type = com.sap.cds.services.Service.class)
+@ServiceName(value = NotificationProviderService_.CDS_NAME, type = Service.class)
 public class StoreNotificationsHandler implements EventHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(StoreNotificationsHandler.class);
