@@ -1147,4 +1147,26 @@ public class NotificationIntegrationTest {
         stored.getProperties().stream().anyMatch(p -> "certId".equals(p.getKey()));
     assertFalse(certIdInProperties, "certId should not appear in Properties");
   }
+
+  @Test
+  void testNoKeyFields_targetParametersIsEmpty() {
+    // Given: SystemMaintenance has no key fields, TargetParameters should be empty
+    SystemMaintenance data = SystemMaintenanceTestData.createValid();
+    SystemMaintenanceContext ctx = SystemMaintenanceContext.create();
+    ctx.setData(data);
+
+    // When
+    notificationService.emit(ctx);
+
+    await()
+        .atMost(5, SECONDS)
+        .until(() -> NotificationProviderServiceMockHandler.getNotificationCount() > 0);
+
+    // Then: TargetParameters should be null or empty
+    Notifications stored = NotificationProviderServiceMockHandler.getAllNotifications().get(0);
+    List<NavigationTargetParams> targetParams = stored.getTargetParameters();
+    assertTrue(
+        targetParams == null || targetParams.isEmpty(),
+        "TargetParameters should be empty when no key fields are defined");
+  }
 }
