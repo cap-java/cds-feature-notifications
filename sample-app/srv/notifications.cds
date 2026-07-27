@@ -1,8 +1,12 @@
 using from 'com.sap.cds/cds-feature-notifications';
+using {sap.cds.notifications as my} from 'com.sap.cds/cds-feature-notifications';
 
 namespace sap.capire.bookshop.notifications;
 
+@odata
 service NotificationService {
+
+  entity StoredNotifications as projection on my.Notifications;
 
   /**
    * Example 1: Manual notification with i18n, HTML email, delivery channels,
@@ -39,6 +43,7 @@ service NotificationService {
   @Common.SemanticObjectAction: 'display'
   event BookOrdered {
     recipients : String;
+    key bookId : UUID;
     bookTitle  : String;
     quantity   : Integer;
     buyer      : String;
