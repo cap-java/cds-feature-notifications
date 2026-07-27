@@ -53,4 +53,7 @@ cds:
   environment:
     production:
       enabled: true
+  requires:
+    notifications:
+      storeNotifications: true
 
