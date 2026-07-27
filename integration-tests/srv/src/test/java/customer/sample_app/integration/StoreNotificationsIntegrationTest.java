@@ -59,7 +59,14 @@ public class StoreNotificationsIntegrationTest {
 
     await()
         .atMost(5, SECONDS)
-        .until(() -> NotificationProviderServiceMockHandler.getNotificationCount() > 0);
+        .until(
+            () ->
+                !persistenceService
+                    .run(
+                        Select.from(Notifications_.CDS_NAME)
+                            .where(n -> n.get("recipient").eq("store-test-1@example.com")))
+                    .listOf(CdsData.class)
+                    .isEmpty());
 
     // Then: one row in DB for this recipient
     List<CdsData> rows =
@@ -93,7 +100,16 @@ public class StoreNotificationsIntegrationTest {
 
     await()
         .atMost(5, SECONDS)
-        .until(() -> NotificationProviderServiceMockHandler.getNotificationCount() > 0);
+        .until(
+            () ->
+                !persistenceService
+                    .run(
+                        Select.from(NotificationProperties_.CDS_NAME)
+                            .where(
+                                p ->
+                                    p.get("notification_recipient").eq("store-test-2@example.com")))
+                    .listOf(CdsData.class)
+                    .isEmpty());
 
     // Then: non-key fields stored as properties
     List<CdsData> props =
@@ -126,7 +142,16 @@ public class StoreNotificationsIntegrationTest {
 
     await()
         .atMost(5, SECONDS)
-        .until(() -> NotificationProviderServiceMockHandler.getNotificationCount() > 0);
+        .until(
+            () ->
+                !persistenceService
+                    .run(
+                        Select.from(NotificationTargetParameters_.CDS_NAME)
+                            .where(
+                                p ->
+                                    p.get("notification_recipient").eq("store-test-3@example.com")))
+                    .listOf(CdsData.class)
+                    .isEmpty());
 
     // Then: certId stored as target parameter
     List<CdsData> params =
@@ -159,7 +184,21 @@ public class StoreNotificationsIntegrationTest {
 
     await()
         .atMost(5, SECONDS)
-        .until(() -> NotificationProviderServiceMockHandler.getNotificationCount() > 0);
+        .until(
+            () -> {
+              List<CdsData> stored =
+                  persistenceService
+                      .run(
+                          Select.from(Notifications_.CDS_NAME)
+                              .where(
+                                  n ->
+                                      n.get("recipient")
+                                          .eq("store-multi-1@example.com")
+                                          .or(n.get("recipient").eq("store-multi-2@example.com"))
+                                          .or(n.get("recipient").eq("store-multi-3@example.com"))))
+                      .listOf(CdsData.class);
+              return stored.size() == 3;
+            });
 
     // Then: 3 rows in DB — one per recipient
     List<CdsData> rows =
