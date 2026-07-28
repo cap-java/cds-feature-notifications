@@ -405,7 +405,6 @@ In production mode:
 - **`NotificationTypeAutoProvisionerHandler`** provisions and syncs notification types in ANS automatically at startup. You only need to maintain your CDS annotations and i18n files.
 - **`NotificationTemplateAutoProvisionerHandler`** provisions and syncs standalone notification templates in ANS automatically at startup, based on the same CDS annotations and i18n files.
 - The **persistent outbox** ensures reliable, ordered delivery
-- When in production mode, you also have the option to store sent notifications to the database for further processing. See [Storing Notifications to DB](#storing-notifications-to-db).
 
 ### Connect to ANS
 
@@ -540,6 +539,17 @@ OAuth2 Client Credentials Flow is also supported (uses `ClientId`, `ClientSecret
 ---
 
 ## Deep Dive
+
+This section covers additional features and configuration options:
+
+- [Recipient Formats](#recipient-formats) — supported recipient types (email, UUID, structured)
+- [Dynamic Priority](#dynamic-priority) — CDS expressions for runtime priority evaluation
+- [Navigation Target Parameters](#navigation-target-parameters) — `key`-annotated fields for deep linking
+- [Storing Notifications to DB](#storing-notifications-to-db) — optional DB persistence for further processing
+- [Batch Notifications](#batch-notifications) — emit multiple notifications in a single call
+- [Identity Authentication Destination](#identity-authentication-destination-language-resolution) — language resolution via IAS
+- [Template Customization](#template-customization) — allow end-users to customize notification content
+- [Outbox](#outbox) — guaranteed ordered delivery with automatic retry
 
 ### Recipient Formats
 
@@ -678,6 +688,29 @@ data.setBuyer(buyer);
 
 Clicking the notification in SAP Build Work Zone then opens the specific `Books(bookId)` record rather than the Books list.
 
+### Storing Notifications to DB
+
+By default, the plugin does not persist sent notifications. If your application needs to store sent notifications for further processing, for example to support a cooldown mechanism or keep a history of sent notifications, you can enable DB storage:
+
+```yaml
+cds:
+  requires:
+    notifications:
+      storeNotifications: true
+```
+
+When enabled, the plugin stores each sent notification to the database after it has been processed. The following entities are created automatically in your application's database:
+
+| Entity | Description |
+|---|---|
+| `sap.cds.notifications.Notifications` | One row per notification per recipient. Key: `(ID, recipient)` where `ID` is the notification ID (ANS-assigned in production mode, locally generated in local mode). |
+| `sap.cds.notifications.NotificationProperties` | Template placeholder values. Event fields not annotated with the `key` keyword. |
+| `sap.cds.notifications.NotificationTargetParameters` | Navigation target parameters. Event fields annotated with the `key` keyword. See [Navigation Target Parameters](#navigation-target-parameters). |
+
+In production mode, the `ID` stored is the one returned by ANS. In local mode, a UUID is generated locally. The `recipient` field holds the email address or UUID of the recipient. Since a single notification can be sent to multiple recipients, one row is created per recipient.
+
+> **Note:** The stored notification entities include `@PersonalData` annotations. This allows the `cap-js/data-privacy` and `cds-feature-data-privacy` modules to automatically handle personal data erasure requests. When a user requests deletion of their data, all notification records for that recipient are removed.
+
 ### Batch Notifications
 
 You can emit multiple notifications of the same type in a single call. Instead of emitting each notification separately:
@@ -752,29 +785,6 @@ event BookOrdered {
 ```
 
 > **Important:** Once a template is made `PUBLIC`, it **cannot be reverted to `PRIVATE`**. This is enforced by ANS. Making this a deliberate opt-in ensures that only templates intended for customization are exposed to customer administrators.
-
-### Storing Notifications to DB
-
-By default, the plugin sends notifications to ANS in production mode and does not persist them. If your application needs to store sent notifications for further processing, for example to support a cooldown mechanism or keep a history of sent notifications, you can enable local DB storage:
-
-```yaml
-cds:
-  requires:
-    notifications:
-      storeNotifications: true
-```
-
-When enabled, the plugin stores each sent notification to the database after it has been successfully delivered to ANS. The following entities are created automatically in your application's database:
-
-| Entity | Description |
-|---|---|
-| `sap.cds.notifications.Notifications` | One row per notification per recipient. Key: `(ID, recipient)` where `ID` is the ANS-assigned notification ID. |
-| `sap.cds.notifications.NotificationProperties` | Template placeholder values. Event fields not annotated with the `key` keyword. |
-| `sap.cds.notifications.NotificationTargetParameters` | Navigation target parameters. Event fields annotated with the `key` keyword. See [Navigation Target Parameters](#navigation-target-parameters). |
-
-The `ID` stored is the one returned by ANS, no new ID is generated. The `recipient` field holds the email address or UUID of the recipient. Since a single notification can be sent to multiple recipients, one row is created per recipient.
-
-> **Note:** The stored notification entities include `@PersonalData` annotations. This allows the `cap-js/data-privacy` and `cds-feature-data-privacy` modules to automatically handle personal data erasure requests. When a user requests deletion of their data, all notification records for that recipient are removed.
 
 ### Outbox
 
