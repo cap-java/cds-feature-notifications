@@ -5,11 +5,9 @@ package com.sap.cds.notifications.handlers;
 
 import cds.gen.notificationproviderservice.NotificationProviderService_;
 import cds.gen.notificationproviderservice.Notifications;
-import cds.gen.notificationproviderservice.Notifications_;
 import com.sap.cds.notifications.helpers.NotificationStorageService;
 import com.sap.cds.services.Service;
 import com.sap.cds.services.cds.CdsCreateEventContext;
-import com.sap.cds.services.cds.CqnService;
 import com.sap.cds.services.handler.EventHandler;
 import com.sap.cds.services.handler.annotations.After;
 import com.sap.cds.services.handler.annotations.ServiceName;
@@ -26,15 +24,13 @@ public class StoreNotificationsHandler implements EventHandler {
     this.storageService = storageService;
   }
 
-  @After(event = CqnService.EVENT_CREATE, entity = Notifications_.CDS_NAME)
-  public void storeNotifications(CdsCreateEventContext context) {
-    List<Notifications> results = context.getResult().listOf(Notifications.class);
-    List<Map<String, Object>> entries = context.getCqn().entries();
-
+  @After
+  public void storeNotifications(CdsCreateEventContext context, List<Notifications> results) {
     if (results == null || results.isEmpty()) {
       return;
     }
 
+    List<Map<String, Object>> entries = context.getCqn().entries();
     Instant sentAt = Instant.now();
 
     for (int i = 0; i < results.size(); i++) {
