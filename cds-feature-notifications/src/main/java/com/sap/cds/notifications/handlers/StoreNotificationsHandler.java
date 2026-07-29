@@ -13,15 +13,14 @@ import com.sap.cds.services.handler.annotations.After;
 import com.sap.cds.services.handler.annotations.ServiceName;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 
 @ServiceName(value = NotificationProviderService_.CDS_NAME, type = Service.class)
 public class StoreNotificationsHandler implements EventHandler {
 
-  private final NotificationStorageHelper storageService;
+  private final NotificationStorageHelper storageHelper;
 
-  public StoreNotificationsHandler(NotificationStorageHelper storageService) {
-    this.storageService = storageService;
+  public StoreNotificationsHandler(NotificationStorageHelper storageHelper) {
+    this.storageHelper = storageHelper;
   }
 
   @After
@@ -30,13 +29,8 @@ public class StoreNotificationsHandler implements EventHandler {
       return;
     }
 
-    List<Map<String, Object>> entries = context.getCqn().entries();
-    Instant sentAt = Instant.now();
-
-    for (int i = 0; i < results.size(); i++) {
-      Notifications result = results.get(i);
-      Notifications requestEntry = Notifications.of(entries.get(i));
-      storageService.store(result.getId(), requestEntry, sentAt);
-    }
+    Notifications result = results.get(0);
+    Notifications requestEntry = Notifications.of(context.getCqn().entries().get(0));
+    storageHelper.store(result.getId(), requestEntry, Instant.now());
   }
 }
