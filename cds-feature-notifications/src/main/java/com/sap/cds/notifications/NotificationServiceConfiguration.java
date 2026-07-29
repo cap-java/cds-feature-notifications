@@ -18,7 +18,7 @@ import com.sap.cds.notifications.handlers.NotificationTypeAutoProvisionerHandler
 import com.sap.cds.notifications.handlers.ProductionHandler;
 import com.sap.cds.notifications.handlers.StoreNotificationsHandler;
 import com.sap.cds.notifications.handlers.StoreNotificationsLocalHandler;
-import com.sap.cds.notifications.helpers.NotificationStorageService;
+import com.sap.cds.notifications.helpers.NotificationStorageHelper;
 import com.sap.cds.services.environment.CdsProperties;
 import com.sap.cds.services.environment.CdsProperties.Remote.RemoteServiceConfig;
 import com.sap.cds.services.outbox.OutboxService;
@@ -153,7 +153,7 @@ public class NotificationServiceConfiguration implements CdsRuntimeConfiguration
               .getCdsRuntime()
               .getServiceCatalog()
               .getService(PersistenceService.class, PersistenceService.DEFAULT_NAME);
-      NotificationStorageService storageService = new NotificationStorageService(db);
+      NotificationStorageHelper storageService = new NotificationStorageHelper(db);
       if (productionEnabled || ansBindingPresent) {
         configurer.eventHandler(new StoreNotificationsHandler(storageService));
       } else {

@@ -5,7 +5,7 @@ package com.sap.cds.notifications.handlers;
 
 import cds.gen.notificationproviderservice.NotificationProviderService_;
 import cds.gen.notificationproviderservice.Notifications;
-import com.sap.cds.notifications.helpers.NotificationStorageService;
+import com.sap.cds.notifications.helpers.NotificationStorageHelper;
 import com.sap.cds.services.Service;
 import com.sap.cds.services.cds.CdsCreateEventContext;
 import com.sap.cds.services.handler.EventHandler;
@@ -18,9 +18,9 @@ import java.util.Map;
 @ServiceName(value = NotificationProviderService_.CDS_NAME, type = Service.class)
 public class StoreNotificationsHandler implements EventHandler {
 
-  private final NotificationStorageService storageService;
+  private final NotificationStorageHelper storageService;
 
-  public StoreNotificationsHandler(NotificationStorageService storageService) {
+  public StoreNotificationsHandler(NotificationStorageHelper storageService) {
     this.storageService = storageService;
   }
 

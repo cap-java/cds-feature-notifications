@@ -16,13 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** Shared service for persisting notifications to the database. */
-public class NotificationStorageService {
+public class NotificationStorageHelper {
 
-  private static final Logger logger = LoggerFactory.getLogger(NotificationStorageService.class);
+  private static final Logger logger = LoggerFactory.getLogger(NotificationStorageHelper.class);
 
   private final PersistenceService persistenceService;
 
-  public NotificationStorageService(PersistenceService persistenceService) {
+  public NotificationStorageHelper(PersistenceService persistenceService) {
     this.persistenceService = persistenceService;
   }
 
