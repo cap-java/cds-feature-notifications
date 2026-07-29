@@ -37,9 +37,8 @@ cds:
   environment:
     production:
       enabled: false
-  requires:
-    notifications:
-      storeNotifications: true
+  notifications:
+    storeNotifications: true
 ---
 spring:
   config.activate.on-profile: test
@@ -56,7 +55,6 @@ cds:
   environment:
     production:
       enabled: true
-  requires:
-    notifications:
-      storeNotifications: true
+  notifications:
+    storeNotifications: true
 

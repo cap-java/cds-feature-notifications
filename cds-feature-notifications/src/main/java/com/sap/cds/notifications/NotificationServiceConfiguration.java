@@ -145,7 +145,7 @@ public class NotificationServiceConfiguration implements CdsRuntimeConfiguration
         configurer
             .getCdsRuntime()
             .getEnvironment()
-            .getProperty("cds.requires.notifications.storeNotifications", Boolean.class, false);
+            .getProperty("cds.notifications.storeNotifications", Boolean.class, false);
 
     if (storeNotifications) {
       PersistenceService db =

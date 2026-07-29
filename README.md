@@ -694,9 +694,8 @@ By default, the plugin does not persist sent notifications. If your application 
 
 ```yaml
 cds:
-  requires:
-    notifications:
-      storeNotifications: true
+  notifications:
+    storeNotifications: true
 ```
 
 When enabled, the plugin stores each sent notification to the database after it has been processed. The following entities are created automatically in your application's database:
