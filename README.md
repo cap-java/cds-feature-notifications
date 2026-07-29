@@ -702,9 +702,9 @@ When enabled, the plugin stores each sent notification to the database after it 
 
 | Entity | Description |
 |---|---|
-| `sap.cds.notifications.Notifications` | One row per notification per recipient. Key: `(ID, recipient)` where `ID` is the notification ID (ANS-assigned in production mode, locally generated in local mode). |
-| `sap.cds.notifications.NotificationProperties` | Template placeholder values. Event fields not annotated with the `key` keyword. |
-| `sap.cds.notifications.NotificationTargetParameters` | Navigation target parameters. Event fields annotated with the `key` keyword. See [Navigation Target Parameters](#navigation-target-parameters). |
+| `sap.cds.notifications.Notifications` | One row per notification per recipient. Stores `ID`, `recipient`, `notificationTypeKey`, `notificationTemplateKey`, `priority`, `navigationTargetObject`, `navigationTargetAction`, and `sentAt` (UTC). Key: `(ID, recipient)` where `ID` is the notification ID (ANS-assigned in production mode, locally generated in local mode). |
+| `sap.cds.notifications.NotificationProperties` | Template placeholder values. Stores `propertyKey` and `propertyValue` for each event field not annotated with the `key` keyword. |
+| `sap.cds.notifications.NotificationTargetParameters` | Navigation target parameters. Stores `paramKey` and `paramValue` for each event field annotated with the `key` keyword. See [Navigation Target Parameters](#navigation-target-parameters). |
 
 In production mode, the `ID` stored is the one returned by ANS. In local mode, a UUID is generated locally. The `recipient` field holds the email address or UUID of the recipient. Since a single notification can be sent to multiple recipients, one row is created per recipient.
 
