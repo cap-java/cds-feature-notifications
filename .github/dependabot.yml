@@ -8,6 +8,8 @@ updates:
     open-pull-requests-limit: 10
     cooldown:
       default-days: 7
+    labels:
+      - "no changelog"
     groups:
       minor-patch:
         patterns:
@@ -24,6 +26,8 @@ updates:
     open-pull-requests-limit: 10
     cooldown:
       default-days: 7
+    labels:
+      - "no changelog"
     groups:
       minor-patch:
         patterns:
@@ -38,6 +42,8 @@ updates:
       interval: weekly
     cooldown:
       default-days: 7
+    labels:
+      - "no changelog"
     groups:
       github-actions:
         patterns:
