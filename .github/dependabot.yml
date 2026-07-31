@@ -8,10 +8,6 @@ updates:
     open-pull-requests-limit: 10
     cooldown:
       default-days: 7
-    ignore:
-    - dependency-name:  com.sap.cds:*
-      versions:
-      - ">=4"
     groups:
       minor-patch:
         patterns:
