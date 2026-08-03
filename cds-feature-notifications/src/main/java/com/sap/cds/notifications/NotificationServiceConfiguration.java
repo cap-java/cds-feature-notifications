@@ -16,9 +16,13 @@ import com.sap.cds.notifications.handlers.LocalNotificationTypeAutoProvisionerHa
 import com.sap.cds.notifications.handlers.NotificationTemplateAutoProvisionerHandler;
 import com.sap.cds.notifications.handlers.NotificationTypeAutoProvisionerHandler;
 import com.sap.cds.notifications.handlers.ProductionHandler;
+import com.sap.cds.notifications.handlers.StoreNotificationsHandler;
+import com.sap.cds.notifications.handlers.StoreNotificationsLocalHandler;
+import com.sap.cds.notifications.helpers.NotificationStorageHelper;
 import com.sap.cds.services.environment.CdsProperties;
 import com.sap.cds.services.environment.CdsProperties.Remote.RemoteServiceConfig;
 import com.sap.cds.services.outbox.OutboxService;
+import com.sap.cds.services.persistence.PersistenceService;
 import com.sap.cds.services.runtime.CdsRuntime;
 import com.sap.cds.services.runtime.CdsRuntimeConfiguration;
 import com.sap.cds.services.runtime.CdsRuntimeConfigurer;
@@ -136,6 +140,27 @@ public class NotificationServiceConfiguration implements CdsRuntimeConfiguration
     // Entity-level @notifications handler, emits CDS events handled by
     // ProductionHandler/LocalHandler
     configurer.eventHandler(new EntityNotificationHandler());
+
+    boolean storeNotifications =
+        configurer
+            .getCdsRuntime()
+            .getEnvironment()
+            .getProperty("cds.notifications.storeNotifications", Boolean.class, false);
+
+    if (storeNotifications) {
+      PersistenceService db =
+          configurer
+              .getCdsRuntime()
+              .getServiceCatalog()
+              .getService(PersistenceService.class, PersistenceService.DEFAULT_NAME);
+      NotificationStorageHelper storageService = new NotificationStorageHelper(db);
+      if (productionEnabled || ansBindingPresent) {
+        configurer.eventHandler(new StoreNotificationsHandler(storageService));
+      } else {
+        configurer.eventHandler(new StoreNotificationsLocalHandler(storageService));
+      }
+      logger.info("storeNotifications enabled - notifications will be stored to DB");
+    }
   }
 
   @Override

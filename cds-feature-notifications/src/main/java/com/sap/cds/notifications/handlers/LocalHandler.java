@@ -14,9 +14,11 @@ import com.sap.cds.services.handler.EventHandler;
 import com.sap.cds.services.handler.annotations.On;
 import com.sap.cds.services.handler.annotations.ServiceName;
 import com.sap.cds.services.runtime.CdsRuntime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,7 @@ import org.slf4j.LoggerFactory;
 public class LocalHandler implements EventHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(LocalHandler.class);
+  static final String SENT_NOTIFICATIONS_KEY = "com.sap.cds.notifications.stored";
   private final NotificationAssembler notificationBuilder;
   private final I18nHelper i18nHelper;
 
@@ -117,6 +120,16 @@ public class LocalHandler implements EventHandler {
       }
       logger.info("└──────────────────────────────────────────────────────────────┘");
     }
+
+    List<Notifications> sentNotifications = new ArrayList<>();
+    for (NotificationAssembler.NotificationBuildResult result : results) {
+      Notifications notification = result.notification();
+      if (notification.getId() == null) {
+        notification.setId(UUID.randomUUID().toString());
+      }
+      sentNotifications.add(notification);
+    }
+    context.put(SENT_NOTIFICATIONS_KEY, sentNotifications);
 
     context.setCompleted();
   }

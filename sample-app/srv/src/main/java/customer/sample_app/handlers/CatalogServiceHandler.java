@@ -61,6 +61,7 @@ public class CatalogServiceHandler implements EventHandler {
 		// Example 1: send manual notification via NotificationService
 		BookOrdered notification = BookOrdered.create();
 		notification.setRecipients(context.getUserInfo().getName());
+		notification.setBookId(bookId);
 		notification.setBookTitle(book.getTitle());
 		notification.setQuantity(context.getQuantity());
 		notification.setBuyer(context.getUserInfo().getName());

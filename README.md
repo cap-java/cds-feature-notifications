@@ -39,6 +39,7 @@ In **local mode**, notifications are logged to the console with no ANS binding r
     - [Case 4: Array of Structured Recipients](#case-4-array-of-structured-recipients)
   - [Dynamic Priority](#dynamic-priority)
   - [Navigation Target Parameters](#navigation-target-parameters)
+  - [Storing Notifications to DB](#storing-notifications-to-db)
   - [Batch Notifications](#batch-notifications)
   - [Identity Authentication Destination (Language Resolution)](#identity-authentication-destination-language-resolution)
     - [Step 1: Create a Technical User in Identity Authentication](#step-1-create-a-technical-user-in-identity-authentication)
@@ -539,6 +540,17 @@ OAuth2 Client Credentials Flow is also supported (uses `ClientId`, `ClientSecret
 
 ## Deep Dive
 
+This section covers additional features and configuration options:
+
+- [Recipient Formats](#recipient-formats) — supported recipient types (email, UUID, structured)
+- [Dynamic Priority](#dynamic-priority) — CDS expressions for runtime priority evaluation
+- [Navigation Target Parameters](#navigation-target-parameters) — `key`-annotated fields for deep linking
+- [Storing Notifications to DB](#storing-notifications-to-db) — optional DB persistence for further processing
+- [Batch Notifications](#batch-notifications) — emit multiple notifications in a single call
+- [Identity Authentication Destination](#identity-authentication-destination-language-resolution) — language resolution via IAS
+- [Template Customization](#template-customization) — allow end-users to customize notification content
+- [Outbox](#outbox) — guaranteed ordered delivery with automatic retry
+
 ### Recipient Formats
 
 The plugin supports four recipient formats:
@@ -675,6 +687,28 @@ data.setBuyer(buyer);
 ```
 
 Clicking the notification in SAP Build Work Zone then opens the specific `Books(bookId)` record rather than the Books list.
+
+### Storing Notifications to DB
+
+By default, the plugin does not persist sent notifications. If your application needs to store sent notifications for further processing, for example to support a cooldown mechanism or keep a history of sent notifications, you can enable DB storage:
+
+```yaml
+cds:
+  notifications:
+    storeNotifications: true
+```
+
+When enabled, the plugin stores each sent notification to the database after it has been processed. The following entities are created automatically in your application's database:
+
+| Entity | Description |
+|---|---|
+| `sap.cds.notifications.Notifications` | One row per notification per recipient. Stores `ID`, `recipient`, `notificationTypeKey`, `notificationTemplateKey`, `priority`, `navigationTargetObject`, `navigationTargetAction`, and `sentAt` (UTC). Key: `(ID, recipient)` where `ID` is the notification ID (ANS-assigned in production mode, locally generated in local mode). |
+| `sap.cds.notifications.NotificationProperties` | Template placeholder values. Stores `propertyKey` and `propertyValue` for each event field not annotated with the `key` keyword. |
+| `sap.cds.notifications.NotificationTargetParameters` | Navigation target parameters. Stores `paramKey` and `paramValue` for each event field annotated with the `key` keyword. See [Navigation Target Parameters](#navigation-target-parameters). |
+
+In production mode, the `ID` stored is the one returned by ANS. In local mode, a UUID is generated locally. The `recipient` field holds the email address or UUID of the recipient. Since a single notification can be sent to multiple recipients, one row is created per recipient.
+
+> **Note:** The stored notification entities include `@PersonalData` annotations. This allows the `cap-js/data-privacy` and `cds-feature-data-privacy` modules to automatically handle personal data erasure requests. When a user requests deletion of their data, all notification records for that recipient are removed.
 
 ### Batch Notifications
 

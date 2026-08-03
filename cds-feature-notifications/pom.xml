@@ -172,7 +172,7 @@
             <phase>generate-sources</phase>
             <configuration>
               <commands>
-                <command>compile ${project.basedir}/srv/external/*.cds --to csn --dest ${project.build.directory}/cds-output/all.csn</command>
+                <command>compile ${project.basedir}/srv/external/*.cds ${project.basedir}/src/main/resources/cds/com.sap.cds/cds-feature-notifications/NotificationStorage.cds --to csn --dest ${project.build.directory}/cds-output/all.csn</command>
               </commands>
             </configuration>
           </execution>

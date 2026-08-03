@@ -12,6 +12,7 @@ This sample demonstrates how to use the `cds-feature-notifications` plugin in a 
 - HTML email templates
 - Delivery channel control (Mail only, Web only, Mail + Web)
 - Semantic object navigation (deep link from notification to app)
+- Navigation target parameters via `key`-annotated event fields
 - Customizable notification templates
 - `where` conditions to filter when notifications are sent
 
@@ -62,6 +63,7 @@ When a user submits an order via the `submitOrder` action, the Java handler manu
 - HTML email template (`email-templates/book-ordered.html`)
 - Mail + Web delivery channels
 - `@Common.SemanticObject` for deep link navigation
+- Navigation target parameters: `key bookId` field is sent as `TargetParameters` to ANS
 - `customizable: true` to allow end-user configuration
 - Static priority `#HIGH`
 - Single string recipient (`recipients: String`)
@@ -89,6 +91,7 @@ When a user submits an order via the `submitOrder` action, the Java handler manu
 }
 event BookOrdered {
   recipients : String;  // single email or UUID
+  key bookId : UUID;    // sent as TargetParameters — navigates to specific book
   bookTitle  : String;
   quantity   : Integer;
   buyer      : String;
@@ -98,6 +101,7 @@ event BookOrdered {
 ```java
 BookOrdered notification = BookOrdered.create();
 notification.setRecipients(context.getUserInfo().getName());
+notification.setBookId(book.getId());
 notification.setBookTitle(book.getTitle());
 notification.setQuantity(context.getQuantity());
 notification.setBuyer(context.getUserInfo().getName());
