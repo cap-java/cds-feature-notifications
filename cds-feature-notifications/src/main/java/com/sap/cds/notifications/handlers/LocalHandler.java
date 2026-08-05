@@ -47,6 +47,8 @@ public class LocalHandler implements EventHandler {
       return;
     }
 
+    List<Notifications> sentNotifications = new ArrayList<>();
+
     for (int i = 0; i < results.size(); i++) {
       NotificationAssembler.NotificationBuildResult result = results.get(i);
       Notifications notification = result.notification();
@@ -61,6 +63,11 @@ public class LocalHandler implements EventHandler {
             result.eventName());
         continue;
       }
+
+      if (notification.getId() == null) {
+        notification.setId(UUID.randomUUID().toString());
+      }
+      sentNotifications.add(notification);
 
       Map<String, String> props =
           notification.getProperties().stream()
@@ -132,15 +139,6 @@ public class LocalHandler implements EventHandler {
         props.forEach((key, value) -> logger.info("│    - {} = {}", key, value));
       }
       logger.info("└──────────────────────────────────────────────────────────────┘");
-    }
-
-    List<Notifications> sentNotifications = new ArrayList<>();
-    for (NotificationAssembler.NotificationBuildResult result : results) {
-      Notifications notification = result.notification();
-      if (notification.getId() == null) {
-        notification.setId(UUID.randomUUID().toString());
-      }
-      sentNotifications.add(notification);
     }
     context.put(SENT_NOTIFICATIONS_KEY, sentNotifications);
 
