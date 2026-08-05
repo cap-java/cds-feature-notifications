@@ -67,7 +67,7 @@ public class CooldownChecker {
         notification.getRecipients().stream()
             .filter(
                 r -> {
-                  String recipientId = resolveRecipientId(r);
+                  String recipientId = NotificationStorageHelper.resolveRecipientId(r);
                   boolean inCooldown =
                       isInCooldown(typeKey, recipientId, cutoff, currentTargetParams);
                   if (inCooldown) {
@@ -140,12 +140,5 @@ public class CooldownChecker {
             Collectors.toMap(
                 NotificationTargetParameters::getParamKey,
                 p -> p.getParamValue() != null ? p.getParamValue() : ""));
-  }
-
-  private String resolveRecipientId(Recipients recipient) {
-    if (recipient.getGlobalUserId() != null && !recipient.getGlobalUserId().isBlank()) {
-      return recipient.getGlobalUserId();
-    }
-    return recipient.getRecipientId();
   }
 }
