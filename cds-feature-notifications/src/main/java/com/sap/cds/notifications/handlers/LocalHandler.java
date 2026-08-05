@@ -6,6 +6,7 @@ package com.sap.cds.notifications.handlers;
 import cds.gen.notificationproviderservice.NotificationProperties;
 import cds.gen.notificationproviderservice.Notifications;
 import com.sap.cds.notifications.assemblers.NotificationAssembler;
+import com.sap.cds.notifications.helpers.CooldownChecker;
 import com.sap.cds.notifications.helpers.I18nHelper;
 import com.sap.cds.reflect.CdsEvent;
 import com.sap.cds.services.EventContext;
@@ -30,10 +31,12 @@ public class LocalHandler implements EventHandler {
   static final String SENT_NOTIFICATIONS_KEY = "com.sap.cds.notifications.stored";
   private final NotificationAssembler notificationBuilder;
   private final I18nHelper i18nHelper;
+  private final CooldownChecker cooldownChecker;
 
-  public LocalHandler(CdsRuntime runtime) {
+  public LocalHandler(CdsRuntime runtime, CooldownChecker cooldownChecker) {
     this.notificationBuilder = new NotificationAssembler(runtime);
     this.i18nHelper = new I18nHelper(runtime);
+    this.cooldownChecker = cooldownChecker;
   }
 
   @On(event = "*")
@@ -48,6 +51,16 @@ public class LocalHandler implements EventHandler {
       NotificationAssembler.NotificationBuildResult result = results.get(i);
       Notifications notification = result.notification();
       CdsEvent event = result.event();
+
+      notification = cooldownChecker.filterCooldownRecipients(event, notification);
+      if (notification == null) {
+        logger.debug(
+            "Skipping notification {}/{} for event '{}' - all recipients in cooldown",
+            i + 1,
+            results.size(),
+            result.eventName());
+        continue;
+      }
 
       Map<String, String> props =
           notification.getProperties().stream()
