@@ -98,8 +98,7 @@ class CooldownCheckerTest {
     void returnsNotificationUnchangedWhenNoStoredNotificationsExist() {
       CdsEvent event = mockEventWithCooldown(20);
 
-      Notifications notification =
-          buildNotification("user@example.com", "BookOrdered", List.of());
+      Notifications notification = buildNotification("user@example.com", "BookOrdered", List.of());
 
       Result mockResult = mock(Result.class);
       when(mockResult.listOf(cds.gen.sap.cds.notifications.Notifications.class))
@@ -116,8 +115,7 @@ class CooldownCheckerTest {
     void returnsNullWhenAllRecipientsInCooldownWithNoTargetParams() {
       CdsEvent event = mockEventWithCooldown(20);
 
-      Notifications notification =
-          buildNotification("user@example.com", "BookOrdered", List.of());
+      Notifications notification = buildNotification("user@example.com", "BookOrdered", List.of());
 
       cds.gen.sap.cds.notifications.Notifications stored =
           cds.gen.sap.cds.notifications.Notifications.create();
