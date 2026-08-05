@@ -55,6 +55,7 @@ service NotificationService {
    * The plugin auto-detects whether each value is an email or a UUID.
    */
   @notification: {
+    cooldown: 3,  // Minimum 3 days between same alerts for the same recipient and book
     template: {
       title         : 'Low stock alert for "{{bookTitle}}"',
       publicTitle   : 'Low stock alert',
@@ -68,6 +69,7 @@ service NotificationService {
   }
   event LowStockAlert {
     recipients : array of String;  // Case 2: multiple recipients (emails or UUIDs)
+    key bookId : UUID;
     bookTitle  : String;
     stock      : Integer;
   }

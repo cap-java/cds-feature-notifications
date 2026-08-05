@@ -40,6 +40,7 @@ In **local mode**, notifications are logged to the console with no ANS binding r
   - [Dynamic Priority](#dynamic-priority)
   - [Navigation Target Parameters](#navigation-target-parameters)
   - [Storing Notifications to DB](#storing-notifications-to-db)
+  - [Cooldown Mechanism](#cooldown-mechanism)
   - [Batch Notifications](#batch-notifications)
   - [Identity Authentication Destination (Language Resolution)](#identity-authentication-destination-language-resolution)
     - [Step 1: Create a Technical User in Identity Authentication](#step-1-create-a-technical-user-in-identity-authentication)
@@ -152,6 +153,7 @@ The `template` section defines the visible content of the notification: titles, 
 | `@notification.template.email.html` | No | Inline HTML or classpath path to HTML template file. See [Step 3](#step-3-add-email-html-template-optional) for details. |
 | `@notification.deliveryChannels` | No | How the notification is delivered: Web and/or Email. If omitted, notifications are delivered via Web only (no email). Each entry has: `channel` (`#Mail` or `#Web`), `enabled` (Boolean), and `defaultPreference` (Boolean, whether the channel is enabled by default for users). Note: setting `#Mail` here is not enough on its own. The ANS instance must be configured with an email infrastructure (see [ANS Service Binding](#option-1-ans-service-binding)). |
 | `@notification.priority` | No | You can set a static notification priority: Priority enum (`#LOW`, `#NEUTRAL`, `#MEDIUM`, `#HIGH`). Can also be a CDS expression (see [Dynamic Priority](#dynamic-priority)). |
+| `@notification.cooldown` | No | Minimum number of days that must pass before sending a notification of the same type again to the same recipient with the same target parameters. Requires `cds.notifications.storeNotifications: true`. See [Cooldown Mechanism](#cooldown-mechanism). |
 | `@Common.SemanticObject` | No | Maps to `NavigationTargetObject` in ANS. Used for SAP Fiori launchpad navigation. Allows users to navigate directly to the relevant Fiori application when clicking the notification in SAP Build Work Zone. |
 | `@Common.SemanticObjectAction` | No | Maps to `NavigationTargetAction` in ANS. Specifies which action to trigger on the semantic object (e.g. `'display'`). |
 | `recipients` | **Yes** | Who receives the notification. Supports 4 formats (see [Recipient Formats](#recipient-formats)). |
@@ -690,7 +692,7 @@ Clicking the notification in SAP Build Work Zone then opens the specific `Books(
 
 ### Storing Notifications to DB
 
-By default, the plugin does not persist sent notifications. If your application needs to store sent notifications for further processing, for example to support a cooldown mechanism or keep a history of sent notifications, you can enable DB storage:
+By default, the plugin does not persist sent notifications. If your application needs to store sent notifications for further processing, for example to support a [cooldown mechanism](#cooldown-mechanism) or keep a history of sent notifications, you can enable DB storage:
 
 ```yaml
 cds:
@@ -709,6 +711,30 @@ When enabled, the plugin stores each sent notification to the database after it 
 In production mode, the `ID` stored is the one returned by ANS. In local mode, a UUID is generated locally. The `recipient` field holds the email address or UUID of the recipient. Since a single notification can be sent to multiple recipients, one row is created per recipient.
 
 > **Note:** The stored notification entities include `@PersonalData` annotations. This allows the `cap-js/data-privacy` and `cds-feature-data-privacy` modules to automatically handle personal data erasure requests. When a user requests deletion of their data, all notification records for that recipient are removed.
+
+### Cooldown Mechanism
+
+To prevent sending the same notification repeatedly, you can define a minimum number of days between notifications of the same type for the same recipient and target parameters:
+
+```cds
+@notification: {
+  cooldown: 20,  // Minimum 20 days between notifications of the same type for the same recipient and target parameters
+  template: { ... }
+}
+event ApproveCollaboration {
+  recipients        : String;
+  key collaborationId : UUID;
+  collaborationName : String;
+}
+```
+
+When `cooldown` is set and `storeNotifications: true` is enabled, the plugin checks the notification history before sending. If a notification of the same type was already sent to the same recipient with the same target parameters within the cooldown window, the notification is skipped.
+
+For example, with the `ApproveCollaboration` event above: `collaborationId` is marked with the `key` keyword, so it is used as a navigation target parameter. Before sending a new `ApproveCollaboration` notification, the plugin checks whether the same recipient was already notified about the same `collaborationId` within the last 20 days. If so, the new notification is skipped. However, if the same recipient receives a notification for a **different** `collaborationId`, it goes through because the target parameters differ.
+
+> **Note:** Cooldown requires `cds.notifications.storeNotifications: true`. Without DB storage, the plugin has no history to check and the `cooldown` annotation is ignored.
+
+> **Note:** If the event has no `key` fields, there are no target parameters. In this case, the cooldown check is based solely on the notification type and the recipient: if the same recipient already received any notification of this type within the cooldown window, the new notification is skipped.
 
 ### Batch Notifications
 
