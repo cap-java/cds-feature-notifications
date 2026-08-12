@@ -53,8 +53,18 @@ service NotificationService {
    * Example 2: Low stock alert with dynamic priority using contains() function.
    * Demonstrates array of recipients — multiple emails/UUIDs in a single notification.
    * The plugin auto-detects whether each value is an email or a UUID.
+   *
+   * With cooldown: 3:
+   * Once the stock drops below the threshold for low stock, the LowStockAlert notification is sent and recorded.
+   * When the book is ordered again (and the stock is lowered with this to an even lower number),
+   * the plugin finds a recent record for the same recipient + type + bookId and skips it.
+   * This repeats until 3 days have passed; only after the cooldown period will that notification type
+   * for that book be sent to that recipient again.
+   *
+   * Without cooldown: On every stock update that drops below the threshold for low stock, a LowStockAlert is sent.
    */
   @notification: {
+    cooldown: 3,  // Minimum 3 days between same notifications for the same recipient and book
     template: {
       title         : 'Low stock alert for "{{bookTitle}}"',
       publicTitle   : 'Low stock alert',
@@ -68,6 +78,7 @@ service NotificationService {
   }
   event LowStockAlert {
     recipients : array of String;  // Case 2: multiple recipients (emails or UUIDs)
+    key bookId : UUID;
     bookTitle  : String;
     stock      : Integer;
   }
