@@ -7,7 +7,9 @@ import cds.gen.notificationproviderservice.NotificationProviderService;
 import cds.gen.notificationproviderservice.Notifications;
 import cds.gen.notificationproviderservice.Notifications_;
 import com.sap.cds.notifications.assemblers.NotificationAssembler;
+import com.sap.cds.notifications.helpers.CooldownChecker;
 import com.sap.cds.ql.Insert;
+import com.sap.cds.reflect.CdsEvent;
 import com.sap.cds.services.EventContext;
 import com.sap.cds.services.cds.ApplicationService;
 import com.sap.cds.services.handler.EventHandler;
@@ -24,11 +26,15 @@ public class ProductionHandler implements EventHandler {
   private static final Logger logger = LoggerFactory.getLogger(ProductionHandler.class);
   private final NotificationProviderService notificationProviderService;
   private final NotificationAssembler notificationBuilder;
+  private final CooldownChecker cooldownChecker;
 
   public ProductionHandler(
-      NotificationProviderService notificationProviderService, CdsRuntime runtime) {
+      NotificationProviderService notificationProviderService,
+      CdsRuntime runtime,
+      CooldownChecker cooldownChecker) {
     this.notificationProviderService = notificationProviderService;
     this.notificationBuilder = new NotificationAssembler(runtime);
+    this.cooldownChecker = cooldownChecker;
   }
 
   @On(event = "*")
@@ -40,6 +46,7 @@ public class ProductionHandler implements EventHandler {
     }
 
     String eventName = results.get(0).eventName();
+    CdsEvent event = results.get(0).event();
     logger.debug("=== Processing {} notification(s) for event: {} ===", results.size(), eventName);
 
     int successCount = 0;
@@ -47,6 +54,18 @@ public class ProductionHandler implements EventHandler {
 
     for (int i = 0; i < results.size(); i++) {
       Notifications notification = results.get(i).notification();
+
+      notification = cooldownChecker.filterCooldownRecipients(event, notification);
+      if (notification == null) {
+        logger.debug(
+            "Skipping notification {}/{} for event '{}' - all recipients in cooldown",
+            i + 1,
+            results.size(),
+            eventName);
+        successCount++;
+        continue;
+      }
+
       try {
         notificationProviderService.run(Insert.into(Notifications_.CDS_NAME).entry(notification));
         successCount++;
