@@ -42,7 +42,7 @@ cds:
     production:
       enabled: false
   notifications:
-    storeNotifications: false
+    storeNotifications: true
 ---
 spring:
   config.activate.on-profile: test
