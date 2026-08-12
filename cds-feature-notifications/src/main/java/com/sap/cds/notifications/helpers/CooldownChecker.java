@@ -36,12 +36,15 @@ public class CooldownChecker {
    * in cooldown and the notification should be skipped entirely.
    */
   public Notifications filterCooldownRecipients(CdsEvent event, Notifications notification) {
-    if (persistenceService == null) {
+    var cooldownAnnotation = event.findAnnotation("notification.cooldown");
+    if (cooldownAnnotation.isEmpty()) {
       return notification;
     }
 
-    var cooldownAnnotation = event.findAnnotation("notification.cooldown");
-    if (cooldownAnnotation.isEmpty()) {
+    if (persistenceService == null) {
+      logger.warn(
+          "Cooldown is configured for event '{}' but storeNotifications is not enabled. Cooldown will be ignored.",
+          event.getName());
       return notification;
     }
 
