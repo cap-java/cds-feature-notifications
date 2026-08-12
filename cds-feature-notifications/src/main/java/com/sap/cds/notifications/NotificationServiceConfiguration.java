@@ -18,6 +18,7 @@ import com.sap.cds.notifications.handlers.NotificationTypeAutoProvisionerHandler
 import com.sap.cds.notifications.handlers.ProductionHandler;
 import com.sap.cds.notifications.handlers.StoreNotificationsHandler;
 import com.sap.cds.notifications.handlers.StoreNotificationsLocalHandler;
+import com.sap.cds.notifications.helpers.CooldownChecker;
 import com.sap.cds.notifications.helpers.NotificationStorageHelper;
 import com.sap.cds.services.environment.CdsProperties;
 import com.sap.cds.services.environment.CdsProperties.Remote.RemoteServiceConfig;
@@ -112,43 +113,15 @@ public class NotificationServiceConfiguration implements CdsRuntimeConfiguration
         environment.getProduction() != null
             && Boolean.TRUE.equals(environment.getProduction().isEnabled());
 
-    if (productionEnabled || ansBindingPresent) {
-      if (ansBindingPresent && !productionEnabled) {
-        logger.info("alert-notification binding detected - using ProductionHandler");
-      } else {
-        logger.info("Production mode enabled - using ProductionHandler");
-      }
-      configurer.eventHandler(new ProductionHandler(outboxedSvc, configurer.getCdsRuntime()));
-      // Register handler for auto-provisioning standalone templates on application prepared event
-      configurer.eventHandler(
-          new NotificationTemplateAutoProvisionerHandler(
-              configurer.getCdsRuntime(), templateProviderSvc));
-      // Register handler for auto-provisioning notification types on application prepared event
-      configurer.eventHandler(
-          new NotificationTypeAutoProvisionerHandler(configurer.getCdsRuntime(), typeProviderSvc));
-    } else {
-      logger.info("Local mode enabled - using LocalHandler (notifications will be logged only)");
-      configurer.eventHandler(new LocalHandler(configurer.getCdsRuntime()));
-      // Register local handler for auto-provisioning standalone templates (logging only)
-      configurer.eventHandler(
-          new LocalNotificationTemplateAutoProvisionerHandler(configurer.getCdsRuntime()));
-      // Register local handler for auto-provisioning notification types (logging only)
-      configurer.eventHandler(
-          new LocalNotificationTypeAutoProvisionerHandler(configurer.getCdsRuntime()));
-    }
-
-    // Entity-level @notifications handler, emits CDS events handled by
-    // ProductionHandler/LocalHandler
-    configurer.eventHandler(new EntityNotificationHandler());
-
     boolean storeNotifications =
         configurer
             .getCdsRuntime()
             .getEnvironment()
             .getProperty("cds.notifications.storeNotifications", Boolean.class, false);
 
+    PersistenceService db = null;
     if (storeNotifications) {
-      PersistenceService db =
+      db =
           configurer
               .getCdsRuntime()
               .getServiceCatalog()
@@ -161,6 +134,37 @@ public class NotificationServiceConfiguration implements CdsRuntimeConfiguration
       }
       logger.info("storeNotifications enabled - notifications will be stored to DB");
     }
+    CooldownChecker cooldownChecker = new CooldownChecker(db);
+
+    if (productionEnabled || ansBindingPresent) {
+      if (ansBindingPresent && !productionEnabled) {
+        logger.info("alert-notification binding detected - using ProductionHandler");
+      } else {
+        logger.info("Production mode enabled - using ProductionHandler");
+      }
+      configurer.eventHandler(
+          new ProductionHandler(outboxedSvc, configurer.getCdsRuntime(), cooldownChecker));
+      // Register handler for auto-provisioning standalone templates on application prepared event
+      configurer.eventHandler(
+          new NotificationTemplateAutoProvisionerHandler(
+              configurer.getCdsRuntime(), templateProviderSvc));
+      // Register handler for auto-provisioning notification types on application prepared event
+      configurer.eventHandler(
+          new NotificationTypeAutoProvisionerHandler(configurer.getCdsRuntime(), typeProviderSvc));
+    } else {
+      logger.info("Local mode enabled - using LocalHandler (notifications will be logged only)");
+      configurer.eventHandler(new LocalHandler(configurer.getCdsRuntime(), cooldownChecker));
+      // Register local handler for auto-provisioning standalone templates (logging only)
+      configurer.eventHandler(
+          new LocalNotificationTemplateAutoProvisionerHandler(configurer.getCdsRuntime()));
+      // Register local handler for auto-provisioning notification types (logging only)
+      configurer.eventHandler(
+          new LocalNotificationTypeAutoProvisionerHandler(configurer.getCdsRuntime()));
+    }
+
+    // Entity-level @notifications handler, emits CDS events handled by
+    // ProductionHandler/LocalHandler
+    configurer.eventHandler(new EntityNotificationHandler());
   }
 
   @Override

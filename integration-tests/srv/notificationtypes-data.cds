@@ -258,6 +258,23 @@ service NotificationService {
     version: String;
   }
 
+  // Cooldown test event — used by CooldownIntegrationTest only
+  @notification : {
+     cooldown: 2,
+     template: {
+        title : 'Reminder: {{message}}',
+        publicTitle : 'Reminder',
+        subtitle : 'Please take action',
+        groupedTitle : 'Reminders',
+     },
+     priority : 'MEDIUM',
+  }
+  event ReminderNotification {
+    recipients: array of String;
+    key reminderId: String;
+    message: String;
+  }
+
   // Future notification events here
 }
 

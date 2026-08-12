@@ -41,7 +41,8 @@ public class NotificationTypeProvisioningTest {
           "ContractDeadline",
           "SecurityAlert",
           "ServerIncident",
-          "DeploymentNotification");
+          "DeploymentNotification",
+          "ReminderNotification");
 
   private NotificationTypeAutoProvisionerHandler createProvisioner() {
     return new NotificationTypeAutoProvisionerHandler(cdsRuntime, notificationTypeProviderService);

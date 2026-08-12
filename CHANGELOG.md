@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ### Added
 - Navigation target parameters support: event fields annotated with the `key` keyword are sent as `TargetParameters` to ANS, enabling notifications to navigate directly to a specific record in the target application
 - Optional DB storage for sent notifications via `cds.notifications.storeNotifications: true`. When enabled, each notification is stored to the database after being sent, including properties and navigation target parameters.
+- Optional cooldown mechanism: add `cooldown: <days>` to the `@notification` annotation to prevent the same notification from being sent to the same recipient with the same target parameters within the specified number of days. Requires `cds.notifications.storeNotifications: true`.
 
 ### Fixed
 - Fall back to `Locale.ROOT` (`i18n.properties`) when no explicit `i18n_en.properties` exists, so applications following the CAP default i18n convention no longer fail at startup with unresolved English placeholders

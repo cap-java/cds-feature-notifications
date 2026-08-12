@@ -99,7 +99,7 @@ public class NotificationStorageHelper {
     return params;
   }
 
-  private String resolveRecipientId(Recipients recipient) {
+  static String resolveRecipientId(Recipients recipient) {
     if (recipient.getGlobalUserId() != null && !recipient.getGlobalUserId().isBlank()) {
       return recipient.getGlobalUserId();
     }
