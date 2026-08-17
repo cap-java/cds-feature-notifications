@@ -43,13 +43,13 @@
     <dependency>
       <groupId>com.sap.cloud.sdk.cloudplatform</groupId>
       <artifactId>connectivity-destination-service</artifactId>
-      <version>5.32.0</version>
+      <version>5.33.0</version>
     </dependency>
 
     <dependency>
       <groupId>com.sap.cloud.sdk.cloudplatform</groupId>
       <artifactId>cloudplatform-connectivity</artifactId>
-      <version>5.32.0</version>
+      <version>5.33.0</version>
     </dependency>
 
     <!-- TESTS -->
