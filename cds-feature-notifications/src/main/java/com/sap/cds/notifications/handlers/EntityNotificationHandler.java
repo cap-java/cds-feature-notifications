@@ -3,9 +3,12 @@
  */
 package com.sap.cds.notifications.handlers;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sap.cds.CdsData;
 import com.sap.cds.Result;
 import com.sap.cds.Struct;
+import com.sap.cds.impl.parser.ExpressionParser;
 import com.sap.cds.notifications.assemblers.NotificationAssembler;
 import com.sap.cds.ql.CQL;
 import com.sap.cds.ql.cqn.CqnContainmentTest;
@@ -78,6 +81,7 @@ import org.slf4j.LoggerFactory;
 public class EntityNotificationHandler implements EventHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(EntityNotificationHandler.class);
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   @After(event = "*")
   public void onEntityChange(EventContext context) {
@@ -364,8 +368,22 @@ public class EntityNotificationHandler implements EventHandler {
   private boolean evaluateWhereCondition(
       Object whereCondition, Map<String, Object> entityData, EventContext context) {
 
-    // Complex CDS expression: CqnValue (e.g., $self.stock > 50)
-    if (!(whereCondition instanceof CqnValue cqnValue)) {
+    // CDS annotation expressions come back from the reflection API as a raw Map (CSN xpr format).
+    // In some SDK versions they may already be typed as CqnValue — accept both.
+    CqnValue cqnValue;
+    if (whereCondition instanceof CqnValue v) {
+      cqnValue = v;
+    } else if (whereCondition instanceof Map<?, ?>) {
+      try {
+        JsonNode jsonNode = OBJECT_MAPPER.valueToTree(whereCondition);
+        cqnValue = ExpressionParser.parsePredicate(jsonNode);
+      } catch (Exception e) {
+        throw new IllegalArgumentException(
+            "Where condition must be a boolean expression (e.g., '($self.stock > 50)'), got: "
+                + whereCondition.getClass().getName(),
+            e);
+      }
+    } else {
       throw new IllegalArgumentException(
           "Where condition must be a boolean expression (e.g., '($self.stock > 50)'), got: "
               + whereCondition.getClass().getName());
