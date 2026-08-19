@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [Unreleased]
+
 ### Added
 
 ### Fixed
@@ -14,7 +16,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Removed
 
-## [Unreleased]
+## Version 0.0.2-alpha - 2026-08-19
 
 ### Added
 - Navigation target parameters support: event fields annotated with the `key` keyword are sent as `TargetParameters` to ANS, enabling notifications to navigate directly to a specific record in the target application
