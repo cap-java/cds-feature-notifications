@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6
 
       - name: Scan With Black Duck
-        uses: cap-java/.github/actions/scan-with-blackduck@b0271722321563f7d0593a0004dce2880349ee4e #main
+        uses: cap-java/.github/actions/scan-with-blackduck@b5eb1ad6341e9fd1d681c42f3b36c4b750a7dac2 #main
         with:
           blackduck_token: ${{ secrets.BLACK_DUCK_TOKEN }}
           maven-version: ${{ env.MAVEN_VERSION }}
@@ -42,7 +42,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6
 
       - name: Scan With CodeQL
-        uses: cap-java/.github/actions/scan-with-codeql@b0271722321563f7d0593a0004dce2880349ee4e #main
+        uses: cap-java/.github/actions/scan-with-codeql@b5eb1ad6341e9fd1d681c42f3b36c4b750a7dac2 #main
         with:
           maven-version: ${{ env.MAVEN_VERSION }}
           java-version: '21'
