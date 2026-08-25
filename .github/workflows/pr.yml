@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6
 
       - name: Scan With Black Duck
-        uses: cap-java/.github/actions/scan-with-blackduck@296573b55e906f5c77a1855bcfe4285cbbc5cac4 #main
+        uses: cap-java/.github/actions/scan-with-blackduck@1040e19f5ca25c2942f2fa56632f430e9a2549be #main
         with:
           blackduck_token: ${{ secrets.BLACK_DUCK_TOKEN }}
           maven-version: ${{ env.MAVEN_VERSION }}
