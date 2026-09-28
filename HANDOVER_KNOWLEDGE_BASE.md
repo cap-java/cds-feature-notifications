@@ -347,6 +347,8 @@ There are two ways to connect the plugin to an ANS instance:
 
 **Notification template provisioning (DELETE + recreate):** Fetch all existing templates → for each template in the CDS model: **DELETE + re-create** if it already exists, INSERT if not. This differs from types — CDS `Update` translates to PATCH at the OData level, but the ANS `NotificationTemplate.svc` endpoint requires PUT for updates (not PATCH). Since CAP's OData v2 client maps `Update` to PATCH rather than PUT, a proper update is not possible through the standard CDS API. The workaround is to delete the existing template and create it fresh. The template payload includes `PropertiesSchema` (auto-generated JSON Schema from event elements), `Tags` (source service name + event name for admin UI filtering), and `Visibility` (`PUBLIC` if `@notification.customizable: true`, otherwise `PRIVATE`).
 
+**Downside of DELETE + recreate:** Deleting a template in ANS also removes associated user settings for that template. This means user settings are reset on every deployment. For production use cases this is not an ideal update strategy — it was chosen only because ANS requires PUT for template updates but CAP's OData v2 client only supports PATCH. If CAP ever supports PUT for OData v2 remote services, the DELETE + recreate approach should be revisited.
+
 **`PUBLIC` visibility is irreversible:** Once a template is made `PUBLIC` in ANS, it cannot be reverted to `PRIVATE`. This is an ANS constraint enforced server-side.
 
 **Future direction — Content Deployment (GACD):**
