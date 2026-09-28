@@ -513,9 +513,9 @@ The central payload builder. Shared between `ProductionHandler` and `LocalHandle
 4. Resolves priority (static enum, static string, or dynamic `CqnValue` expression via DB).
 5. Auto-detects recipient format and maps to the correct ANS field:
    - Value contains `@` → treated as **email address** → mapped to `RecipientId`
-   - Value looks like a UUID → treated as **SAP Identity Directory user ID** → mapped to `GlobalUserId`
+   - Value looks like a UUID → treated as **IAS Global User ID** → mapped to `GlobalUserId`. Note: I/P/S user numbers are not valid here — only the UUID assigned by IAS works.
    
-   ANS uses `GlobalUserId` for in-app notifications to SAP BTP users and `RecipientId` for email delivery. The plugin handles the distinction automatically so the consuming app only needs to pass the raw value.
+   The plugin handles the distinction automatically so the consuming app only needs to pass the raw value.
 
    **Multiple recipients:** The CDS event element can be declared as `array of String` to send the same notification to multiple recipients in one emit call:
 
