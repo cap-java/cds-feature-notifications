@@ -415,6 +415,27 @@ event LowStockAlert {
 
 ---
 
+### ADR-9: Standalone Templates Over Embedded Templates
+
+**Decision:** The plugin provisions notification templates as **standalone templates** via the `NotificationTemplate.svc` API — not as embedded templates inside the `NotificationType` payload.
+
+**Background:** ANS supports two ways to define notification content:
+1. **Embedded templates** — template content is included directly inside the `NotificationType` payload (nested under the type object).
+2. **Standalone templates** — template content is provisioned separately via the `NotificationTemplate.svc` endpoint, linked to the type by a shared key.
+
+ANS does not allow both `Templates` and `Translations` on a `NotificationType` at the same time — it is one or the other, but at least one must be present. The plugin sets `Translations` on the type for admin UI display labels (`DisplayName`, `GroupTitle`) and provisions the actual notification content (title, body, email body) separately via the `NotificationTemplate.svc` standalone template endpoint.
+
+**Why standalone:**
+- Standalone templates are more powerful and flexible (confirmed with ANS team).
+- For the consuming app, this distinction is invisible — the plugin handles both the type and the template behind the scenes using the same CDS annotations.
+
+**Template visibility — `PRIVATE` by default:**
+Templates are provisioned as `PRIVATE` unless `@notification.customizable: true` is set on the event, in which case they are provisioned as `PUBLIC`. This default was chosen because template customization (via the ANS admin UI) should be a deliberate decision by the developer — not something that happens automatically for every notification type.
+
+**`PUBLIC` visibility is irreversible:** Once a template is made `PUBLIC` in ANS, it cannot be reverted to `PRIVATE` through the API. Changing back requires re-provisioning (the plugin deletes and recreates the template on every startup, so changing the annotation back to no `@notification.customizable` and redeploying will recreate it as `PRIVATE`).
+
+---
+
 ## 5. Known Constraints and Non-Obvious Rules
 
 ### Event names must be globally unique
@@ -604,7 +625,7 @@ event LowStockAlert { ... }
 
 ### `NotificationTemplateAssembler`
 
-**ANS API dependency:** Builds the standalone `NotificationTemplate` payload for the ANS `NotificationTemplate.svc` OData v2 API (note: different URL suffix `/odatav2` vs `/v2` for the other two services). The annotation→field mapping is documented in the class-level Javadoc and mirrors the [ANS Notification Templates API](https://help.sap.com/docs/alert-notification/sap-alert-notification-for-sap-btp/manage-notification-templates). Key mappings: `Translation.Title` ← `@notification.template.title`, `Translation.Body` ← `@notification.template.subtitle`, `Translation.Preview` ← `@notification.template.publicTitle`, `PropertiesSchema` is auto-generated as JSON Schema from the event elements, `Tags` carry `source` (owning service name) and `event` (event name) for filtering in the ANS admin UI.
+**ANS API dependency:** Builds the standalone `NotificationTemplate` payload for the ANS `NotificationTemplate.svc` OData v2 API (note: different URL suffix `/odatav2` vs `/v2` for the other two services). Key mappings: `Translation.Title` ← `@notification.template.title`, `Translation.Body` ← `@notification.template.subtitle`, `Translation.Preview` ← `@notification.template.publicTitle`, `PropertiesSchema` is auto-generated as a JSON Schema object from the event's non-key, non-recipient elements — each field becomes a typed property (CDS type mapped to JSON Schema type), `Tags` are key-value metadata attached to the template: two tags are set — `source` (the owning service name, e.g. `NotificationService`) and `event` (the event simple name, e.g. `LowStockAlert`) — so templates can be filtered and grouped by service or event in the ANS admin UI.
 
 If ANS changes its template API — for example adds new translation fields, changes the `PropertiesSchema` format, or modifies how `Tags` work — `NotificationTemplateAssembler.createTranslation()`, `buildPropertiesSchema()`, and `buildTags()` are the methods to update.
 
@@ -624,9 +645,9 @@ If ANS changes its template API — for example adds new translation fields, cha
 
 The detection is simple: if the resolved value ends with `.html`, it is treated as a classpath path; otherwise it is used as-is. The file must be placed under `src/main/resources/` in the consuming app's `srv` module (e.g. `src/main/resources/email-templates/book-ordered.html`) — Spring Boot puts everything under `src/main/resources/` on the classpath automatically, so no extra configuration is needed.
 
-Both `{i18n>KEY}` and `{{mustache}}` placeholders can appear in the HTML file (see the two-phase resolution note in the `I18nHelper` section above).
+Both `{i18n>KEY}` and `{{mustache}}` placeholders can appear in the HTML file (see the two-phase resolution note in the [`I18nHelper` section](#i18nhelper)).
 
-> **General rule:** Whenever ANS releases API changes, cross-check all three assemblers against the updated ANS documentation links above. The CDS remote service models (`.cds` files under `src/main/resources/cds/`) may also need updating if the OData entity shapes change.
+> **General rule:** Whenever ANS releases API changes, cross-check all three assemblers against the updated ANS documentation. The CDS remote service models (`.cds` files under `src/main/resources/cds/`) may also need updating if the OData entity shapes change — see [Section 9](#9-adding-a-new-ans-remote-service-endpoint-to-the-plugin) for how to add a new remote service endpoint.
 
 ### `I18nHelper`
 
