@@ -720,9 +720,9 @@ For each recipient the following fields are stored:
 
 In addition, two composition child tables are populated from the same request:
 
-**`sap.cds.notifications.NotificationProperties`** — one row per non-key, non-recipient event field (the Mustache template placeholders). For example `bookTitle = "Wuthering Heights"`, `stock = "12"`. These correspond to the `Properties` list in the ANS payload.
+**`sap.cds.notifications.NotificationProperties`** — one row per non-key, non-recipient event field (the Mustache template placeholders — see [ADR-8](#adr-8-cds-event-key-elements-as-ans-target-parameters) for the key/non-key distinction). For example `bookTitle = "Wuthering Heights"`, `stock = "12"`. These correspond to the `Properties` list in the ANS payload.
 
-**`sap.cds.notifications.NotificationTargetParameters`** — one row per `key`-annotated event field (used for deep-link navigation). For example `bookId = "abc-123"`. These correspond to `TargetParameters` in the ANS payload.
+**`sap.cds.notifications.NotificationTargetParameters`** — one row per `key`-annotated event field (used for deep-link navigation). For example `bookId = "abc-123"`. These correspond to `TargetParameters` in the ANS payload (see [ADR-8](#adr-8-cds-event-key-elements-as-ans-target-parameters) for why only `key` fields become target parameters).
 
 **`resolveRecipientId` (static):** Extracts the plain string identifier from a `Recipients` object — prefers `GlobalUserId` (UUID) if set, falls back to `RecipientId` (email). This is the value stored in the `recipient` column and is also what `CooldownChecker` queries against, ensuring the stored and queried values always match.
 
