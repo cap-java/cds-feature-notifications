@@ -411,7 +411,7 @@ event LowStockAlert {
 
 **Why the developer controls this explicitly:** Not every event field should be a navigation key. For example, `stock` is a display value, not a record identifier. Letting the developer mark `key` fields gives full control over which fields drive navigation targets and cooldown scoping. Automatically treating all fields (or all entity key fields) as target parameters would make cooldown too coarse or generate unnecessary ANS payload.
 
-**For the `@notifications` declarative path:** Entity key fields do NOT automatically become target parameters in the emitted event — you must explicitly mark the corresponding element as `key` in the CDS event definition. Also, if `parameters` is omitted in the `@notifications` annotation, all entity fields are passed through automatically — useful for quick prototyping but can expose unwanted fields (including personal data). For entities with `@PersonalData` annotations, always declare `parameters` explicitly.
+**For the `@notifications` declarative path:** Entity key fields do NOT automatically become target parameters in the emitted event — you must explicitly mark the corresponding element as `key` in the CDS event definition. Also, if `parameters` is omitted in the `@notifications` annotation, all entity fields are passed through as properties automatically — useful for quick prototyping but can expose unwanted fields (including personal data). For entities with `@PersonalData` annotations, always declare `parameters` explicitly to control which fields are included.
 
 ---
 
@@ -542,7 +542,7 @@ Runs `@After` every entity operation. Does nothing if the entity has no `@notifi
 - Reads result rows from `context.get("result")` — handles both `Result` (CRUD) and `Map` (bound actions).
 - Evaluates optional `where` conditions per row via `$DUMMY SELECT`.
 - Resolves `$self.fieldName` expressions for recipients and parameters.
-- Collects matching rows into a `List<CdsData>` and emits a single batch event on the notification event's owning service.
+- Collects rows that pass the `where` condition into a `List<CdsData>` and emits a single batch event on the notification event's owning service.
 
 **Why `@After` and not `@On` or `@Before`:** The notification must be sent only after the entity operation has completed successfully. `@After` guarantees two things: (1) the result rows are available (fields like `createdBy`/`modifiedBy` are only populated after the write), and (2) the operation has not been rolled back — if the CRUD fails, `@After` is not called, so no notification is sent for a failed write. Using `@On` would mean intercepting the actual CRUD execution, not reacting to it.
 
@@ -554,7 +554,7 @@ Runs `@After` every entity operation. Does nothing if the entity has no `@notifi
 | Static string | `'admin@example.com'` | Passed through as-is |
 | Array | `[$self.createdBy, $self.modifiedBy]` | Each entry resolved separately; nulls are dropped |
 
-**`$user` is not supported.** Only `$self.fieldName` and static strings are resolved. `$user` (the CAP session variable for the current user) is not available here because the handler operates on entity result rows, not on the request context's user object.
+**`$user` is not supported** as a recipient expression. Only `$self.fieldName` and static strings are resolved. Support for `$user` was not implemented — see [ADR-2](#adr-2-dynamic-cds-expressions-via-dummy-select) for the full list of resolved session variables.
 
 **Why `$self.createdBy` works:** CAP's managed aspect automatically populates `createdBy` and `modifiedBy` on every entity that uses `managed` (or extends `cuid, managed`). After a CREATE or UPDATE, these fields are present in the result row, so `$self.createdBy` reliably resolves to the user who triggered the operation.
 
@@ -564,7 +564,7 @@ The `@notifications` annotation value must be an **array** — even if there is 
 |---|---|---|---|
 | `type` | String | Yes | Name of the CDS event to emit |
 | `on` | Array of Strings | Yes | CRUD events or bound action names that trigger the notification (e.g. `['CREATE', 'UPDATE']`) |
-| `recipients` | Expression or Array | Yes | `$self.fieldName` expression(s) resolving to the recipient |
+| `recipients` | Expression, String, or Array | Yes | `$self.fieldName` expression, static string (e.g. `'admin@example.com'`), or array of either |
 | `where` | CQL Expression | No | Boolean condition — notification only fires if met |
 | `parameters` | Map | No | Explicit field mapping: `propertyName : $self.fieldName` |
 
@@ -589,7 +589,7 @@ entity Books ...
 
 For each entry, the handler resolves the `$self.fieldName` expression against the actual entity row and puts the result into the event `CdsData` under the given key (`bookTitle`, `author`, `stock`). These keys then flow through `NotificationAssembler` into the ANS notification's `Properties` list and can be referenced as `{{bookTitle}}`, `{{author}}`, `{{stock}}` in the Mustache template.
 
-**If `parameters` is omitted**, all entity fields are passed through as properties automatically — useful for quick prototyping but can expose unwanted fields (including personal data). For entities with `@PersonalData` annotations, always declare `parameters` explicitly to control which fields are included.
+**If `parameters` is omitted**, all entity fields are passed through as properties automatically — see [Section 5](#for-the-notifications-declarative-path) for the implications.
 
 ### `NotificationTypeAssembler`
 
