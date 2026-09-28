@@ -703,7 +703,7 @@ Here `EMAIL_SUBJECT` is resolved via `{i18n>EMAIL_SUBJECT}` at provisioning — 
 
 **What gets stored and where:**
 
-A single `store(notificationId, request, sentAt)` call writes one row per recipient. For a notification sent to three recipients, three rows are written to `sap.cds.notifications.Notifications`.
+A single `store(notificationId, request, sentAt)` call writes one row per recipient. For a notification sent to three recipients, three rows are written to `sap.cds.notifications.Notifications` (see [Section 8](#8-db-storage-and-cooldown) for where these tables come from).
 
 For each recipient the following fields are stored:
 
