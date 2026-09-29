@@ -105,7 +105,7 @@ ANS exposes three separate OData v2 services, all reachable through the same `SA
 | `NotificationTypeProviderService` | `NotificationType.svc` | `/v2` | Managing notification types |
 | `NotificationTemplateProviderService` | `NotificationTemplate.svc` | `/odatav2` | Managing standalone templates |
 
-> ⚠️ **Check before modifying:** The actual ANS API endpoints may have changed — the suffixes above reflect the code at handover time but should be verified against the [ANS Notification Provider API reference](https://int.hub.cloud.sap/api/notification_provider_api/resource/Notifications_API). If the API paths change, update `NotificationServiceConfiguration.environment()` (`setSuffix` calls) and re-verify all three services.
+> ⚠️ **Check before modifying:** The actual ANS API endpoints may have changed — the suffixes above reflect the code at handover time but should be verified against the ANS Notification Provider API reference. If the API paths change, update `NotificationServiceConfiguration.environment()` (`setSuffix` calls) and re-verify all three services.
 
 All three are registered programmatically in `NotificationServiceConfiguration.environment()` via `CdsProperties.Remote`. This is why the consuming app's `pom.xml` must exclude these service models from code generation — otherwise the CDS Maven plugin would generate Java stubs for them, conflicting with the plugin's own generated classes.
 
