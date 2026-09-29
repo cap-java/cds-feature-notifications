@@ -465,7 +465,7 @@ The workaround is to add explicit `<excludes>` to the `cds-maven-plugin` configu
 </excludes>
 ```
 
-**Why this is a CAP Java limitation:** Ideally, a plugin JAR should be able to declare its own CDS models as "already compiled — do not re-generate for consumers." CAP Java currently has no such mechanism. The plugin cannot protect consumers from this collision automatically; each consuming app must add the excludes manually. This is documented in the plugin's README. Tracked in [cap/issues#20533](https://github.tools.sap/cap/issues/issues/20533#issuecomment-25531075).
+**Why this is a CAP Java limitation:** Ideally, a plugin JAR should be able to declare its own CDS models as "already compiled — do not re-generate for consumers." CAP Java currently has no such mechanism. The plugin cannot protect consumers from this collision automatically; each consuming app must add the excludes manually.
 
 **If CAP Java adds native plugin model exclusion support in the future**, these `<excludes>` entries in consuming apps could become unnecessary. If you see that CAP introduces a `cds-maven-plugin` feature like `plugin-model-excludes` or similar, revisit whether the manual excludes can be dropped and update the README accordingly.
 
