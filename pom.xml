@@ -64,7 +64,7 @@
 
     <!-- Versions of CAP Java and cds-dk used for build and integrations tests -->
     <!-- https://central.sonatype.com/artifact/com.sap.cds/cds-services-api/versions -->
-    <cds.services.version>5.1.1</cds.services.version>
+    <cds.services.version>5.2.0</cds.services.version>
     <!-- https://www.npmjs.com/package/@sap/cds-dk?activeTab=versions -->
     <cds.cdsdk-version>10.0.4</cds.cdsdk-version>
 
@@ -84,7 +84,7 @@
       <dependency>
         <groupId>com.sap.cloud.sdk</groupId>
         <artifactId>sdk-bom</artifactId>
-        <version>5.34.0</version>
+        <version>5.35.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -100,7 +100,7 @@
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-bom</artifactId>
-        <version>5.23.0</version>
+        <version>5.24.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -108,14 +108,14 @@
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>1.6.3</version>
+        <version>1.6.6</version>
         <scope>runtime</scope>
       </dependency>
 
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-core</artifactId>
-        <version>1.6.3</version>
+        <version>1.6.6</version>
         <scope>runtime</scope>
       </dependency>
 
@@ -181,7 +181,7 @@
         <plugin>
           <groupId>org.sonatype.central</groupId>
           <artifactId>central-publishing-maven-plugin</artifactId>
-          <version>0.11.0</version>
+          <version>0.12.0</version>
           <extensions>true</extensions>
         </plugin>
         <plugin>
@@ -190,11 +190,11 @@
         </plugin>
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.6.0</version>
+          <version>3.6.1</version>
         </plugin>
         <plugin>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <version>3.6.0</version>
+          <version>3.6.1</version>
         </plugin>
         <plugin>
           <artifactId>maven-pmd-plugin</artifactId>
@@ -202,7 +202,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-enforcer-plugin</artifactId>
-          <version>3.6.3</version>
+          <version>3.7.0</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -212,7 +212,7 @@
         <plugin>
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
-          <version>0.8.15</version>
+          <version>0.8.16</version>
         </plugin>
         <plugin>
           <groupId>com.sap.cds</groupId>
@@ -261,7 +261,7 @@
               <rules>
                 <banDuplicatePomDependencyVersions/>
                 <requireMavenVersion>
-                  <version>3.6.3</version>
+                  <version>3.7.0</version>
                 </requireMavenVersion>
                 <requireJavaVersion>
                   <version>${java.version}</version>
@@ -275,7 +275,7 @@
       <plugin>
         <groupId>com.diffplug.spotless</groupId>
         <artifactId>spotless-maven-plugin</artifactId>
-        <version>3.10.2</version>
+        <version>3.10.4</version>
         <configuration>
           <java>
             <googleJavaFormat>
